@@ -1,0 +1,73 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cream: #ffffc5;
+  --color-cream-dim: #f5f0b3;
+  --color-rust: #b14305;
+  --color-rust-dark: #8a3304;
+  --color-ink: #18251a;
+  --color-ink-light: #233222;
+
+  --font-display: "Archivo Black", "Space Grotesk", sans-serif;
+  --font-body: "Space Grotesk", sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-body);
+    background-color: var(--color-cream);
+    color: var(--color-ink);
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  ::selection {
+    background-color: var(--color-rust);
+    color: var(--color-cream);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-rust);
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .pattern-zulu {
+    background-image: repeating-linear-gradient(
+      45deg,
+      currentColor 0px,
+      currentColor 2px,
+      transparent 2px,
+      transparent 16px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      currentColor 0px,
+      currentColor 2px,
+      transparent 2px,
+      transparent 16px
+    );
+    background-size: 32px 32px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
