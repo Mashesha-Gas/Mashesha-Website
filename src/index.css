@@ -7,6 +7,7 @@
   --color-rust-dark: #8a3304;
   --color-ink: #18251a;
   --color-ink-light: #233222;
+  --color-charcoal: #2d2d2d;
 
   --font-display: "Archivo Black", "Space Grotesk", sans-serif;
   --font-body: "Space Grotesk", sans-serif;
@@ -21,7 +22,7 @@
     margin: 0;
     font-family: var(--font-body);
     background-color: var(--color-cream);
-    color: var(--color-ink);
+    color: var(--color-charcoal);
     font-size: 16px;
     line-height: 1.6;
   }

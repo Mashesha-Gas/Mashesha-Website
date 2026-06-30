@@ -1,17 +1,47 @@
 import { useEffect, useState } from "react";
+import { Link, NavLink } from "react-router-dom";
 import FlameLogo from "./FlameLogo";
+import { useAuth } from "../context/AuthContext";
 
 const NAV_LINKS = [
-  { href: "#products", label: "Products" },
-  { href: "#how-it-works", label: "How It Works" },
-  { href: "#why-mashesha", label: "Why Mashesha" },
-  { href: "#service-area", label: "Service Area" },
-  { href: "#contact", label: "Contact" },
+  { to: "/", label: "Home" },
+  { to: "/products", label: "Our Cylinders" },
+  { to: "/about", label: "About Us" },
+  { to: "/locations", label: "Delivery Areas" },
+  { to: "/contact", label: "Contact Us" },
 ];
+
+function CartIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <path d="M16 10a4 4 0 01-8 0" />
+    </svg>
+  );
+}
+
+function ProfileIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+    </svg>
+  );
+}
+
+function UserAvatar({ name }) {
+  return (
+    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-charcoal text-xs font-semibold text-cream">
+      {name.charAt(0).toUpperCase()}
+    </span>
+  );
+}
 
 function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -26,90 +56,132 @@ function Header() {
     };
   }, [open]);
 
+  const profileLink = user ? "/profile" : "/login";
+  const profileLabel = user ? `Profile (${user.name})` : "Log in";
+
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
-        scrolled ? "bg-ink/95 backdrop-blur-sm shadow-lg" : "bg-ink"
+        scrolled ? "bg-rust/95 backdrop-blur-sm shadow-lg" : "bg-rust"
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3 sm:px-8">
-        <a
-          href="#top"
-          className="flex items-center gap-2 text-cream cursor-pointer"
+
+        {/* Logo */}
+        <Link
+          to="/"
+          className="flex items-center gap-2 text-charcoal"
           aria-label="Mashesha home"
         >
-          <FlameLogo className="h-9 w-6 text-cream [--logo-skyline:#18251a]" />
-          <span className="font-display text-xl tracking-wide">MASHESHA</span>
-        </a>
+          <FlameLogo className="h-9 w-6 text-charcoal [--logo-skyline:#b14305]" />
+          <span className="font-display text-xl tracking-wide">MASHESHA GAS</span>
+        </Link>
 
+        {/* Desktop nav */}
         <nav className="hidden items-center gap-8 lg:flex" aria-label="Primary">
           {NAV_LINKS.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="text-sm font-medium text-cream/85 transition-colors duration-200 hover:text-rust cursor-pointer"
+            <NavLink
+              key={link.to}
+              to={link.to}
+              end={link.to === "/"}
+              className={({ isActive }) =>
+                `text-sm font-medium transition-colors duration-200 ${
+                  isActive ? "text-charcoal font-bold" : "text-charcoal/75 hover:text-charcoal"
+                }`
+              }
             >
               {link.label}
-            </a>
+            </NavLink>
           ))}
         </nav>
 
-        <div className="hidden lg:block">
-          <a
-            href="#contact"
-            className="inline-flex items-center justify-center rounded-full bg-rust px-5 py-2.5 text-sm font-semibold text-cream transition-colors duration-200 hover:bg-rust-dark cursor-pointer"
+        {/* Right side: profile, cart, order button */}
+        <div className="hidden lg:flex items-center gap-3">
+          <Link
+            to={profileLink}
+            aria-label={profileLabel}
+            className="flex h-9 w-9 items-center justify-center rounded-full text-charcoal/75 transition-colors duration-200 hover:bg-charcoal/10 hover:text-charcoal"
+          >
+            {user ? <UserAvatar name={user.name} /> : <ProfileIcon />}
+          </Link>
+          <Link
+            to="/cart"
+            aria-label="My cart"
+            className="flex h-9 w-9 items-center justify-center rounded-full text-charcoal/75 transition-colors duration-200 hover:bg-charcoal/10 hover:text-charcoal"
+          >
+            <CartIcon />
+          </Link>
+          {/* Button flips to cream background so it stands out against the rust header */}
+          <Link
+            to="/contact"
+            className="ml-2 inline-flex items-center justify-center rounded-full bg-cream px-5 py-2.5 text-sm font-semibold text-rust transition-colors duration-200 hover:bg-cream-dim"
           >
             Order Gas
-          </a>
+          </Link>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          className="flex h-11 w-11 items-center justify-center rounded-full text-cream lg:hidden cursor-pointer"
-          aria-label={open ? "Close menu" : "Open menu"}
-          aria-expanded={open}
-        >
-          <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" aria-hidden="true">
-            {open ? (
-              <path
-                d="M6 6L18 18M18 6L6 18"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            ) : (
-              <path
-                d="M4 7H20M4 12H20M4 17H20"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            )}
-          </svg>
-        </button>
+        {/* Mobile: profile + cart icons + hamburger */}
+        <div className="flex items-center gap-1 lg:hidden">
+          <Link
+            to={profileLink}
+            aria-label={profileLabel}
+            className="flex h-10 w-10 items-center justify-center rounded-full text-charcoal/75 hover:text-charcoal"
+          >
+            {user ? <UserAvatar name={user.name} /> : <ProfileIcon />}
+          </Link>
+          <Link
+            to="/cart"
+            aria-label="My cart"
+            className="flex h-10 w-10 items-center justify-center rounded-full text-charcoal/75 hover:text-charcoal"
+          >
+            <CartIcon />
+          </Link>
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            className="flex h-10 w-10 items-center justify-center rounded-full text-charcoal cursor-pointer"
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+          >
+            <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" aria-hidden="true">
+              {open ? (
+                <path d="M6 6L18 18M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              ) : (
+                <path d="M4 7H20M4 12H20M4 17H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              )}
+            </svg>
+          </button>
+        </div>
       </div>
 
+      {/* Mobile menu */}
       {open && (
-        <div className="fixed inset-x-0 top-[60px] bottom-0 overflow-y-auto border-t border-cream/10 bg-ink px-5 pb-6 pt-2 lg:hidden">
+        <div className="fixed inset-x-0 top-[60px] bottom-0 overflow-y-auto border-t border-charcoal/20 bg-rust px-5 pb-6 pt-2 lg:hidden">
           <nav className="flex flex-col gap-1" aria-label="Mobile">
             {NAV_LINKS.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
+              <NavLink
+                key={link.to}
+                to={link.to}
+                end={link.to === "/"}
                 onClick={() => setOpen(false)}
-                className="rounded-lg px-3 py-3 text-base font-medium text-cream/90 transition-colors duration-200 hover:bg-cream/10 hover:text-rust cursor-pointer"
+                className={({ isActive }) =>
+                  `rounded-lg px-3 py-3 text-base font-medium transition-colors duration-200 ${
+                    isActive
+                      ? "bg-charcoal/10 text-charcoal font-bold"
+                      : "text-charcoal/80 hover:bg-charcoal/10 hover:text-charcoal"
+                  }`
+                }
               >
                 {link.label}
-              </a>
+              </NavLink>
             ))}
-            <a
-              href="#contact"
+            <Link
+              to="/contact"
               onClick={() => setOpen(false)}
-              className="mt-3 inline-flex items-center justify-center rounded-full bg-rust px-5 py-3 text-base font-semibold text-cream cursor-pointer"
+              className="mt-3 inline-flex items-center justify-center rounded-full bg-cream px-5 py-3 text-base font-semibold text-rust"
             >
               Order Gas
-            </a>
+            </Link>
           </nav>
         </div>
       )}

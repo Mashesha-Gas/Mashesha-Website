@@ -1,29 +1,30 @@
+import { Link } from "react-router-dom";
 import CylinderIcon from "./CylinderIcon";
 
 const CYLINDERS = [
   {
-    size: "9kg",
-    use: "Compact home use",
-    desc: "Perfect for small households, single-plate cooking, and braais.",
+    size: "1kg",
+    use: "Portable & camping",
+    desc: "Perfect for camping trips, outdoor braais, and single-burner stoves.",
+    height: "h-20",
+  },
+  {
+    size: "3kg",
+    use: "Small household & backup",
+    desc: "Ideal for singles, small apartments, and keeping a backup on hand.",
     height: "h-28",
   },
   {
-    size: "14kg",
-    use: "Everyday household",
+    size: "12kg",
+    use: "Everyday household cooking",
     desc: "Our most popular size — built for daily cooking and water heating.",
-    height: "h-36",
+    height: "h-40",
   },
   {
-    size: "19kg",
-    use: "Large family & catering",
-    desc: "Steady supply for bigger families, guest houses, and small eateries.",
-    height: "h-44",
-  },
-  {
-    size: "48kg",
-    use: "Business & bulk",
-    desc: "For restaurants, spaza shops, and businesses that can't run dry.",
-    height: "h-52",
+    size: "18kg",
+    use: "Large family & small business",
+    desc: "Steady supply for bigger families, guesthouses, and small eateries.",
+    height: "h-48",
   },
 ];
 
@@ -59,11 +60,11 @@ function Products() {
               <h3 className="font-display mt-6 text-3xl text-cream">{cyl.size}</h3>
               <p className="mt-1 text-sm font-semibold text-rust">{cyl.use}</p>
               <p className="mt-3 text-sm text-cream/65">{cyl.desc}</p>
-              <a
-                href="#contact"
-                className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-cream transition-colors duration-200 hover:text-rust cursor-pointer"
+              <Link
+                to={`/products/${cyl.size}`}
+                className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-cream transition-colors duration-200 hover:text-rust"
               >
-                Order this size
+                View details
                 <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" aria-hidden="true">
                   <path
                     d="M3 8H13M13 8L9 4M13 8L9 12"
@@ -73,7 +74,7 @@ function Products() {
                     strokeLinejoin="round"
                   />
                 </svg>
-              </a>
+              </Link>
             </div>
           ))}
         </div>
