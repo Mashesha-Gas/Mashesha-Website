@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import JohannesburgMap from "../components/JohannesburgMap";
 
 const AREAS = [
   "Soweto", "Sandton", "Randburg", "Roodepoort", "Midrand", "Alexandra",
@@ -21,6 +22,14 @@ export default function LocationsPage() {
           <p className="mt-5 text-lg text-charcoal/65">
             Mashesha covers most of Johannesburg and the surrounding areas.
             If your area isn't listed, contact us — we may still be able to help.
+          </p>
+        </div>
+
+        {/* Map */}
+        <div className="mb-12">
+          <JohannesburgMap />
+          <p className="mt-3 text-xs text-charcoal/40 text-center">
+            Mashesha Gas — Jeppestown, Johannesburg
           </p>
         </div>
 

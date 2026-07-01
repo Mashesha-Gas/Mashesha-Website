@@ -13,21 +13,21 @@ export default function CartPage() {
   const isEmpty = cartItems.length === 0;
 
   return (
-    <main className="bg-cream min-h-screen pt-24 pb-20">
+    <main className="bg-rust min-h-screen pt-24 pb-20">
       <div className="mx-auto max-w-4xl px-5 sm:px-8">
 
         {/* Page header */}
         <div className="py-12">
-          <span className="text-xs font-semibold uppercase tracking-widest text-rust">
+          <span className="text-xs font-semibold uppercase tracking-widest text-cream/70">
             Your order
           </span>
-          <h1 className="font-display mt-4 text-5xl text-charcoal sm:text-6xl">
+          <h1 className="font-display mt-4 text-5xl text-cream sm:text-6xl">
             Cart.
           </h1>
         </div>
 
         {isEmpty ? (
-          <div className="rounded-2xl border border-charcoal/10 bg-white p-16 text-center">
+          <div className="rounded-2xl bg-cream p-16 text-center">
             <p className="text-charcoal/50 text-lg">Your cart is empty.</p>
             <Link
               to="/products"
@@ -44,7 +44,7 @@ export default function CartPage() {
               {cartItems.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between rounded-2xl border border-charcoal/10 bg-white p-6"
+                  className="flex items-center justify-between rounded-2xl bg-cream p-6"
                 >
                   <div>
                     <p className="font-display text-2xl text-charcoal">{item.size}</p>
@@ -72,7 +72,7 @@ export default function CartPage() {
             </div>
 
             {/* Order summary */}
-            <div className="rounded-2xl border border-charcoal/10 bg-white p-7 h-fit">
+            <div className="rounded-2xl bg-cream p-7 h-fit">
               <h2 className="font-display text-xl text-charcoal">Order summary</h2>
 
               <div className="mt-6 space-y-3 text-sm">
@@ -93,7 +93,7 @@ export default function CartPage() {
               </div>
 
               <Link
-                to="/contact"
+                to="/checkout"
                 className="mt-8 w-full inline-flex items-center justify-center rounded-full bg-rust px-5 py-3 text-sm font-semibold text-cream transition-colors duration-200 hover:bg-rust-dark"
               >
                 Place order

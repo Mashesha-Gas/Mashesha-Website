@@ -8,6 +8,7 @@ import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import LocationsPage from "./pages/LocationsPage";
 import CartPage from "./pages/CartPage";
+import CheckoutPage from "./pages/CheckoutPage";
 import ProfilePage from "./pages/ProfilePage";
 import AuthPage from "./pages/AuthPage";
 import { useAuth } from "./context/AuthContext";
@@ -38,6 +39,7 @@ function App() {
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/locations" element={<LocationsPage />} />
         <Route path="/cart" element={<CartPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/login" element={<AuthPage />} />
         <Route
           path="/profile"

@@ -2,15 +2,27 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const orderHistory = [
+  { id: "ORD-004", date: "01 Jul 2026", items: "12kg × 1", total: "R 400", status: "Out for delivery" },
+  { id: "ORD-005", date: "01 Jul 2026", items: "3kg × 1", total: "R 170", status: "Processing" },
   { id: "ORD-001", date: "12 Jun 2026", items: "12kg × 1", total: "R 350", status: "Delivered" },
   { id: "ORD-002", date: "28 May 2026", items: "3kg × 2", total: "R 240", status: "Delivered" },
-  { id: "ORD-003", date: "10 May 2026", items: "18kg × 1", total: "R 520", status: "Delivered" },
+  { id: "ORD-003", date: "10 May 2026", items: "18kg × 1", total: "R 520", status: "Cancelled" },
 ];
 
+const ACTIVE_STATUSES = ["Processing", "Out for delivery"];
+
 const statusColour: Record<string, string> = {
-  Delivered: "text-green-600",
-  Processing: "text-rust",
-  Cancelled: "text-charcoal/40",
+  "Delivered": "text-green-600",
+  "Out for delivery": "text-rust",
+  "Processing": "text-rust",
+  "Cancelled": "text-charcoal/40",
+};
+
+const statusDot: Record<string, string> = {
+  "Delivered": "bg-green-500",
+  "Out for delivery": "bg-rust animate-pulse",
+  "Processing": "bg-rust animate-pulse",
+  "Cancelled": "bg-charcoal/25",
 };
 
 export default function ProfilePage() {
@@ -25,15 +37,15 @@ export default function ProfilePage() {
   if (!user) return null;
 
   return (
-    <main className="bg-cream min-h-screen pt-24 pb-20">
+    <main className="bg-rust min-h-screen pt-24 pb-20">
       <div className="mx-auto max-w-4xl px-5 sm:px-8">
 
         {/* Page header */}
         <div className="py-12">
-          <span className="text-xs font-semibold uppercase tracking-widest text-rust">
+          <span className="text-xs font-semibold uppercase tracking-widest text-cream/70">
             Account
           </span>
-          <h1 className="font-display mt-4 text-5xl text-charcoal sm:text-6xl">
+          <h1 className="font-display mt-4 text-5xl text-cream sm:text-6xl">
             My profile.
           </h1>
         </div>
@@ -47,12 +59,12 @@ export default function ProfilePage() {
                 {user.name.charAt(0).toUpperCase()}
               </div>
               <div>
-                <p className="font-semibold text-charcoal">{user.name}</p>
-                <p className="text-sm text-charcoal/50">Customer</p>
+                <p className="font-semibold text-cream">{user.name}</p>
+                <p className="text-sm text-cream/60">Customer</p>
               </div>
             </div>
 
-            <div className="rounded-2xl border border-charcoal/10 bg-white p-6 space-y-4">
+            <div className="rounded-2xl bg-cream p-6 space-y-4">
               <h2 className="font-display text-lg text-charcoal">Personal details</h2>
               <div>
                 <p className="text-xs font-semibold uppercase tracking-widest text-rust">Email</p>
@@ -71,7 +83,7 @@ export default function ProfilePage() {
               </button>
             </div>
 
-            <div className="rounded-2xl border border-charcoal/10 bg-white p-6 space-y-3">
+            <div className="rounded-2xl bg-cream p-6 space-y-3">
               <Link
                 to="/cart"
                 className="flex items-center justify-between text-sm text-charcoal/70 hover:text-rust transition-colors duration-200"
@@ -98,25 +110,60 @@ export default function ProfilePage() {
 
           {/* Order history */}
           <div className="lg:col-span-2">
-            <h2 className="font-display text-2xl text-charcoal mb-6">Order history</h2>
-            <div className="space-y-4">
-              {orderHistory.map((order) => (
-                <div
-                  key={order.id}
-                  className="flex items-center justify-between rounded-2xl border border-charcoal/10 bg-white px-6 py-5"
-                >
-                  <div>
-                    <p className="text-sm font-semibold text-charcoal">{order.id}</p>
-                    <p className="mt-0.5 text-xs text-charcoal/50">{order.date} · {order.items}</p>
+            <h2 className="font-display text-2xl text-cream mb-6">Order history</h2>
+
+            <div className="space-y-8">
+              {/* Active */}
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-widest text-cream/50 mb-3">Active</p>
+                {orderHistory.filter(o => ACTIVE_STATUSES.includes(o.status)).length === 0 ? (
+                  <div className="rounded-2xl bg-cream/20 px-6 py-4 text-sm text-cream/50">No active orders right now.</div>
+                ) : (
+                  <div className="space-y-3">
+                    {orderHistory.filter(o => ACTIVE_STATUSES.includes(o.status)).map((order) => (
+                      <div key={order.id} className="flex items-center justify-between rounded-2xl bg-cream px-6 py-5">
+                        <div className="flex items-center gap-3">
+                          <span className={`h-2.5 w-2.5 rounded-full flex-shrink-0 ${statusDot[order.status]}`} />
+                          <div>
+                            <p className="text-sm font-semibold text-charcoal">{order.id}</p>
+                            <p className="mt-0.5 text-xs text-charcoal/50">{order.date} · {order.items}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-semibold text-charcoal">{order.total}</p>
+                          <p className={`mt-0.5 text-xs font-medium ${statusColour[order.status] ?? "text-charcoal/50"}`}>{order.status}</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm font-semibold text-charcoal">{order.total}</p>
-                    <p className={`mt-0.5 text-xs font-medium ${statusColour[order.status] ?? "text-charcoal/50"}`}>
-                      {order.status}
-                    </p>
+                )}
+              </div>
+
+              {/* Past */}
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-widest text-cream/50 mb-3">Past</p>
+                {orderHistory.filter(o => !ACTIVE_STATUSES.includes(o.status)).length === 0 ? (
+                  <div className="rounded-2xl bg-cream/20 px-6 py-4 text-sm text-cream/50">No past orders yet.</div>
+                ) : (
+                  <div className="space-y-3">
+                    {orderHistory.filter(o => !ACTIVE_STATUSES.includes(o.status)).map((order) => (
+                      <div key={order.id} className="flex items-center justify-between rounded-2xl bg-cream px-6 py-5">
+                        <div className="flex items-center gap-3">
+                          <span className={`h-2.5 w-2.5 rounded-full flex-shrink-0 ${statusDot[order.status]}`} />
+                          <div>
+                            <p className="text-sm font-semibold text-charcoal">{order.id}</p>
+                            <p className="mt-0.5 text-xs text-charcoal/50">{order.date} · {order.items}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-semibold text-charcoal">{order.total}</p>
+                          <p className={`mt-0.5 text-xs font-medium ${statusColour[order.status] ?? "text-charcoal/50"}`}>{order.status}</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                </div>
-              ))}
+                )}
+              </div>
             </div>
           </div>
         </div>

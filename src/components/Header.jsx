@@ -32,7 +32,7 @@ function ProfileIcon() {
 
 function UserAvatar({ name }) {
   return (
-    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-charcoal text-xs font-semibold text-cream">
+    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-cream text-xs font-semibold text-rust">
       {name.charAt(0).toUpperCase()}
     </span>
   );
@@ -70,10 +70,10 @@ function Header() {
         {/* Logo */}
         <Link
           to="/"
-          className="flex items-center gap-2 text-charcoal"
+          className="flex items-center gap-2 text-cream"
           aria-label="Mashesha home"
         >
-          <FlameLogo className="h-9 w-6 text-charcoal [--logo-skyline:#b14305]" />
+          <FlameLogo className="h-9 w-6 text-cream [--logo-skyline:#b14305]" />
           <span className="font-display text-xl tracking-wide">MASHESHA GAS</span>
         </Link>
 
@@ -86,7 +86,7 @@ function Header() {
               end={link.to === "/"}
               className={({ isActive }) =>
                 `text-sm font-medium transition-colors duration-200 ${
-                  isActive ? "text-charcoal font-bold" : "text-charcoal/75 hover:text-charcoal"
+                  isActive ? "text-charcoal font-bold" : "text-cream/80 hover:text-cream"
                 }`
               }
             >
@@ -100,14 +100,14 @@ function Header() {
           <Link
             to={profileLink}
             aria-label={profileLabel}
-            className="flex h-9 w-9 items-center justify-center rounded-full text-charcoal/75 transition-colors duration-200 hover:bg-charcoal/10 hover:text-charcoal"
+            className="flex h-9 w-9 items-center justify-center rounded-full text-cream/80 transition-colors duration-200 hover:bg-cream/10 hover:text-cream"
           >
             {user ? <UserAvatar name={user.name} /> : <ProfileIcon />}
           </Link>
           <Link
             to="/cart"
             aria-label="My cart"
-            className="flex h-9 w-9 items-center justify-center rounded-full text-charcoal/75 transition-colors duration-200 hover:bg-charcoal/10 hover:text-charcoal"
+            className="flex h-9 w-9 items-center justify-center rounded-full text-cream/80 transition-colors duration-200 hover:bg-cream/10 hover:text-cream"
           >
             <CartIcon />
           </Link>
@@ -125,21 +125,21 @@ function Header() {
           <Link
             to={profileLink}
             aria-label={profileLabel}
-            className="flex h-10 w-10 items-center justify-center rounded-full text-charcoal/75 hover:text-charcoal"
+            className="flex h-10 w-10 items-center justify-center rounded-full text-cream/80 hover:text-cream"
           >
             {user ? <UserAvatar name={user.name} /> : <ProfileIcon />}
           </Link>
           <Link
             to="/cart"
             aria-label="My cart"
-            className="flex h-10 w-10 items-center justify-center rounded-full text-charcoal/75 hover:text-charcoal"
+            className="flex h-10 w-10 items-center justify-center rounded-full text-cream/80 hover:text-cream"
           >
             <CartIcon />
           </Link>
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
-            className="flex h-10 w-10 items-center justify-center rounded-full text-charcoal cursor-pointer"
+            className="flex h-10 w-10 items-center justify-center rounded-full text-cream cursor-pointer"
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
           >
