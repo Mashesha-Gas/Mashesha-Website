@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
-import FlameLogo from "./FlameLogo";
+import logoName from "./logo&name.png";
 import { useAuth } from "../context/AuthContext";
 
 const NAV_LINKS = [
@@ -60,21 +60,21 @@ function Header() {
   const profileLabel = user ? `Profile (${user.name})` : "Log in";
 
   return (
-    <header
-      className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
-        scrolled ? "bg-rust/95 backdrop-blur-sm shadow-lg" : "bg-rust"
-      }`}
-    >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3 sm:px-8">
+    <header className="fixed inset-x-0 top-0 z-50">
+      <div
+        className={`relative z-10 mx-auto flex max-w-7xl items-center justify-between px-5 py-3 transition-colors duration-300 sm:px-8 ${
+          scrolled ? "bg-rust/95 backdrop-blur-sm shadow-lg" : "bg-rust"
+        }`}
+      >
 
         {/* Logo */}
         <Link
           to="/"
-          className="flex items-center gap-2 text-cream"
+          onClick={() => setOpen(false)}
+          className="flex items-center"
           aria-label="Mashesha home"
         >
-          <FlameLogo className="h-9 w-6 text-cream [--logo-skyline:#b14305]" />
-          <span className="font-display text-xl tracking-wide">MASHESHA GAS</span>
+          <img src={logoName} alt="Mashesha Gas" className="h-10 w-auto" />
         </Link>
 
         {/* Desktop nav */}
@@ -124,6 +124,7 @@ function Header() {
         <div className="flex items-center gap-1 lg:hidden">
           <Link
             to={profileLink}
+            onClick={() => setOpen(false)}
             aria-label={profileLabel}
             className="flex h-10 w-10 items-center justify-center rounded-full text-cream/80 hover:text-cream"
           >
@@ -131,6 +132,7 @@ function Header() {
           </Link>
           <Link
             to="/cart"
+            onClick={() => setOpen(false)}
             aria-label="My cart"
             className="flex h-10 w-10 items-center justify-center rounded-full text-cream/80 hover:text-cream"
           >
@@ -167,8 +169,8 @@ function Header() {
                 className={({ isActive }) =>
                   `rounded-lg px-3 py-3 text-base font-medium transition-colors duration-200 ${
                     isActive
-                      ? "bg-charcoal/10 text-charcoal font-bold"
-                      : "text-charcoal/80 hover:bg-charcoal/10 hover:text-charcoal"
+                      ? "bg-cream/10 text-cream font-bold"
+                      : "text-cream/80 hover:bg-cream/10 hover:text-cream"
                   }`
                 }
               >

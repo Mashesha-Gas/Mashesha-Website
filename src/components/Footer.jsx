@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import FlameLogo from "./FlameLogo";
+import logoName from "./logo&name.png";
 
 function Footer() {
   const year = new Date().getFullYear();
@@ -13,9 +13,8 @@ function Footer() {
 
           {/* Brand block */}
           <div>
-            <div className="flex items-center gap-2.5 text-cream">
-              <FlameLogo className="h-7 w-5 text-cream [--logo-skyline:#b14305]" />
-              <span className="font-display text-lg tracking-wide">MASHESHA GAS</span>
+            <div className="flex items-center">
+              <img src={logoName} alt="Mashesha Gas" className="h-8 w-auto" />
             </div>
             <Link
               to="/contact"

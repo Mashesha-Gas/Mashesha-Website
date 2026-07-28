@@ -1,13 +1,10 @@
 import { Link } from "react-router-dom";
-
-const cartItems = [
-  { id: 1, size: "12kg", tagline: "Everyday household cooking", price: 350, qty: 1 },
-  { id: 2, size: "3kg", tagline: "Small household & backup", price: 120, qty: 2 },
-];
+import { useCart } from "../context/CartContext";
 
 const DELIVERY_FEE = 50;
 
 export default function CartPage() {
+  const { items: cartItems, increment, decrement, removeItem } = useCart();
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.qty, 0);
   const total = subtotal + DELIVERY_FEE;
   const isEmpty = cartItems.length === 0;
@@ -52,18 +49,31 @@ export default function CartPage() {
                   </div>
                   <div className="flex items-center gap-6">
                     <div className="flex items-center gap-3">
-                      <button className="flex h-7 w-7 items-center justify-center rounded-full border border-charcoal/20 text-charcoal/60 hover:border-rust hover:text-rust text-sm">
+                      <button
+                        type="button"
+                        onClick={() => decrement(item.id)}
+                        disabled={item.qty <= 1}
+                        className="flex h-7 w-7 items-center justify-center rounded-full border border-charcoal/20 text-charcoal/60 hover:border-rust hover:text-rust text-sm disabled:opacity-30 disabled:hover:border-charcoal/20 disabled:hover:text-charcoal/60"
+                      >
                         −
                       </button>
                       <span className="text-charcoal text-sm w-4 text-center">{item.qty}</span>
-                      <button className="flex h-7 w-7 items-center justify-center rounded-full border border-charcoal/20 text-charcoal/60 hover:border-rust hover:text-rust text-sm">
+                      <button
+                        type="button"
+                        onClick={() => increment(item.id)}
+                        className="flex h-7 w-7 items-center justify-center rounded-full border border-charcoal/20 text-charcoal/60 hover:border-rust hover:text-rust text-sm"
+                      >
                         +
                       </button>
                     </div>
                     <span className="text-charcoal font-semibold w-20 text-right">
                       R {(item.price * item.qty).toLocaleString()}
                     </span>
-                    <button className="text-charcoal/25 hover:text-rust transition-colors duration-200 text-sm">
+                    <button
+                      type="button"
+                      onClick={() => removeItem(item.id)}
+                      className="text-charcoal/25 hover:text-rust transition-colors duration-200 text-sm"
+                    >
                       ✕
                     </button>
                   </div>

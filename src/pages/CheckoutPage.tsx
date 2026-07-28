@@ -1,11 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useCart } from "../context/CartContext";
 
-// Mirrors the cart — in a real app this would come from shared cart state
-const cartItems = [
-  { id: 1, size: "12kg", tagline: "Everyday household cooking", price: 350, qty: 1 },
-  { id: 2, size: "3kg", tagline: "Small household & backup", price: 120, qty: 2 },
-];
 const DELIVERY_FEE = 50;
 
 type Step = "payment" | "processing" | "success";
@@ -39,6 +35,7 @@ export default function CheckoutPage() {
   const [name, setName] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const navigate = useNavigate();
+  const { items: cartItems } = useCart();
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.qty, 0);
   const total = subtotal + DELIVERY_FEE;
