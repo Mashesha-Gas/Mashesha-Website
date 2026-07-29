@@ -1,44 +1,41 @@
 import { Link } from "react-router-dom";
+import { useInventoryList, resolveImageUrl, CYLINDER_TYPE } from "../hooks/useInventory";
 
-const CYLINDERS = [
-  {
-    size: "1kg",
-    tagline: "Portable & camping",
-    desc: "Perfect for camping trips, outdoor braais, and single-burner stoves. Lightweight enough to pack in a bag.",
-    image: "/images/cylinder-1kg.jpg",
-  },
-  {
-    size: "3kg",
-    tagline: "Small household & backup",
-    desc: "Ideal for singles, small apartments, and keeping a backup cylinder on hand at all times.",
-    image: "/images/cylinder-3kg.jpg",
-  },
-  {
-    size: "12kg",
-    tagline: "Everyday household cooking",
-    desc: "Our most popular size — built for daily cooking and water heating in a typical South African home.",
-    image: "/images/cylinder-12kg.jpg",
-  },
-  {
-    size: "18kg",
-    tagline: "Large family & small business",
-    desc: "Steady supply for bigger families, guesthouses, and small eateries that can't afford to run dry.",
-    image: "/images/cylinder-18kg.jpg",
-  },
-];
+interface InventoryRow {
+  inventory_id: number;
+  inventory_name: string;
+  inventory_description: string | null;
+  inventory_size: string | null;
+  inventory_price: number | string | null;
+  inventory_sale: number | string | null;
+  inventory_type: string | null;
+  inventory_brand: string | null;
+  inventory_thumbnail_path: string | null;
+}
 
-function ProductImage({ src, size }: { src: string; size: string }) {
+function formatPrice(item: InventoryRow) {
+  const price = Number(item.inventory_price);
+  const sale = item.inventory_sale != null ? Number(item.inventory_sale) : null;
+  if (sale != null && sale < price) {
+    return `R ${sale.toLocaleString()} (was R ${price.toLocaleString()})`;
+  }
+  return `R ${price.toLocaleString()}`;
+}
+
+function ProductImage({ src, label }: { src: string | null; label: string }) {
   return (
     <div className="relative w-full h-48 rounded-xl overflow-hidden bg-rust/8 border border-rust/10">
-      <img
-        src={src}
-        alt={`Mashesha ${size} gas cylinder`}
-        className="w-full h-full object-contain p-4"
-        onError={(e) => {
-          // Hide the broken image and show the placeholder behind it
-          (e.target as HTMLImageElement).style.display = "none";
-        }}
-      />
+      {src && (
+        <img
+          src={src}
+          alt={`Mashesha ${label} gas cylinder`}
+          className="w-full h-full object-contain p-4"
+          onError={(e) => {
+            // Hide the broken image and show the placeholder behind it
+            (e.target as HTMLImageElement).style.display = "none";
+          }}
+        />
+      )}
       {/* Placeholder sits behind the image — visible when image fails or is missing */}
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-rust/40">
         <svg viewBox="0 0 24 24" className="h-8 w-8" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -46,13 +43,16 @@ function ProductImage({ src, size }: { src: string; size: string }) {
           <circle cx="12" cy="13" r="3" />
           <path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" />
         </svg>
-        <span className="text-xs font-medium">{size} photo</span>
+        <span className="text-xs font-medium">{label} photo</span>
       </div>
     </div>
   );
 }
 
 export default function ProductsPage() {
+  const { items, loading, error } = useInventoryList();
+  const cylinders = items.filter((item: InventoryRow) => item.inventory_type === CYLINDER_TYPE);
+
   return (
     <main className="bg-cream min-h-screen pt-24 pb-20">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
@@ -65,37 +65,57 @@ export default function ProductsPage() {
             Our gas cylinders.
           </h1>
           <p className="mt-5 text-lg text-charcoal/65">
-            Mashesha stocks four cylinder sizes — from portable 1 kg canisters to
-            large 18 kg tanks for homes and businesses. Click any size to learn more.
+            Browse our current cylinder stock, straight from the Mashesha inventory.
+            Click any cylinder to learn more.
           </p>
         </div>
 
-        {/* Cylinder cards */}
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {CYLINDERS.map((cyl) => (
-            <Link
-              key={cyl.size}
-              to={`/products/${cyl.size}`}
-              className="group flex flex-col rounded-2xl border border-charcoal/10 bg-white overflow-hidden transition-colors duration-200 hover:border-rust/50 hover:bg-rust/5"
-            >
-              {/* Product image */}
-              <ProductImage src={cyl.image} size={cyl.size} />
+        {loading && (
+          <p className="text-charcoal/60">Loading cylinders…</p>
+        )}
 
-              {/* Card text */}
-              <div className="flex flex-col flex-1 p-6">
-                <span className="font-display text-4xl text-charcoal">{cyl.size}</span>
-                <span className="mt-2 text-sm font-semibold text-rust">{cyl.tagline}</span>
-                <p className="mt-3 text-sm text-charcoal/65 leading-relaxed flex-1">{cyl.desc}</p>
-                <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-charcoal transition-colors duration-200 group-hover:text-rust">
-                  View details
-                  <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" aria-hidden="true">
-                    <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </span>
-              </div>
-            </Link>
-          ))}
-        </div>
+        {!loading && error && (
+          <p className="text-rust">
+            Couldn't load products right now. Please try again shortly.
+          </p>
+        )}
+
+        {!loading && !error && cylinders.length === 0 && (
+          <p className="text-charcoal/60">No cylinders in stock right now — check back soon.</p>
+        )}
+
+        {!loading && !error && cylinders.length > 0 && (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {cylinders.map((item: InventoryRow) => {
+              const label = item.inventory_size || item.inventory_name;
+              return (
+                <Link
+                  key={item.inventory_id}
+                  to={`/products/${item.inventory_id}`}
+                  className="group flex flex-col rounded-2xl border border-charcoal/10 bg-white overflow-hidden transition-colors duration-200 hover:border-rust/50 hover:bg-rust/5"
+                >
+                  {/* Product image */}
+                  <ProductImage src={resolveImageUrl(item.inventory_thumbnail_path)} label={label} />
+
+                  {/* Card text */}
+                  <div className="flex flex-col flex-1 p-6">
+                    <span className="font-display text-4xl text-charcoal">{label}</span>
+                    <span className="mt-2 text-sm font-semibold text-rust">{formatPrice(item)}</span>
+                    <p className="mt-3 text-sm text-charcoal/65 leading-relaxed flex-1">
+                      {item.inventory_description}
+                    </p>
+                    <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-charcoal transition-colors duration-200 group-hover:text-rust">
+                      View details
+                      <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" aria-hidden="true">
+                        <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
 
         {/* Order CTA */}
         <div className="mt-16 rounded-2xl bg-rust p-10 text-center">
