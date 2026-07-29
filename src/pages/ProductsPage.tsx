@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useInventoryList, resolveImageUrl, CYLINDER_TYPE } from "../hooks/useInventory";
 
@@ -23,28 +24,30 @@ function formatPrice(item: InventoryRow) {
 }
 
 function ProductImage({ src, label }: { src: string | null; label: string }) {
+  const [failed, setFailed] = useState(false);
+  const showImage = src && !failed;
+
   return (
-    <div className="relative w-full h-48 rounded-xl overflow-hidden bg-rust/8 border border-rust/10">
-      {src && (
+    <div className="relative w-full h-48 rounded-xl overflow-hidden bg-white border border-rust/10">
+      {showImage && (
         <img
           src={src}
           alt={`Mashesha ${label} gas cylinder`}
           className="w-full h-full object-contain p-4"
-          onError={(e) => {
-            // Hide the broken image and show the placeholder behind it
-            (e.target as HTMLImageElement).style.display = "none";
-          }}
+          onError={() => setFailed(true)}
         />
       )}
-      {/* Placeholder sits behind the image — visible when image fails or is missing */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-rust/40">
-        <svg viewBox="0 0 24 24" className="h-8 w-8" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <rect x="3" y="7" width="18" height="13" rx="2" />
-          <circle cx="12" cy="13" r="3" />
-          <path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" />
-        </svg>
-        <span className="text-xs font-medium">{label} photo</span>
-      </div>
+      {/* Placeholder only renders when there's no image or it failed to load */}
+      {!showImage && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-rust/40">
+          <svg viewBox="0 0 24 24" className="h-8 w-8" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <rect x="3" y="7" width="18" height="13" rx="2" />
+            <circle cx="12" cy="13" r="3" />
+            <path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" />
+          </svg>
+          <span className="text-xs font-medium">{label} photo</span>
+        </div>
+      )}
     </div>
   );
 }
