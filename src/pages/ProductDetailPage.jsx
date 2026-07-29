@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
 import CylinderIcon from "../components/CylinderIcon";
 import { useInventoryItem, useInventoryList, resolveImageUrl, CYLINDER_TYPE } from "../hooks/useInventory";
+import { useCart } from "../context/CartContext";
 
 function formatPrice(item) {
   const price = Number(item.inventory_price);
@@ -25,7 +26,10 @@ function ProductDetailPage() {
   const { id } = useParams();
   const { item: product, loading, error } = useInventoryItem(id);
   const { items: allItems } = useInventoryList();
+  const { addItem } = useCart();
   const [imageFailed, setImageFailed] = useState(false);
+  const [qty, setQty] = useState(1);
+  const [added, setAdded] = useState(false);
 
   if (loading) {
     return (
@@ -48,6 +52,12 @@ function ProductDetailPage() {
   const otherSizes = allItems.filter(
     (i) => i.inventory_type === CYLINDER_TYPE && i.inventory_id !== product.inventory_id
   );
+
+  function handleAddToCart() {
+    addItem(product, qty);
+    setAdded(true);
+    setTimeout(() => setAdded(false), 2000);
+  }
 
   return (
     <>
@@ -92,16 +102,46 @@ function ProductDetailPage() {
                 {price.was && <span className="ml-2 text-base font-medium text-charcoal/40 line-through">{price.was}</span>}
               </p>
               <p className="mt-5 max-w-lg text-base leading-relaxed text-charcoal/65">{product.inventory_description}</p>
-              <div className="mt-8 flex flex-wrap items-center gap-4">
-                <Link
-                  to="/contact"
-                  className="inline-flex items-center justify-center rounded-full bg-rust px-6 py-3 text-sm font-semibold text-cream transition-colors duration-200 hover:bg-rust-dark"
+
+              {inStock && (
+                <div className="mt-6 flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setQty((q) => Math.max(1, q - 1))}
+                    disabled={qty <= 1}
+                    className="flex h-9 w-9 items-center justify-center rounded-full border border-charcoal/20 text-charcoal/60 hover:border-rust hover:text-rust disabled:opacity-30 disabled:hover:border-charcoal/20 disabled:hover:text-charcoal/60"
+                  >
+                    −
+                  </button>
+                  <span className="w-6 text-center text-charcoal">{qty}</span>
+                  <button
+                    type="button"
+                    onClick={() => setQty((q) => q + 1)}
+                    className="flex h-9 w-9 items-center justify-center rounded-full border border-charcoal/20 text-charcoal/60 hover:border-rust hover:text-rust"
+                  >
+                    +
+                  </button>
+                </div>
+              )}
+
+              <div className="mt-6 flex flex-wrap items-center gap-4">
+                <button
+                  type="button"
+                  onClick={handleAddToCart}
+                  disabled={!inStock}
+                  className="inline-flex items-center justify-center rounded-full bg-rust px-6 py-3 text-sm font-semibold text-cream transition-colors duration-200 hover:bg-rust-dark disabled:opacity-40 disabled:hover:bg-rust"
                 >
-                  Order this size
-                </Link>
-                <Link to="/products" className="text-sm font-semibold text-charcoal/60 transition-colors duration-200 hover:text-charcoal">
-                  ← Back to all products
-                </Link>
+                  {!inStock ? "Out of stock" : added ? "Added ✓" : "Add to cart"}
+                </button>
+                {added ? (
+                  <Link to="/cart" className="text-sm font-semibold text-rust transition-colors duration-200 hover:text-rust-dark">
+                    View cart →
+                  </Link>
+                ) : (
+                  <Link to="/products" className="text-sm font-semibold text-charcoal/60 transition-colors duration-200 hover:text-charcoal">
+                    ← Back to all products
+                  </Link>
+                )}
               </div>
             </div>
           </div>

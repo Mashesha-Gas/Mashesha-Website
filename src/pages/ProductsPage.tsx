@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useInventoryList, resolveImageUrl, CYLINDER_TYPE } from "../hooks/useInventory";
+import { useCart } from "../context/CartContext";
 
 interface InventoryRow {
   inventory_id: number;
@@ -9,6 +10,7 @@ interface InventoryRow {
   inventory_size: string | null;
   inventory_price: number | string | null;
   inventory_sale: number | string | null;
+  inventory_quantity: number | string | null;
   inventory_type: string | null;
   inventory_brand: string | null;
   inventory_thumbnail_path: string | null;
@@ -52,6 +54,56 @@ function ProductImage({ src, label }: { src: string | null; label: string }) {
   );
 }
 
+function ProductCard({ item }: { item: InventoryRow }) {
+  const { addItem } = useCart();
+  const [added, setAdded] = useState(false);
+  const label = item.inventory_size || item.inventory_name;
+  const inStock = Number(item.inventory_quantity) > 0;
+
+  function handleAdd(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    addItem(item);
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1500);
+  }
+
+  return (
+    <Link
+      to={`/products/${item.inventory_id}`}
+      className="group flex flex-col rounded-2xl border border-charcoal/10 bg-white overflow-hidden transition-colors duration-200 hover:border-rust/50 hover:bg-rust/5"
+    >
+      {/* Product image */}
+      <ProductImage src={resolveImageUrl(item.inventory_thumbnail_path)} label={label} />
+
+      {/* Card text */}
+      <div className="flex flex-col flex-1 p-6">
+        <span className="font-display text-4xl text-charcoal">{label}</span>
+        <span className="mt-2 text-sm font-semibold text-rust">{formatPrice(item)}</span>
+        <p className="mt-3 text-sm text-charcoal/65 leading-relaxed flex-1">
+          {item.inventory_description}
+        </p>
+        <div className="mt-5 flex items-center justify-between gap-3">
+          <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-charcoal transition-colors duration-200 group-hover:text-rust">
+            View details
+            <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" aria-hidden="true">
+              <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </span>
+          <button
+            type="button"
+            onClick={handleAdd}
+            disabled={!inStock}
+            className="rounded-full bg-rust px-4 py-2 text-xs font-semibold text-cream transition-colors duration-200 hover:bg-rust-dark disabled:opacity-40 disabled:hover:bg-rust disabled:cursor-not-allowed"
+          >
+            {!inStock ? "Out of stock" : added ? "Added ✓" : "Add to cart"}
+          </button>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
 export default function ProductsPage() {
   const { items, loading, error } = useInventoryList();
   const cylinders = items.filter((item: InventoryRow) => item.inventory_type === CYLINDER_TYPE);
@@ -89,34 +141,9 @@ export default function ProductsPage() {
 
         {!loading && !error && cylinders.length > 0 && (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {cylinders.map((item: InventoryRow) => {
-              const label = item.inventory_size || item.inventory_name;
-              return (
-                <Link
-                  key={item.inventory_id}
-                  to={`/products/${item.inventory_id}`}
-                  className="group flex flex-col rounded-2xl border border-charcoal/10 bg-white overflow-hidden transition-colors duration-200 hover:border-rust/50 hover:bg-rust/5"
-                >
-                  {/* Product image */}
-                  <ProductImage src={resolveImageUrl(item.inventory_thumbnail_path)} label={label} />
-
-                  {/* Card text */}
-                  <div className="flex flex-col flex-1 p-6">
-                    <span className="font-display text-4xl text-charcoal">{label}</span>
-                    <span className="mt-2 text-sm font-semibold text-rust">{formatPrice(item)}</span>
-                    <p className="mt-3 text-sm text-charcoal/65 leading-relaxed flex-1">
-                      {item.inventory_description}
-                    </p>
-                    <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-charcoal transition-colors duration-200 group-hover:text-rust">
-                      View details
-                      <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" aria-hidden="true">
-                        <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </span>
-                  </div>
-                </Link>
-              );
-            })}
+            {cylinders.map((item: InventoryRow) => (
+              <ProductCard key={item.inventory_id} item={item} />
+            ))}
           </div>
         )}
 

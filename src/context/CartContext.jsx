@@ -5,20 +5,33 @@ import { createContext, useContext, useState } from "react";
 
 const CartContext = createContext(null);
 
-const INITIAL_ITEMS = [
-  { id: 1, size: "12kg", tagline: "Everyday household cooking", price: 350, qty: 1 },
-  { id: 2, size: "3kg", tagline: "Small household & backup", price: 120, qty: 2 },
-];
-
 export function CartProvider({ children }) {
   const [items, setItems] = useState(() => {
     const saved = localStorage.getItem("mashesha_cart");
-    return saved ? JSON.parse(saved) : INITIAL_ITEMS;
+    return saved ? JSON.parse(saved) : [];
   });
 
   function persist(next) {
     localStorage.setItem("mashesha_cart", JSON.stringify(next));
     setItems(next);
+  }
+
+  // Accepts a raw Inventory row from the API and adds it to the cart,
+  // merging into an existing line if that product is already in there.
+  function addItem(product, qty = 1) {
+    const price =
+      product.inventory_sale != null && Number(product.inventory_sale) < Number(product.inventory_price)
+        ? Number(product.inventory_sale)
+        : Number(product.inventory_price);
+    const size = product.inventory_size || product.inventory_name;
+    const id = product.inventory_id;
+
+    const existing = items.find((item) => item.id === id);
+    if (existing) {
+      persist(items.map((item) => (item.id === id ? { ...item, qty: item.qty + qty } : item)));
+    } else {
+      persist([...items, { id, size, tagline: product.inventory_brand || "", price, qty }]);
+    }
   }
 
   function increment(id) {
@@ -36,7 +49,7 @@ export function CartProvider({ children }) {
   }
 
   return (
-    <CartContext.Provider value={{ items, increment, decrement, removeItem }}>
+    <CartContext.Provider value={{ items, addItem, increment, decrement, removeItem }}>
       {children}
     </CartContext.Provider>
   );
