@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
 import CylinderIcon from "../components/CylinderIcon";
 import { useInventoryItem, useInventoryList, resolveImageUrl, CYLINDER_TYPE } from "../hooks/useInventory";
@@ -24,6 +25,7 @@ function ProductDetailPage() {
   const { id } = useParams();
   const { item: product, loading, error } = useInventoryItem(id);
   const { items: allItems } = useInventoryList();
+  const [imageFailed, setImageFailed] = useState(false);
 
   if (loading) {
     return (
@@ -40,6 +42,7 @@ function ProductDetailPage() {
   const label = product.inventory_size || product.inventory_name;
   const price = formatPrice(product);
   const imageUrl = resolveImageUrl(product.inventory_thumbnail_path);
+  const showImage = imageUrl && !imageFailed;
   const inStock = Number(product.inventory_quantity) > 0;
 
   const otherSizes = allItems.filter(
@@ -64,19 +67,19 @@ function ProductDetailPage() {
       {/* Hero */}
       <section className="bg-cream py-16 sm:py-24">
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
-          <div className="flex flex-col items-center gap-12 sm:flex-row sm:items-end">
-            <div className="flex flex-shrink-0 items-end justify-center">
-              {imageUrl ? (
+          <div className="flex flex-col items-center gap-12 sm:flex-row sm:items-center">
+            <div className="relative h-56 w-56 flex-shrink-0 overflow-hidden rounded-2xl border border-rust/10 bg-white sm:h-64 sm:w-64">
+              {showImage ? (
                 <img
                   src={imageUrl}
                   alt={`Mashesha ${label} gas cylinder`}
-                  className="h-48 w-auto object-contain sm:h-64"
-                  onError={(e) => {
-                    e.target.style.display = "none";
-                  }}
+                  className="h-full w-full object-contain p-6"
+                  onError={() => setImageFailed(true)}
                 />
               ) : (
-                <CylinderIcon className="h-40 w-auto text-rust" />
+                <div className="flex h-full w-full items-center justify-center">
+                  <CylinderIcon className="h-32 w-auto text-rust" />
+                </div>
               )}
             </div>
             <div>
