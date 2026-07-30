@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 export default function AuthPage() {
   const [tab, setTab] = useState<"login" | "signup">("login");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const { login, signup } = useAuth();
   const navigate = useNavigate();
@@ -12,18 +13,26 @@ export default function AuthPage() {
 
   const from = (location.state as { from?: string })?.from ?? "/profile";
 
-  function handleLogin(e: React.SyntheticEvent) {
+  async function handleLogin(e: React.SyntheticEvent) {
     e.preventDefault();
     setError("");
     const form = e.target as HTMLFormElement;
     const email = (form.elements.namedItem("email") as HTMLInputElement).value;
     const password = (form.elements.namedItem("password") as HTMLInputElement).value;
     if (!email || !password) { setError("Please fill in all fields."); return; }
-    login({ email, password });
-    navigate(from, { replace: true });
+
+    setSubmitting(true);
+    try {
+      await login({ email, password });
+      navigate(from, { replace: true });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Couldn't log in. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
-  function handleSignup(e: React.SyntheticEvent) {
+  async function handleSignup(e: React.SyntheticEvent) {
     e.preventDefault();
     setError("");
     const form = e.target as HTMLFormElement;
@@ -33,8 +42,16 @@ export default function AuthPage() {
     const confirm = (form.elements.namedItem("confirm") as HTMLInputElement).value;
     if (!name || !email || !password) { setError("Please fill in all fields."); return; }
     if (password !== confirm) { setError("Passwords don't match."); return; }
-    signup({ name, email, password });
-    navigate(from, { replace: true });
+
+    setSubmitting(true);
+    try {
+      await signup({ name, email, password });
+      navigate(from, { replace: true });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Couldn't create your account. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   const inputClass =
@@ -88,8 +105,12 @@ export default function AuthPage() {
               <label className={labelClass}>Password</label>
               <input name="password" type="password" required placeholder="••••••••" className={inputClass} />
             </div>
-            <button type="submit" className="w-full rounded-full bg-rust py-3 text-sm font-semibold text-cream transition-colors duration-200 hover:bg-rust-dark">
-              Log in
+            <button
+              type="submit"
+              disabled={submitting}
+              className="w-full rounded-full bg-rust py-3 text-sm font-semibold text-cream transition-colors duration-200 hover:bg-rust-dark disabled:opacity-60"
+            >
+              {submitting ? "Logging in…" : "Log in"}
             </button>
             <p className="text-center text-xs text-charcoal/40">
               No account yet?{" "}
@@ -120,8 +141,12 @@ export default function AuthPage() {
               <label className={labelClass}>Confirm password</label>
               <input name="confirm" type="password" required placeholder="••••••••" className={inputClass} />
             </div>
-            <button type="submit" className="w-full rounded-full bg-rust py-3 text-sm font-semibold text-cream transition-colors duration-200 hover:bg-rust-dark">
-              Create account
+            <button
+              type="submit"
+              disabled={submitting}
+              className="w-full rounded-full bg-rust py-3 text-sm font-semibold text-cream transition-colors duration-200 hover:bg-rust-dark disabled:opacity-60"
+            >
+              {submitting ? "Creating account…" : "Create account"}
             </button>
             <p className="text-center text-xs text-charcoal/40">
               Already have an account?{" "}
