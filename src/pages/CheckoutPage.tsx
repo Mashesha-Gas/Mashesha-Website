@@ -193,7 +193,7 @@ export default function CheckoutPage() {
           <form onSubmit={handlePlaceOrder} className="lg:col-span-3 space-y-8">
 
             {/* Contact details */}
-            <div className="space-y-5">
+            <div className="space-y-5 rounded-2xl border border-charcoal/10 bg-white p-6 sm:p-7">
               <p className={labelClass}>Contact details</p>
               <div>
                 <label className={labelClass}>Full name</label>
@@ -234,7 +234,7 @@ export default function CheckoutPage() {
             </div>
 
             {/* Delivery address */}
-            <div className="space-y-5">
+            <div className="space-y-5 rounded-2xl border border-charcoal/10 bg-white p-6 sm:p-7">
               <p className={labelClass}>Delivery address</p>
               <div>
                 <label className={labelClass}>Street address</label>
