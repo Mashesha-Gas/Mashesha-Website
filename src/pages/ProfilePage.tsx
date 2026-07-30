@@ -1,33 +1,60 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useMyOrders, ORDER_STATUS, isActiveOrder } from "../hooks/useOrders";
+import { useInventoryList } from "../hooks/useInventory";
 
-const orderHistory = [
-  { id: "ORD-004", date: "01 Jul 2026", items: "12kg × 1", total: "R 400", status: "Out for delivery" },
-  { id: "ORD-005", date: "01 Jul 2026", items: "3kg × 1", total: "R 170", status: "Processing" },
-  { id: "ORD-001", date: "12 Jun 2026", items: "12kg × 1", total: "R 350", status: "Delivered" },
-  { id: "ORD-002", date: "28 May 2026", items: "3kg × 2", total: "R 240", status: "Delivered" },
-  { id: "ORD-003", date: "10 May 2026", items: "18kg × 1", total: "R 520", status: "Cancelled" },
-];
+interface Order {
+  order_id: number;
+  order_items_json: string;
+  order_total: number | string | null;
+  order_date: string;
+  order_status: number | null;
+}
 
-const ACTIVE_STATUSES = ["Processing", "Out for delivery"];
+function formatOrderDate(dateStr: string) {
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  return d.toLocaleDateString("en-ZA", { day: "2-digit", month: "short", year: "numeric" });
+}
 
-const statusColour: Record<string, string> = {
-  "Delivered": "text-green-600",
-  "Out for delivery": "text-rust",
-  "Processing": "text-rust",
-  "Cancelled": "text-charcoal/40",
-};
+function itemsLabel(order: Order, labelById: Record<number, string>) {
+  try {
+    const items: { inventory_id: number; qty: number }[] = JSON.parse(order.order_items_json || "[]");
+    return items.map((it) => `${labelById[it.inventory_id] ?? `Item #${it.inventory_id}`} × ${it.qty}`).join(", ");
+  } catch {
+    return "—";
+  }
+}
 
-const statusDot: Record<string, string> = {
-  "Delivered": "bg-green-500",
-  "Out for delivery": "bg-rust animate-pulse",
-  "Processing": "bg-rust animate-pulse",
-  "Cancelled": "bg-charcoal/25",
-};
+function OrderRow({ order, label }: { order: Order; label: string }) {
+  const status = order.order_status != null ? ORDER_STATUS[order.order_status] : undefined;
+  return (
+    <div className="flex items-center justify-between rounded-2xl bg-cream px-6 py-5">
+      <div className="flex items-center gap-3">
+        <span className={`h-2.5 w-2.5 rounded-full flex-shrink-0 ${status?.dot ?? "bg-charcoal/25"}`} />
+        <div>
+          <p className="text-sm font-semibold text-charcoal">Order #{order.order_id}</p>
+          <p className="mt-0.5 text-xs text-charcoal/50">{formatOrderDate(order.order_date)} · {label}</p>
+        </div>
+      </div>
+      <div className="text-right">
+        <p className="text-sm font-semibold text-charcoal">R {Number(order.order_total ?? 0).toLocaleString()}</p>
+        <p className={`mt-0.5 text-xs font-medium ${status?.text ?? "text-charcoal/50"}`}>{status?.label ?? "Unknown"}</p>
+      </div>
+    </div>
+  );
+}
 
 export default function ProfilePage() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { orders, loading: ordersLoading } = useMyOrders(user?.token);
+  const { items: inventory } = useInventoryList();
+
+  const labelById = inventory.reduce<Record<number, string>>((map, item) => {
+    map[item.inventory_id] = item.inventory_size || item.inventory_name;
+    return map;
+  }, {});
 
   function handleSignOut() {
     logout();
@@ -35,6 +62,9 @@ export default function ProfilePage() {
   }
 
   if (!user) return null;
+
+  const activeOrders = orders.filter(isActiveOrder);
+  const pastOrders = orders.filter((o) => !isActiveOrder(o));
 
   return (
     <main className="bg-rust min-h-screen pt-24 pb-20">
@@ -72,7 +102,11 @@ export default function ProfilePage() {
               </div>
               <div>
                 <p className="text-xs font-semibold uppercase tracking-widest text-rust">Phone</p>
-                <p className="mt-1 text-sm text-charcoal/40 italic">Not set</p>
+                {user.mobile ? (
+                  <p className="mt-1 text-sm text-charcoal/80">{user.mobile}</p>
+                ) : (
+                  <p className="mt-1 text-sm text-charcoal/40 italic">Not set</p>
+                )}
               </div>
               <div>
                 <p className="text-xs font-semibold uppercase tracking-widest text-rust">Delivery address</p>
@@ -112,59 +146,43 @@ export default function ProfilePage() {
           <div className="lg:col-span-2">
             <h2 className="font-display text-2xl text-cream mb-6">Order history</h2>
 
-            <div className="space-y-8">
-              {/* Active */}
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-widest text-cream/50 mb-3">Active</p>
-                {orderHistory.filter(o => ACTIVE_STATUSES.includes(o.status)).length === 0 ? (
-                  <div className="rounded-2xl bg-cream/20 px-6 py-4 text-sm text-cream/50">No active orders right now.</div>
-                ) : (
-                  <div className="space-y-3">
-                    {orderHistory.filter(o => ACTIVE_STATUSES.includes(o.status)).map((order) => (
-                      <div key={order.id} className="flex items-center justify-between rounded-2xl bg-cream px-6 py-5">
-                        <div className="flex items-center gap-3">
-                          <span className={`h-2.5 w-2.5 rounded-full flex-shrink-0 ${statusDot[order.status]}`} />
-                          <div>
-                            <p className="text-sm font-semibold text-charcoal">{order.id}</p>
-                            <p className="mt-0.5 text-xs text-charcoal/50">{order.date} · {order.items}</p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm font-semibold text-charcoal">{order.total}</p>
-                          <p className={`mt-0.5 text-xs font-medium ${statusColour[order.status] ?? "text-charcoal/50"}`}>{order.status}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+            {ordersLoading ? (
+              <div className="rounded-2xl bg-cream/20 px-6 py-4 text-sm text-cream/50">Loading your orders…</div>
+            ) : orders.length === 0 ? (
+              <div className="rounded-2xl bg-cream/20 px-6 py-4 text-sm text-cream/50">
+                You haven't placed any orders yet.
               </div>
+            ) : (
+              <div className="space-y-8">
+                {/* Active */}
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-widest text-cream/50 mb-3">Active</p>
+                  {activeOrders.length === 0 ? (
+                    <div className="rounded-2xl bg-cream/20 px-6 py-4 text-sm text-cream/50">No active orders right now.</div>
+                  ) : (
+                    <div className="space-y-3">
+                      {activeOrders.map((order) => (
+                        <OrderRow key={order.order_id} order={order} label={itemsLabel(order, labelById)} />
+                      ))}
+                    </div>
+                  )}
+                </div>
 
-              {/* Past */}
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-widest text-cream/50 mb-3">Past</p>
-                {orderHistory.filter(o => !ACTIVE_STATUSES.includes(o.status)).length === 0 ? (
-                  <div className="rounded-2xl bg-cream/20 px-6 py-4 text-sm text-cream/50">No past orders yet.</div>
-                ) : (
-                  <div className="space-y-3">
-                    {orderHistory.filter(o => !ACTIVE_STATUSES.includes(o.status)).map((order) => (
-                      <div key={order.id} className="flex items-center justify-between rounded-2xl bg-cream px-6 py-5">
-                        <div className="flex items-center gap-3">
-                          <span className={`h-2.5 w-2.5 rounded-full flex-shrink-0 ${statusDot[order.status]}`} />
-                          <div>
-                            <p className="text-sm font-semibold text-charcoal">{order.id}</p>
-                            <p className="mt-0.5 text-xs text-charcoal/50">{order.date} · {order.items}</p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm font-semibold text-charcoal">{order.total}</p>
-                          <p className={`mt-0.5 text-xs font-medium ${statusColour[order.status] ?? "text-charcoal/50"}`}>{order.status}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                {/* Past */}
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-widest text-cream/50 mb-3">Past</p>
+                  {pastOrders.length === 0 ? (
+                    <div className="rounded-2xl bg-cream/20 px-6 py-4 text-sm text-cream/50">No past orders yet.</div>
+                  ) : (
+                    <div className="space-y-3">
+                      {pastOrders.map((order) => (
+                        <OrderRow key={order.order_id} order={order} label={itemsLabel(order, labelById)} />
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
