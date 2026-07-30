@@ -33,7 +33,7 @@ export function CartProvider({ children }) {
     if (existing) {
       persist(items.map((item) => (item.id === id ? { ...item, qty: item.qty + qty } : item)));
     } else {
-      persist([...items, { id, size, tagline: product.inventory_brand || "", price, qty }]);
+      persist([...items, { id, size, tagline: product.inventory_brand || "", price, qty, vendorId: product.inventory_vendor_id }]);
     }
 
     setToast({
@@ -60,8 +60,12 @@ export function CartProvider({ children }) {
     persist(items.filter((item) => item.id !== id));
   }
 
+  function clearCart() {
+    persist([]);
+  }
+
   return (
-    <CartContext.Provider value={{ items, addItem, increment, decrement, removeItem, toast }}>
+    <CartContext.Provider value={{ items, addItem, increment, decrement, removeItem, clearCart, toast }}>
       {children}
     </CartContext.Provider>
   );

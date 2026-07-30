@@ -65,10 +65,17 @@ export function AuthProvider({ children }) {
     setUser(sessionUser);
   }
 
-  async function login({ email, password }) {
-    const { token } = await request("/api/customers/login", { method: "POST", body: { email, password } });
+  // Fetches the full profile for a token and makes it the active session —
+  // shared by login/signup and by checkout's "create an account" flow, which
+  // already has a token from POST /customers by the time it wants to log in.
+  async function establishSession(token) {
     const customer = await request("/api/customers/me", { token });
     persist(toSessionUser(token, customer));
+  }
+
+  async function login({ email, password }) {
+    const { token } = await request("/api/customers/login", { method: "POST", body: { email, password } });
+    await establishSession(token);
   }
 
   async function signup({ name, email, password }) {
@@ -76,8 +83,7 @@ export function AuthProvider({ children }) {
       method: "POST",
       body: { customer_name: name, customer_email: email, customer_password: password },
     });
-    const customer = await request("/api/customers/me", { token });
-    persist(toSessionUser(token, customer));
+    await establishSession(token);
   }
 
   // Accepts any subset of { customer_name, customer_mobile, customer_company,
@@ -96,7 +102,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, signup, updateProfile, logout }}>
+    <AuthContext.Provider value={{ user, login, signup, updateProfile, establishSession, logout }}>
       {children}
     </AuthContext.Provider>
   );

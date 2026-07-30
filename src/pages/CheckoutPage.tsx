@@ -4,6 +4,7 @@ import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { PROVINCES } from "../constants";
 
+const API = import.meta.env.VITE_API_URL;
 const DELIVERY_FEE = 50;
 
 type Step = "details" | "processing" | "success";
@@ -50,6 +51,26 @@ function buildInitialForm(user: any): FormState {
   };
 }
 
+// Never shown to the customer — only used when they place an order without
+// opting into a visible account, so the Orders/Customers FK still has a real
+// row to point at. They'd need a password-reset flow (not built yet) to ever
+// log into it.
+function randomPassword() {
+  const bytes = crypto.getRandomValues(new Uint8Array(24));
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function postJson(path: string, body: unknown) {
+  const res = await fetch(`${API}${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || "Something went wrong. Please try again.");
+  return data;
+}
+
 function LockIcon() {
   return (
     <svg viewBox="0 0 20 20" className="h-4 w-4" fill="currentColor" aria-hidden="true">
@@ -59,11 +80,16 @@ function LockIcon() {
 }
 
 export default function CheckoutPage() {
-  const { user } = useAuth();
+  const { user, establishSession } = useAuth();
+  const { items: cartItems, clearCart } = useCart();
   const [step, setStep] = useState<Step>("details");
   const [form, setForm] = useState<FormState>(() => buildInitialForm(user));
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const { items: cartItems } = useCart();
+  const [submitError, setSubmitError] = useState("");
+  const [createAccount, setCreateAccount] = useState(false);
+  const [accountPassword, setAccountPassword] = useState("");
+  const [accountConfirm, setAccountConfirm] = useState("");
+  const [placedOrder, setPlacedOrder] = useState<{ items: typeof cartItems; total: number; orderId: number } | null>(null);
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.qty, 0);
   const total = subtotal + DELIVERY_FEE;
@@ -76,22 +102,94 @@ export default function CheckoutPage() {
     const e: Record<string, string> = {};
     if (!form.fullName.trim()) e.fullName = "Enter your full name.";
     if (form.phone.replace(/\D/g, "").length < 10) e.phone = "Enter a valid phone number.";
-    if (form.email.trim() && !form.email.includes("@")) e.email = "Enter a valid email address.";
+    if (!form.email.trim()) e.email = "Enter your email address.";
+    else if (!form.email.includes("@")) e.email = "Enter a valid email address.";
     if (!form.addressLine1.trim()) e.addressLine1 = "Enter your street address.";
     if (!form.city.trim()) e.city = "Enter your city or suburb.";
     if (!form.province) e.province = "Select a province.";
     if (form.postcode.replace(/\D/g, "").length !== 4) e.postcode = "Enter a valid 4-digit postal code.";
+    if (!user && createAccount) {
+      if (accountPassword.length < 8) e.accountPassword = "Password must be at least 8 characters.";
+      if (accountPassword !== accountConfirm) e.accountConfirm = "Passwords don't match.";
+    }
     setErrors(e);
     return Object.keys(e).length === 0;
   }
 
-  function handlePlaceOrder(e: React.SyntheticEvent) {
+  // Every order needs a real Customers row behind it (Orders.order_customer_email
+  // is a FK). Logged-in customers already have one; guests get one created here —
+  // with the password they chose if they ticked "create an account", or a random
+  // one they'll never see otherwise. An email that's already registered is left
+  // alone and just reused for this order.
+  async function resolveCustomerEmail(): Promise<string> {
+    if (user) return user.email;
+
+    const existsRes = await fetch(`${API}/api/customers/${encodeURIComponent(form.email)}`);
+    if (existsRes.ok) return form.email;
+
+    const password = createAccount && accountPassword ? accountPassword : randomPassword();
+    const data = await postJson("/api/customers", {
+      customer_name: form.fullName,
+      customer_email: form.email,
+      customer_password: password,
+      customer_mobile: form.phone,
+      customer_company: form.company || null,
+    });
+
+    if (createAccount) {
+      await establishSession(data.token);
+    }
+
+    return form.email;
+  }
+
+  async function createOrderAddress(): Promise<number> {
+    const data = await postJson("/api/addresses", {
+      address_line1: form.addressLine1,
+      address_unit: form.addressLine2 || null,
+      address_city: form.city,
+      address_postcode: form.postcode,
+      address_province: form.province,
+    });
+    return data.address_id;
+  }
+
+  async function handlePlaceOrder(e: React.SyntheticEvent) {
     e.preventDefault();
     if (!validate()) return;
 
     setStep("processing");
-    // Simulate a short delay while the "order" is sent off
-    setTimeout(() => setStep("success"), 2000);
+    setSubmitError("");
+    try {
+      const email = await resolveCustomerEmail();
+      const addressId = await createOrderAddress();
+
+      const vendorIds = Array.from(
+        new Set(cartItems.map((item: any) => item.vendorId).filter((v: unknown) => v != null))
+      );
+      const now = new Date();
+
+      const order = await postJson("/api/orders", {
+        order_items_json: JSON.stringify(cartItems.map((item) => ({ inventory_id: item.id, qty: item.qty }))),
+        order_total: total,
+        order_date: now.toISOString().slice(0, 10),
+        order_time: now.toTimeString().slice(0, 8),
+        order_type: 202,
+        order_payment_type: "cod",
+        order_status: 301,
+        order_vendor_id: vendorIds.length === 1 ? vendorIds[0] : null,
+        order_customer_email: email,
+        order_address_id: addressId,
+        order_guid: crypto.randomUUID(),
+      });
+
+      setPlacedOrder({ items: cartItems, total, orderId: order.order_id });
+      clearCart();
+      setStep("success");
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : "Couldn't place your order. Please try again.");
+      setStep("details");
+    }
   }
 
   const inputClass = (field: string) =>
@@ -115,7 +213,7 @@ export default function CheckoutPage() {
   }
 
   // ── Success screen ──────────────────────────────────────────────────────────
-  if (step === "success") {
+  if (step === "success" && placedOrder) {
     return (
       <main className="bg-cream min-h-screen flex items-center justify-center pt-20 px-5 pb-12">
         <div className="w-full max-w-md text-center space-y-5">
@@ -126,7 +224,7 @@ export default function CheckoutPage() {
           </div>
           <h1 className="font-display text-4xl text-charcoal">Order placed!</h1>
           <p className="text-charcoal/65 leading-relaxed">
-            Thanks, {form.fullName.split(" ")[0]}. We'll confirm your delivery by SMS or WhatsApp shortly.
+            Thanks, {form.fullName.split(" ")[0]}. Order #{placedOrder.orderId} — we'll confirm your delivery by SMS or WhatsApp shortly.
           </p>
 
           {/* Delivery details */}
@@ -154,7 +252,7 @@ export default function CheckoutPage() {
           </div>
 
           <div className="rounded-2xl border border-charcoal/10 bg-white p-6 text-left space-y-3 text-sm">
-            {cartItems.map((item) => (
+            {placedOrder.items.map((item) => (
               <div key={item.id} className="flex justify-between text-charcoal/65">
                 <span>{item.size} × {item.qty}</span>
                 <span>R {(item.price * item.qty).toLocaleString()}</span>
@@ -166,7 +264,7 @@ export default function CheckoutPage() {
             </div>
             <div className="border-t border-charcoal/10 pt-3 flex justify-between font-semibold text-charcoal">
               <span>Total due on delivery</span>
-              <span>R {total.toLocaleString()}</span>
+              <span>R {placedOrder.total.toLocaleString()}</span>
             </div>
           </div>
           <div className="flex flex-col gap-3 pt-2">
@@ -203,6 +301,10 @@ export default function CheckoutPage() {
           {/* Details form — takes 3 of 5 columns */}
           <form onSubmit={handlePlaceOrder} className="lg:col-span-3 space-y-8">
 
+            {submitError && (
+              <p className="rounded-xl border border-rust/30 bg-rust/10 px-4 py-3 text-sm text-rust">{submitError}</p>
+            )}
+
             {/* Contact details */}
             <div className="space-y-5 rounded-2xl border border-charcoal/10 bg-white p-6 sm:p-7">
               <p className={labelClass}>Contact details</p>
@@ -231,13 +333,14 @@ export default function CheckoutPage() {
                   {errors.phone && <p className="mt-1.5 text-xs text-red-500">{errors.phone}</p>}
                 </div>
                 <div>
-                  <label className={labelClass}>Email (optional)</label>
+                  <label className={labelClass}>Email</label>
                   <input
                     type="email"
                     placeholder="you@example.com"
                     value={form.email}
+                    disabled={!!user}
                     onChange={(e) => update("email", e.target.value)}
-                    className={inputClass("email")}
+                    className={`${inputClass("email")} ${user ? "opacity-60" : ""}`}
                   />
                   {errors.email && <p className="mt-1.5 text-xs text-red-500">{errors.email}</p>}
                 </div>
@@ -253,6 +356,47 @@ export default function CheckoutPage() {
                   className={inputClass("company")}
                 />
               </div>
+
+              {/* Guests get the option to save these details for next time */}
+              {!user && (
+                <div className="rounded-xl border border-charcoal/10 bg-cream/60 p-4">
+                  <label className="flex items-center gap-2 text-sm font-semibold text-charcoal">
+                    <input
+                      type="checkbox"
+                      checked={createAccount}
+                      onChange={(e) => setCreateAccount(e.target.checked)}
+                      className="h-4 w-4 rounded border-charcoal/30 text-rust focus:ring-rust"
+                    />
+                    Create an account to track this order
+                  </label>
+                  {createAccount && (
+                    <div className="mt-4 grid grid-cols-2 gap-4">
+                      <div>
+                        <label className={labelClass}>Password</label>
+                        <input
+                          type="password"
+                          placeholder="••••••••"
+                          value={accountPassword}
+                          onChange={(e) => setAccountPassword(e.target.value)}
+                          className={inputClass("accountPassword")}
+                        />
+                        {errors.accountPassword && <p className="mt-1.5 text-xs text-red-500">{errors.accountPassword}</p>}
+                      </div>
+                      <div>
+                        <label className={labelClass}>Confirm password</label>
+                        <input
+                          type="password"
+                          placeholder="••••••••"
+                          value={accountConfirm}
+                          onChange={(e) => setAccountConfirm(e.target.value)}
+                          className={inputClass("accountConfirm")}
+                        />
+                        {errors.accountConfirm && <p className="mt-1.5 text-xs text-red-500">{errors.accountConfirm}</p>}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Delivery address */}
