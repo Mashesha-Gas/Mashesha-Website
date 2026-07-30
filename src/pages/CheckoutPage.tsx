@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { PROVINCES } from "../constants";
 
 const API = import.meta.env.VITE_API_URL;
+const PAYSTACK_PUBLIC_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
 const DELIVERY_FEE = 50;
 
 type Step = "details" | "processing" | "success";
@@ -154,13 +155,26 @@ export default function CheckoutPage() {
     return data.address_id;
   }
 
-  async function handlePlaceOrder(e: React.SyntheticEvent) {
-    e.preventDefault();
-    if (!validate()) return;
-
+  // Runs after Paystack's popup calls back with a reference — re-verifies it
+  // server-side (the popup's own "success" callback is never trusted alone),
+  // cross-checks the paid amount against this order's total, then creates
+  // the order with that reference recorded in order_guid.
+  async function finalizeOrder(reference: string) {
     setStep("processing");
-    setSubmitError("");
     try {
+      const verifyRes = await fetch(`${API}/api/payments/verify`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reference }),
+      });
+      const verifyData = await verifyRes.json().catch(() => ({}));
+      if (!verifyRes.ok || !verifyData.verified) {
+        throw new Error("We couldn't confirm your payment with Paystack. You have not been charged — please try again.");
+      }
+      if (verifyData.currency !== "ZAR" || Math.abs(verifyData.amount - total) > 0.5) {
+        throw new Error("The confirmed payment amount didn't match your order. Please contact us before trying again.");
+      }
+
       const email = await resolveCustomerEmail();
       const addressId = await createOrderAddress();
 
@@ -175,12 +189,12 @@ export default function CheckoutPage() {
         order_date: now.toISOString().slice(0, 10),
         order_time: now.toTimeString().slice(0, 8),
         order_type: 202,
-        order_payment_type: "cod",
+        order_payment_type: "card",
         order_status: 301,
         order_vendor_id: vendorIds.length === 1 ? vendorIds[0] : null,
         order_customer_email: email,
         order_address_id: addressId,
-        order_guid: crypto.randomUUID(),
+        order_guid: reference,
       });
 
       setPlacedOrder({ items: cartItems, total, orderId: order.order_id });
@@ -190,6 +204,33 @@ export default function CheckoutPage() {
       setSubmitError(err instanceof Error ? err.message : "Couldn't place your order. Please try again.");
       setStep("details");
     }
+  }
+
+  function handlePlaceOrder(e: React.SyntheticEvent) {
+    e.preventDefault();
+    if (!validate()) return;
+    setSubmitError("");
+
+    const paystack = (window as any).PaystackPop;
+    if (!paystack) {
+      setSubmitError("Payments are still loading — please try again in a moment.");
+      return;
+    }
+
+    const handler = paystack.setup({
+      key: PAYSTACK_PUBLIC_KEY,
+      email: form.email,
+      amount: Math.round(total * 100),
+      currency: "ZAR",
+      ref: crypto.randomUUID(),
+      callback: (response: { reference: string }) => {
+        finalizeOrder(response.reference);
+      },
+      onClose: () => {
+        setSubmitError("Payment was cancelled — your order was not placed.");
+      },
+    });
+    handler.openIframe();
   }
 
   const inputClass = (field: string) =>
@@ -263,7 +304,7 @@ export default function CheckoutPage() {
               <span>R {DELIVERY_FEE}</span>
             </div>
             <div className="border-t border-charcoal/10 pt-3 flex justify-between font-semibold text-charcoal">
-              <span>Total due on delivery</span>
+              <span>Total paid</span>
               <span>R {placedOrder.total.toLocaleString()}</span>
             </div>
           </div>
@@ -473,12 +514,12 @@ export default function CheckoutPage() {
               className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-rust py-4 text-sm font-semibold text-cream transition-colors duration-200 hover:bg-rust-dark"
             >
               <LockIcon />
-              Place order — R {total.toLocaleString()}
+              Pay R {total.toLocaleString()} with Paystack
             </button>
 
             <p className="text-center text-xs text-charcoal/40 flex items-center justify-center gap-1.5">
               <LockIcon />
-              This is a demo checkout — payment is collected on delivery, nothing is charged now.
+              Secure payment powered by Paystack — your card details never touch our servers.
             </p>
           </form>
 
