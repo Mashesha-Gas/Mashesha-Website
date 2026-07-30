@@ -1,20 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
+import { PROVINCES } from "../constants";
 
 const DELIVERY_FEE = 50;
-
-const PROVINCES = [
-  "Eastern Cape",
-  "Free State",
-  "Gauteng",
-  "KwaZulu-Natal",
-  "Limpopo",
-  "Mpumalanga",
-  "North West",
-  "Northern Cape",
-  "Western Cape",
-];
 
 type Step = "details" | "processing" | "success";
 
@@ -22,6 +12,7 @@ type FormState = {
   fullName: string;
   phone: string;
   email: string;
+  company: string;
   addressLine1: string;
   addressLine2: string;
   city: string;
@@ -33,12 +24,31 @@ const EMPTY_FORM: FormState = {
   fullName: "",
   phone: "",
   email: "",
+  company: "",
   addressLine1: "",
   addressLine2: "",
   city: "",
   province: "",
   postcode: "",
 };
+
+// Prefills the form from the logged-in customer's saved details (if any) —
+// a guest checking out with no session just gets the blank form.
+function buildInitialForm(user: any): FormState {
+  if (!user) return EMPTY_FORM;
+  const address = user.address;
+  return {
+    fullName: user.name ?? "",
+    phone: user.mobile ?? "",
+    email: user.email ?? "",
+    company: user.company ?? "",
+    addressLine1: address?.address_line1 ?? "",
+    addressLine2: [address?.address_unit, address?.address_line2].filter(Boolean).join(", "),
+    city: address?.address_city ?? "",
+    province: address?.address_province ?? "",
+    postcode: address?.address_postcode != null ? String(address.address_postcode) : "",
+  };
+}
 
 function LockIcon() {
   return (
@@ -49,8 +59,9 @@ function LockIcon() {
 }
 
 export default function CheckoutPage() {
+  const { user } = useAuth();
   const [step, setStep] = useState<Step>("details");
-  const [form, setForm] = useState<FormState>(EMPTY_FORM);
+  const [form, setForm] = useState<FormState>(() => buildInitialForm(user));
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { items: cartItems } = useCart();
 
@@ -230,6 +241,17 @@ export default function CheckoutPage() {
                   />
                   {errors.email && <p className="mt-1.5 text-xs text-red-500">{errors.email}</p>}
                 </div>
+              </div>
+
+              <div>
+                <label className={labelClass}>Company (optional)</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Jane's Spaza"
+                  value={form.company}
+                  onChange={(e) => update("company", e.target.value)}
+                  className={inputClass("company")}
+                />
               </div>
             </div>
 

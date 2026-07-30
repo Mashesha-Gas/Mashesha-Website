@@ -29,20 +29,27 @@ function loadStoredUser() {
   return parsed;
 }
 
-function toSessionUser({ token, customer }) {
+// `customer` here is whatever /api/customers/{login,me} returns — includes
+// `address` (the joined Addresses row, or null) alongside the plain fields.
+function toSessionUser(token, customer) {
   return {
     token,
     email: customer.customer_email,
     name: customer.customer_name || customer.customer_email.split("@")[0],
     mobile: customer.customer_mobile,
+    company: customer.customer_company,
+    address: customer.address ?? null,
   };
 }
 
-async function postJson(path, body) {
+async function request(path, { method = "GET", token, body } = {}) {
   const res = await fetch(`${API}${path}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    ...(body ? { body: JSON.stringify(body) } : {}),
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.error || "Something went wrong. Please try again.");
@@ -59,17 +66,28 @@ export function AuthProvider({ children }) {
   }
 
   async function login({ email, password }) {
-    const data = await postJson("/api/customers/login", { email, password });
-    persist(toSessionUser(data));
+    const { token } = await request("/api/customers/login", { method: "POST", body: { email, password } });
+    const customer = await request("/api/customers/me", { token });
+    persist(toSessionUser(token, customer));
   }
 
   async function signup({ name, email, password }) {
-    const data = await postJson("/api/customers", {
-      customer_name: name,
-      customer_email: email,
-      customer_password: password,
+    const { token } = await request("/api/customers", {
+      method: "POST",
+      body: { customer_name: name, customer_email: email, customer_password: password },
     });
-    persist(toSessionUser(data));
+    const customer = await request("/api/customers/me", { token });
+    persist(toSessionUser(token, customer));
+  }
+
+  // Accepts any subset of { customer_name, customer_mobile, customer_company,
+  // customer_password, address_line1, address_line2, address_unit, address_city,
+  // address_postcode, address_province } — omitted fields keep their current value.
+  async function updateProfile(fields) {
+    if (!user) throw new Error("Not logged in");
+    const customer = await request("/api/customers/me", { method: "PUT", token: user.token, body: fields });
+    persist(toSessionUser(user.token, customer));
+    return customer;
   }
 
   function logout() {
@@ -78,7 +96,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, signup, logout }}>
+    <AuthContext.Provider value={{ user, login, signup, updateProfile, logout }}>
       {children}
     </AuthContext.Provider>
   );
