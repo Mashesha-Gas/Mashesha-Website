@@ -155,10 +155,12 @@ export default function CheckoutPage() {
     return data.address_id;
   }
 
-  // Runs after Paystack's popup calls back with a reference — re-verifies it
-  // server-side (the popup's own "success" callback is never trusted alone),
-  // cross-checks the paid amount against this order's total, then creates
-  // the order with that reference recorded in order_guid.
+  // Runs after Paystack's popup calls back with a reference. This does its
+  // own early verify+amount check purely for fast user feedback — the real
+  // enforcement happens server-side in POST /api/orders, which independently
+  // re-verifies paystack_reference with Paystack before it'll write anything
+  // to order_payment_reference, so a request that skips this flow entirely
+  // (e.g. hitting the API directly) still can't forge a paid order.
   async function finalizeOrder(reference: string) {
     setStep("processing");
     try {
@@ -194,7 +196,8 @@ export default function CheckoutPage() {
         order_vendor_id: vendorIds.length === 1 ? vendorIds[0] : null,
         order_customer_email: email,
         order_address_id: addressId,
-        order_guid: reference,
+        order_guid: crypto.randomUUID(),
+        paystack_reference: reference,
       });
 
       setPlacedOrder({ items: cartItems, total, orderId: order.order_id });
