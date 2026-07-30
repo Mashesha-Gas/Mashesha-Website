@@ -1,10 +1,44 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 
 const DELIVERY_FEE = 50;
 
-type Step = "payment" | "processing" | "success";
+const PROVINCES = [
+  "Eastern Cape",
+  "Free State",
+  "Gauteng",
+  "KwaZulu-Natal",
+  "Limpopo",
+  "Mpumalanga",
+  "North West",
+  "Northern Cape",
+  "Western Cape",
+];
+
+type Step = "details" | "processing" | "success";
+
+type FormState = {
+  fullName: string;
+  phone: string;
+  email: string;
+  addressLine1: string;
+  addressLine2: string;
+  city: string;
+  province: string;
+  postcode: string;
+};
+
+const EMPTY_FORM: FormState = {
+  fullName: "",
+  phone: "",
+  email: "",
+  addressLine1: "",
+  addressLine2: "",
+  city: "",
+  province: "",
+  postcode: "",
+};
 
 function LockIcon() {
   return (
@@ -14,50 +48,38 @@ function LockIcon() {
   );
 }
 
-// Formats a raw card number string as "1234 5678 9012 3456"
-function formatCardNumber(value: string) {
-  return value.replace(/\D/g, "").slice(0, 16).replace(/(.{4})/g, "$1 ").trim();
-}
-
-// Formats expiry as "MM / YY"
-function formatExpiry(value: string) {
-  const digits = value.replace(/\D/g, "").slice(0, 4);
-  if (digits.length >= 3) return digits.slice(0, 2) + " / " + digits.slice(2);
-  return digits;
-}
-
 export default function CheckoutPage() {
-  const [step, setStep] = useState<Step>("payment");
-  const [method, setMethod] = useState<"card" | "eft">("card");
-  const [cardNumber, setCardNumber] = useState("");
-  const [expiry, setExpiry] = useState("");
-  const [cvv, setCvv] = useState("");
-  const [name, setName] = useState("");
+  const [step, setStep] = useState<Step>("details");
+  const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const navigate = useNavigate();
   const { items: cartItems } = useCart();
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.qty, 0);
   const total = subtotal + DELIVERY_FEE;
 
+  function update<K extends keyof FormState>(field: K, value: FormState[K]) {
+    setForm((f) => ({ ...f, [field]: value }));
+  }
+
   function validate() {
     const e: Record<string, string> = {};
-    if (method === "card") {
-      if (cardNumber.replace(/\s/g, "").length < 16) e.cardNumber = "Enter a valid 16-digit card number.";
-      if (expiry.replace(/\s/g, "").replace("/", "").length < 4) e.expiry = "Enter a valid expiry date.";
-      if (cvv.length < 3) e.cvv = "Enter your 3-digit CVV.";
-      if (!name.trim()) e.name = "Enter the name on your card.";
-    }
+    if (!form.fullName.trim()) e.fullName = "Enter your full name.";
+    if (form.phone.replace(/\D/g, "").length < 10) e.phone = "Enter a valid phone number.";
+    if (form.email.trim() && !form.email.includes("@")) e.email = "Enter a valid email address.";
+    if (!form.addressLine1.trim()) e.addressLine1 = "Enter your street address.";
+    if (!form.city.trim()) e.city = "Enter your city or suburb.";
+    if (!form.province) e.province = "Select a province.";
+    if (form.postcode.replace(/\D/g, "").length !== 4) e.postcode = "Enter a valid 4-digit postal code.";
     setErrors(e);
     return Object.keys(e).length === 0;
   }
 
-  function handlePay(e: React.SyntheticEvent) {
+  function handlePlaceOrder(e: React.SyntheticEvent) {
     e.preventDefault();
     if (!validate()) return;
 
     setStep("processing");
-    // Simulate a 2-second payment processing delay
+    // Simulate a short delay while the "order" is sent off
     setTimeout(() => setStep("success"), 2000);
   }
 
@@ -74,7 +96,7 @@ export default function CheckoutPage() {
       <main className="bg-cream min-h-screen flex items-center justify-center pt-20">
         <div className="text-center space-y-5">
           <div className="mx-auto h-14 w-14 rounded-full border-4 border-rust border-t-transparent animate-spin" />
-          <p className="font-display text-2xl text-charcoal">Processing payment…</p>
+          <p className="font-display text-2xl text-charcoal">Placing your order…</p>
           <p className="text-sm text-charcoal/50">Please don't close this page.</p>
         </div>
       </main>
@@ -93,21 +115,30 @@ export default function CheckoutPage() {
           </div>
           <h1 className="font-display text-4xl text-charcoal">Order placed!</h1>
           <p className="text-charcoal/65 leading-relaxed">
-            Thanks for your order. We'll confirm your delivery by SMS or WhatsApp shortly.
+            Thanks, {form.fullName.split(" ")[0]}. We'll confirm your delivery by SMS or WhatsApp shortly.
           </p>
 
-          {/* Delivery time estimate */}
-          <div className="rounded-2xl bg-rust p-5 text-left flex items-start gap-4">
-            <svg viewBox="0 0 24 24" className="h-5 w-5 flex-shrink-0 text-cream mt-0.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="10" />
-              <path d="M12 6v6l4 2" />
-            </svg>
-            <div>
-              <p className="text-sm font-semibold text-cream">Estimated delivery</p>
+          {/* Delivery details */}
+          <div className="rounded-2xl bg-rust p-5 text-left space-y-3">
+            <div className="flex items-start gap-4">
+              <svg viewBox="0 0 24 24" className="h-5 w-5 flex-shrink-0 text-cream mt-0.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 6v6l4 2" />
+              </svg>
+              <div>
+                <p className="text-sm font-semibold text-cream">Estimated delivery</p>
+                <p className="mt-0.5 text-sm text-cream/80">
+                  Today between <span className="font-semibold text-cream">2 – 4 hours</span> from now.
+                  Orders placed after 3 pm are delivered the following morning.
+                </p>
+              </div>
+            </div>
+            <div className="border-t border-cream/20 pt-3">
+              <p className="text-sm font-semibold text-cream">Delivering to</p>
               <p className="mt-0.5 text-sm text-cream/80">
-                Today between <span className="font-semibold text-cream">2 – 4 hours</span> from now.
-                Orders placed after 3 pm are delivered the following morning.
+                {form.addressLine1}{form.addressLine2 ? `, ${form.addressLine2}` : ""}, {form.city}, {form.province} {form.postcode}
               </p>
+              <p className="mt-1 text-sm text-cream/80">{form.phone}</p>
             </div>
           </div>
 
@@ -123,7 +154,7 @@ export default function CheckoutPage() {
               <span>R {DELIVERY_FEE}</span>
             </div>
             <div className="border-t border-charcoal/10 pt-3 flex justify-between font-semibold text-charcoal">
-              <span>Total paid</span>
+              <span>Total due on delivery</span>
               <span>R {total.toLocaleString()}</span>
             </div>
           </div>
@@ -143,7 +174,7 @@ export default function CheckoutPage() {
     );
   }
 
-  // ── Payment form ────────────────────────────────────────────────────────────
+  // ── Address & contact details form ──────────────────────────────────────────
   return (
     <main className="bg-cream min-h-screen pt-24 pb-20">
       <div className="mx-auto max-w-5xl px-5 sm:px-8">
@@ -158,125 +189,130 @@ export default function CheckoutPage() {
 
         <div className="grid gap-10 lg:grid-cols-5">
 
-          {/* Payment form — takes 3 of 5 columns */}
-          <form onSubmit={handlePay} className="lg:col-span-3 space-y-8">
+          {/* Details form — takes 3 of 5 columns */}
+          <form onSubmit={handlePlaceOrder} className="lg:col-span-3 space-y-8">
 
-            {/* Payment method toggle */}
-            <div>
-              <p className={labelClass}>Payment method</p>
-              <div className="flex rounded-xl border border-charcoal/10 bg-white p-1">
-                <button
-                  type="button"
-                  onClick={() => setMethod("card")}
-                  className={`flex-1 rounded-lg py-2.5 text-sm font-semibold transition-colors duration-200 ${
-                    method === "card" ? "bg-rust text-cream" : "text-charcoal/50 hover:text-charcoal"
-                  }`}
-                >
-                  Credit / Debit card
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setMethod("eft")}
-                  className={`flex-1 rounded-lg py-2.5 text-sm font-semibold transition-colors duration-200 ${
-                    method === "eft" ? "bg-rust text-cream" : "text-charcoal/50 hover:text-charcoal"
-                  }`}
-                >
-                  EFT / Bank transfer
-                </button>
+            {/* Contact details */}
+            <div className="space-y-5">
+              <p className={labelClass}>Contact details</p>
+              <div>
+                <label className={labelClass}>Full name</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Thandi Mokoena"
+                  value={form.fullName}
+                  onChange={(e) => update("fullName", e.target.value)}
+                  className={inputClass("fullName")}
+                />
+                {errors.fullName && <p className="mt-1.5 text-xs text-red-500">{errors.fullName}</p>}
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={labelClass}>Phone</label>
+                  <input
+                    type="tel"
+                    placeholder="082 123 4567"
+                    value={form.phone}
+                    onChange={(e) => update("phone", e.target.value)}
+                    className={inputClass("phone")}
+                  />
+                  {errors.phone && <p className="mt-1.5 text-xs text-red-500">{errors.phone}</p>}
+                </div>
+                <div>
+                  <label className={labelClass}>Email (optional)</label>
+                  <input
+                    type="email"
+                    placeholder="you@example.com"
+                    value={form.email}
+                    onChange={(e) => update("email", e.target.value)}
+                    className={inputClass("email")}
+                  />
+                  {errors.email && <p className="mt-1.5 text-xs text-red-500">{errors.email}</p>}
+                </div>
               </div>
             </div>
 
-            {/* Card fields */}
-            {method === "card" && (
-              <div className="space-y-5">
-                <div>
-                  <label className={labelClass}>Name on card</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Thandi Mokoena"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className={inputClass("name")}
-                  />
-                  {errors.name && <p className="mt-1.5 text-xs text-red-500">{errors.name}</p>}
-                </div>
+            {/* Delivery address */}
+            <div className="space-y-5">
+              <p className={labelClass}>Delivery address</p>
+              <div>
+                <label className={labelClass}>Street address</label>
+                <input
+                  type="text"
+                  placeholder="e.g. 12 Long Street"
+                  value={form.addressLine1}
+                  onChange={(e) => update("addressLine1", e.target.value)}
+                  className={inputClass("addressLine1")}
+                />
+                {errors.addressLine1 && <p className="mt-1.5 text-xs text-red-500">{errors.addressLine1}</p>}
+              </div>
 
+              <div>
+                <label className={labelClass}>Unit / complex (optional)</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Unit 4, Flat 2B"
+                  value={form.addressLine2}
+                  onChange={(e) => update("addressLine2", e.target.value)}
+                  className={inputClass("addressLine2")}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className={labelClass}>Card number</label>
+                  <label className={labelClass}>City / suburb</label>
                   <input
                     type="text"
-                    placeholder="1234 5678 9012 3456"
-                    value={cardNumber}
-                    onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
+                    placeholder="e.g. Sandton"
+                    value={form.city}
+                    onChange={(e) => update("city", e.target.value)}
+                    className={inputClass("city")}
+                  />
+                  {errors.city && <p className="mt-1.5 text-xs text-red-500">{errors.city}</p>}
+                </div>
+                <div>
+                  <label className={labelClass}>Postal code</label>
+                  <input
+                    type="text"
+                    placeholder="2065"
                     inputMode="numeric"
-                    className={inputClass("cardNumber")}
+                    value={form.postcode}
+                    onChange={(e) => update("postcode", e.target.value.replace(/\D/g, "").slice(0, 4))}
+                    className={inputClass("postcode")}
                   />
-                  {errors.cardNumber && <p className="mt-1.5 text-xs text-red-500">{errors.cardNumber}</p>}
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className={labelClass}>Expiry</label>
-                    <input
-                      type="text"
-                      placeholder="MM / YY"
-                      value={expiry}
-                      onChange={(e) => setExpiry(formatExpiry(e.target.value))}
-                      inputMode="numeric"
-                      className={inputClass("expiry")}
-                    />
-                    {errors.expiry && <p className="mt-1.5 text-xs text-red-500">{errors.expiry}</p>}
-                  </div>
-                  <div>
-                    <label className={labelClass}>CVV</label>
-                    <input
-                      type="text"
-                      placeholder="123"
-                      value={cvv}
-                      onChange={(e) => setCvv(e.target.value.replace(/\D/g, "").slice(0, 4))}
-                      inputMode="numeric"
-                      className={inputClass("cvv")}
-                    />
-                    {errors.cvv && <p className="mt-1.5 text-xs text-red-500">{errors.cvv}</p>}
-                  </div>
+                  {errors.postcode && <p className="mt-1.5 text-xs text-red-500">{errors.postcode}</p>}
                 </div>
               </div>
-            )}
 
-            {/* EFT instructions */}
-            {method === "eft" && (
-              <div className="rounded-2xl border border-charcoal/10 bg-white p-7 space-y-4">
-                <p className="text-sm font-semibold text-charcoal">Bank transfer details</p>
-                {[
-                  { label: "Bank", value: "FNB" },
-                  { label: "Account name", value: "Mashesha Gas (Pty) Ltd" },
-                  { label: "Account number", value: "62 000 123 456" },
-                  { label: "Branch code", value: "250 655" },
-                  { label: "Reference", value: "Your phone number" },
-                ].map((row) => (
-                  <div key={row.label} className="flex justify-between text-sm border-t border-charcoal/8 pt-3">
-                    <span className="text-charcoal/50">{row.label}</span>
-                    <span className="font-medium text-charcoal">{row.value}</span>
-                  </div>
-                ))}
-                <p className="text-xs text-charcoal/50 pt-2">
-                  Send your proof of payment to <span className="text-rust">info@mashesha.co.za</span> and we'll confirm your delivery.
-                </p>
+              <div>
+                <label className={labelClass}>Province</label>
+                <select
+                  value={form.province}
+                  onChange={(e) => update("province", e.target.value)}
+                  className={inputClass("province")}
+                >
+                  <option value="">Select a province</option>
+                  {PROVINCES.map((p) => (
+                    <option key={p} value={p}>{p}</option>
+                  ))}
+                </select>
+                {errors.province && <p className="mt-1.5 text-xs text-red-500">{errors.province}</p>}
               </div>
-            )}
+            </div>
 
-            {/* Pay button */}
+            {/* Place order button */}
             <button
               type="submit"
               className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-rust py-4 text-sm font-semibold text-cream transition-colors duration-200 hover:bg-rust-dark"
             >
               <LockIcon />
-              {method === "card" ? `Pay R ${total.toLocaleString()}` : "I've made the transfer"}
+              Place order — R {total.toLocaleString()}
             </button>
 
             <p className="text-center text-xs text-charcoal/40 flex items-center justify-center gap-1.5">
               <LockIcon />
-              This is a demo checkout — no real payment is processed.
+              This is a demo checkout — payment is collected on delivery, nothing is charged now.
             </p>
           </form>
 
