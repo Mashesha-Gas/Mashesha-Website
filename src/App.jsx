@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import CartToast from "./components/CartToast";
 import HomePage from "./pages/HomePage";
 import ProductsPage from "./pages/ProductsPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
@@ -51,6 +52,7 @@ function App() {
         />
       </Routes>
       <Footer />
+      <CartToast />
     </>
   );
 }

@@ -10,6 +10,9 @@ export function CartProvider({ children }) {
     const saved = localStorage.getItem("mashesha_cart");
     return saved ? JSON.parse(saved) : [];
   });
+  // Set on every addItem() call so <CartToast> can slide in — a new object
+  // (via ts) even for the same product, so re-adding retriggers the popup.
+  const [toast, setToast] = useState(null);
 
   function persist(next) {
     localStorage.setItem("mashesha_cart", JSON.stringify(next));
@@ -32,6 +35,15 @@ export function CartProvider({ children }) {
     } else {
       persist([...items, { id, size, tagline: product.inventory_brand || "", price, qty }]);
     }
+
+    setToast({
+      id,
+      size,
+      qty,
+      price,
+      thumbnailPath: product.inventory_thumbnail_path || null,
+      ts: Date.now(),
+    });
   }
 
   function increment(id) {
@@ -49,7 +61,7 @@ export function CartProvider({ children }) {
   }
 
   return (
-    <CartContext.Provider value={{ items, addItem, increment, decrement, removeItem }}>
+    <CartContext.Provider value={{ items, addItem, increment, decrement, removeItem, toast }}>
       {children}
     </CartContext.Provider>
   );

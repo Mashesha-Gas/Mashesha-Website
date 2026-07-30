@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import logoName from "./logo&name.png";
 import { useAuth } from "../context/AuthContext";
+import { useCart } from "../context/CartContext";
 
 const NAV_LINKS = [
   { to: "/", label: "Home" },
@@ -30,6 +31,15 @@ function ProfileIcon() {
   );
 }
 
+function CartBadge({ count }) {
+  if (count <= 0) return null;
+  return (
+    <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-cream px-1 text-[10px] font-bold text-rust">
+      {count > 99 ? "99+" : count}
+    </span>
+  );
+}
+
 function UserAvatar({ name }) {
   return (
     <span className="flex h-8 w-8 items-center justify-center rounded-full bg-cream text-xs font-semibold text-rust">
@@ -42,6 +52,8 @@ function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { user } = useAuth();
+  const { items } = useCart();
+  const cartCount = items.reduce((sum, item) => sum + item.qty, 0);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -107,9 +119,10 @@ function Header() {
           <Link
             to="/cart"
             aria-label="My cart"
-            className="flex h-9 w-9 items-center justify-center rounded-full text-cream/80 transition-colors duration-200 hover:bg-cream/10 hover:text-cream"
+            className="relative flex h-9 w-9 items-center justify-center rounded-full text-cream/80 transition-colors duration-200 hover:bg-cream/10 hover:text-cream"
           >
             <CartIcon />
+            <CartBadge count={cartCount} />
           </Link>
           {/* Button flips to cream background so it stands out against the rust header */}
           <Link
@@ -134,9 +147,10 @@ function Header() {
             to="/cart"
             onClick={() => setOpen(false)}
             aria-label="My cart"
-            className="flex h-10 w-10 items-center justify-center rounded-full text-cream/80 hover:text-cream"
+            className="relative flex h-10 w-10 items-center justify-center rounded-full text-cream/80 hover:text-cream"
           >
             <CartIcon />
+            <CartBadge count={cartCount} />
           </Link>
           <button
             type="button"
