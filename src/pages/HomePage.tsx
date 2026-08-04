@@ -1,11 +1,15 @@
 import { Link } from "react-router-dom";
+import orangePatternedBackground from "../components/OrangePatternedBackround.png";
 
 export default function HomePage() {
   return (
     <main>
       {/* Hero */}
-      <section className="bg-rust min-h-screen flex items-center pt-20">
-        <div className="mx-auto max-w-7xl px-5 sm:px-8 py-20">
+      <section
+        className="relative bg-rust min-h-screen flex items-center pt-20 overflow-hidden bg-cover bg-center"
+        style={{ backgroundImage: `url(${orangePatternedBackground})` }}
+      >
+        <div className="relative mx-auto max-w-7xl px-5 sm:px-8 py-20">
           <span className="text-xs font-semibold uppercase tracking-widest text-cream/80">
             Johannesburg's gas delivery service
           </span>
