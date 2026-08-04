@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useInventoryList, resolveImageUrl, CYLINDER_TYPE } from "../hooks/useInventory";
 import { useCart } from "../context/CartContext";
+import SEO from "../components/SEO";
 
 interface InventoryRow {
   inventory_id: number;
@@ -110,6 +111,11 @@ export default function ProductsPage() {
 
   return (
     <main className="bg-cream min-h-screen pt-24 pb-20">
+      <SEO
+        title="Gas Cylinders for Sale | LPG for Cooking & Gas Heaters — Mashesha"
+        description="Browse LPG gas cylinders for cooking, stoves and gas heaters. All sizes in stock, refilled to SANS safety standards, delivered across Johannesburg by Mashesha."
+        path="/products"
+      />
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         {/* Page header */}
         <div className="max-w-2xl py-12">

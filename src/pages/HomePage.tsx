@@ -1,9 +1,15 @@
 import { Link } from "react-router-dom";
-import orangePatternedBackground from "../components/OrangePatternedBackround.png";
+import SEO from "../components/SEO";
+import orangePatternedBackground from "../components/orange-patterned-background.webp";
 
 export default function HomePage() {
   return (
     <main>
+      <SEO
+        title="Mashesha — Gas Delivery Near You | LPG Gas in Johannesburg"
+        description="Mashesha delivers LPG gas cylinders straight to your door in Johannesburg. Fast, safe gas delivery for cooking, stoves and gas heaters — order gas near you today."
+        path="/"
+      />
       {/* Hero */}
       <section
         className="relative bg-rust min-h-screen flex items-center pt-20 overflow-hidden bg-cover bg-center"

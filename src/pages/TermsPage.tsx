@@ -1,3 +1,5 @@
+import SEO from "../components/SEO";
+
 const SECTIONS = [
   {
     title: "1. Acceptance of terms",
@@ -36,6 +38,11 @@ const SECTIONS = [
 export default function TermsPage() {
   return (
     <main className="bg-cream min-h-screen pt-24 pb-20">
+      <SEO
+        title="Terms & Conditions | Mashesha"
+        description="Read the terms and conditions for ordering LPG gas delivery from Mashesha in Johannesburg."
+        path="/terms"
+      />
       <div className="mx-auto max-w-3xl px-5 sm:px-8">
         <span className="text-xs font-semibold uppercase tracking-widest text-rust">
           Legal

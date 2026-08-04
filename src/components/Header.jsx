@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
-import logoIcon from "./logo-icon.png";
+import logoIcon from "./logo-icon.webp";
 import nameSlogan from "./nameslogan-cropped.png";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";

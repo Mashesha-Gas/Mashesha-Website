@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import logoIcon from "./logo-icon.png";
+import logoIcon from "./logo-icon.webp";
 import nameSlogan from "./nameslogan-cropped.png";
 
 function Footer() {

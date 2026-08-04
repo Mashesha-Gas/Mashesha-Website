@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { useMyOrders, ORDER_STATUS, isActiveOrder } from "../hooks/useOrders";
 import { useInventoryList } from "../hooks/useInventory";
 import { PROVINCES } from "../constants";
+import SEO from "../components/SEO";
 
 interface Order {
   order_id: number;
@@ -222,6 +223,7 @@ export default function ProfilePage() {
 
   return (
     <main className="bg-rust min-h-screen pt-24 pb-20">
+      <SEO title="My Profile | Mashesha" description="View your Mashesha account and order history." path="/profile" noIndex />
       <div className="mx-auto max-w-4xl px-5 sm:px-8">
 
         {/* Page header */}
