@@ -49,7 +49,10 @@
       "Bash(curl -s -o /dev/null -w \"status: %{http_code}\\\\n\" http://localhost:3000/api/customers/guest-flow-test@example.com)",
       "Bash(curl -s -X POST http://localhost:3000/api/customers -H 'Content-Type: application/json' -d '{\"customer_name\":\"Guest Flow Test\",\"customer_email\":\"guest-flow-test@example.com\",\"customer_password\":\"9f3a7c1e8b2d4f6091a5c3e7b8d2f4a6\",\"customer_mobile\":\"0821234567\",\"customer_company\":null}' -w '\\\\nstatus: %{http_code}\\\\n')",
       "Bash(curl -s -X POST http://localhost:3000/api/customers/forgot-password -H 'Content-Type: application/json' -d '{\"email\":\"guest-flow-test@example.com\"}' -w '\\\\nstatus: %{http_code}\\\\n')",
-      "Bash(curl -s -X DELETE http://localhost:3000/api/customers/guest-flow-test@example.com -w \"\\\\ndeleted: %{http_code}\\\\n\")"
+      "Bash(curl -s -X DELETE http://localhost:3000/api/customers/guest-flow-test@example.com -w \"\\\\ndeleted: %{http_code}\\\\n\")",
+      "Bash(powershell -NoProfile -Command 'Add-Type -AssemblyName System.Drawing; $img = [System.Drawing.Image]::FromFile\\('\\\\''c:\\\\Mashesha\\\\mashesa-website\\\\public\\\\og-image.jpg'\\\\''\\); Write-Output \\($img.Width.ToString\\(\\) + '\\\\''x'\\\\'' + $img.Height.ToString\\(\\)\\); $img.Dispose\\(\\)')",
+      "Bash(WEBSITE_URL=https://mashesha.co.za node -e ' *)",
+      "Bash(OUT_PATH=/c/Users/hoque/AppData/Local/Temp/claude/c--Mashesha-mashesa-website/d8c0ecc4-675c-48df-83db-94435cc4feb4/scratchpad/preview-reset-email.html node -e ' *)"
     ]
   }
 }
