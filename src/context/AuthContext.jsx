@@ -86,6 +86,14 @@ export function AuthProvider({ children }) {
     await establishSession(token);
   }
 
+  async function forgotPassword({ email }) {
+    await request("/api/customers/forgot-password", { method: "POST", body: { email } });
+  }
+
+  async function resetPassword({ token, password }) {
+    await request("/api/customers/reset-password", { method: "POST", body: { token, password } });
+  }
+
   // Accepts any subset of { customer_name, customer_mobile, customer_company,
   // customer_password, address_line1, address_line2, address_unit, address_city,
   // address_postcode, address_province } — omitted fields keep their current value.
@@ -102,7 +110,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, signup, updateProfile, establishSession, logout }}>
+    <AuthContext.Provider value={{ user, login, signup, updateProfile, establishSession, logout, forgotPassword, resetPassword }}>
       {children}
     </AuthContext.Provider>
   );

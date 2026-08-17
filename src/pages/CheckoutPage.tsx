@@ -167,7 +167,7 @@ export default function CheckoutPage() {
       const verifyRes = await fetch(`${API}/api/payments/verify`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ reference }),
+        body: JSON.stringify({ reference, email: form.email }),
       });
       const verifyData = await verifyRes.json().catch(() => ({}));
       if (!verifyRes.ok || !verifyData.verified) {

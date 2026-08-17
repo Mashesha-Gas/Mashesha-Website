@@ -12,6 +12,7 @@ import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import ProfilePage from "./pages/ProfilePage";
 import AuthPage from "./pages/AuthPage";
+import ResetPassword from "./pages/ResetPassword";
 import { useAuth } from "./context/AuthContext";
 
 // ProtectedRoute wraps pages that require login.
@@ -42,6 +43,7 @@ function App() {
         <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/login" element={<AuthPage />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route
           path="/profile"
           element={
