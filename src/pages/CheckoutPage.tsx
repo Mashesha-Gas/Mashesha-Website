@@ -126,8 +126,9 @@ export default function CheckoutPage() {
   async function resolveCustomerEmail(): Promise<string> {
     if (user) return user.email;
 
-    const existsRes = await fetch(`${API}/api/customers/${encodeURIComponent(form.email)}`);
-    if (existsRes.ok) return form.email;
+    const existsRes = await fetch(`${API}/api/customers/${encodeURIComponent(form.email)}/exists`);
+    const { exists } = await existsRes.json().catch(() => ({ exists: false }));
+    if (exists) return form.email;
 
     const password = createAccount && accountPassword ? accountPassword : randomPassword();
     const data = await postJson("/api/customers", {
