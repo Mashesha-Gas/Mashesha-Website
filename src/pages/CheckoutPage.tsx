@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { PROVINCES } from "../constants";
+import SEO from "../components/SEO";
 
 const API = import.meta.env.VITE_API_URL;
 const PAYSTACK_PUBLIC_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
@@ -247,6 +248,7 @@ export default function CheckoutPage() {
   if (step === "processing") {
     return (
       <main className="bg-cream min-h-screen flex items-center justify-center pt-20">
+        <SEO title="Placing Your Order… | Mashesha" description="Placing your gas cylinder order." path="/checkout" noIndex />
         <div className="text-center space-y-5">
           <div className="mx-auto h-14 w-14 rounded-full border-4 border-rust border-t-transparent animate-spin" />
           <p className="font-display text-2xl text-charcoal">Placing your order…</p>
@@ -260,6 +262,7 @@ export default function CheckoutPage() {
   if (step === "success" && placedOrder) {
     return (
       <main className="bg-cream min-h-screen flex items-center justify-center pt-20 px-5 pb-12">
+        <SEO title="Order Placed | Mashesha" description="Your gas cylinder order has been placed." path="/checkout" noIndex />
         <div className="w-full max-w-md text-center space-y-5">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-rust">
             <svg viewBox="0 0 24 24" className="h-8 w-8 text-cream" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -330,6 +333,7 @@ export default function CheckoutPage() {
   // ── Address & contact details form ──────────────────────────────────────────
   return (
     <main className="bg-cream min-h-screen pt-24 pb-20">
+      <SEO title="Checkout | Mashesha" description="Complete your gas cylinder order details and delivery address." path="/checkout" noIndex />
       <div className="mx-auto max-w-5xl px-5 sm:px-8">
 
         {/* Header */}

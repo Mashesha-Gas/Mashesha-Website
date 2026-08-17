@@ -1,15 +1,34 @@
 import { Link } from "react-router-dom";
 import JohannesburgMap from "../components/JohannesburgMap";
+import SEO from "../components/SEO";
 
 const AREAS = [
-  "Soweto", "Sandton", "Randburg", "Roodepoort", "Midrand", "Alexandra",
-  "Tembisa", "Boksburg", "Germiston", "Edenvale", "Kempton Park", "Fourways",
-  "Diepkloof", "Orange Farm", "Naturena", "Lenasia",
+  { name: "Soweto", blurb: "Fast LPG gas cylinder delivery across Soweto, every day of the week." },
+  { name: "Sandton", blurb: "Reliable gas delivery in Sandton for homes, offices and restaurants." },
+  { name: "Randburg", blurb: "LPG gas cylinders delivered to your door in Randburg, same day." },
+  { name: "Roodepoort", blurb: "Order gas delivery in Roodepoort — cylinders refilled and delivered fast." },
+  { name: "Midrand", blurb: "Gas delivery in Midrand for cooking, heating, and business use." },
+  { name: "Alexandra", blurb: "Mashesha delivers LPG gas straight to your door in Alexandra." },
+  { name: "Tembisa", blurb: "Same-day gas cylinder delivery across Tembisa, safe and reliable." },
+  { name: "Boksburg", blurb: "Get LPG gas delivered in Boksburg — order online or by phone." },
+  { name: "Germiston", blurb: "Gas delivery in Germiston for households and small businesses." },
+  { name: "Edenvale", blurb: "LPG gas cylinders delivered fast across Edenvale." },
+  { name: "Kempton Park", blurb: "Order gas delivery near Kempton Park, refilled to SANS standards." },
+  { name: "Fourways", blurb: "Gas delivery in Fourways — cylinders for cooking and gas heaters." },
+  { name: "Diepkloof", blurb: "Same-day LPG delivery for homes and businesses in Diepkloof." },
+  { name: "Orange Farm", blurb: "Mashesha delivers gas cylinders to Orange Farm, fast and safe." },
+  { name: "Naturena", blurb: "Reliable gas delivery in Naturena, refilled and delivered same day." },
+  { name: "Lenasia", blurb: "LPG gas delivery in Lenasia for cooking and gas heaters." },
 ];
 
 export default function LocationsPage() {
   return (
     <main className="bg-cream min-h-screen pt-24 pb-20">
+      <SEO
+        title="Gas Delivery Near You — Johannesburg Areas We Serve | Mashesha"
+        description="Mashesha delivers LPG gas to Soweto, Sandton, Randburg, Midrand and more. Find out if we deliver gas near you, anywhere across Johannesburg."
+        path="/locations"
+      />
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         {/* Page header */}
         <div className="py-12 max-w-2xl">
@@ -36,12 +55,27 @@ export default function LocationsPage() {
         {/* Areas grid */}
         <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 mb-16">
           {AREAS.map((area) => (
-            <div
-              key={area}
-              className="rounded-xl border border-charcoal/10 bg-white px-5 py-4"
+            <details
+              key={area.name}
+              className="group rounded-xl border border-charcoal/10 bg-white px-5 py-4"
             >
-              <span className="text-sm font-medium text-charcoal">{area}</span>
-            </div>
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-2 marker:hidden [&::-webkit-details-marker]:hidden">
+                <span className="text-sm font-medium text-charcoal">{area.name}</span>
+                <svg
+                  viewBox="0 0 12 8"
+                  className="h-2.5 w-2.5 flex-shrink-0 text-charcoal/30 transition-transform duration-200 group-open:rotate-180"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M1 1.5L6 6.5L11 1.5" />
+                </svg>
+              </summary>
+              <p className="mt-2 text-xs text-charcoal/60 leading-relaxed">{area.blurb}</p>
+            </details>
           ))}
         </div>
 

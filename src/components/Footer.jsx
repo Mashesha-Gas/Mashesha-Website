@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import logoName from "./logo&name.png";
+import logoIcon from "./logo-icon.webp";
+import nameSlogan from "./nameslogan-cropped.png";
 
 function Footer() {
   const year = new Date().getFullYear();
@@ -13,8 +14,9 @@ function Footer() {
 
           {/* Brand block */}
           <div>
-            <div className="flex items-center">
-              <img src={logoName} alt="Mashesha Gas" className="h-8 w-auto" />
+            <div className="flex items-center gap-2">
+              <img src={logoIcon} alt="" className="h-8 w-auto" />
+              <img src={nameSlogan} alt="Mashesha — Gas shup shup." className="h-6 w-auto" />
             </div>
             <Link
               to="/contact"
@@ -45,9 +47,17 @@ function Footer() {
         </div>
 
         {/* Copyright */}
-        <p className="mt-8 border-t border-cream/15 pt-5 text-center text-xs text-cream/35">
-          © {year} Mashesha Gas. All rights reserved.
-        </p>
+        <div className="mt-8 border-t border-cream/15 pt-5 flex flex-col items-center gap-2 text-center sm:flex-row sm:justify-between">
+          <p className="text-xs text-cream/35">
+            © {year} Mashesha Gas. All rights reserved.
+          </p>
+          <Link
+            to="/terms"
+            className="text-xs text-cream/50 hover:text-cream/80 transition-colors duration-200"
+          >
+            Terms & Conditions
+          </Link>
+        </div>
       </div>
     </footer>
   );

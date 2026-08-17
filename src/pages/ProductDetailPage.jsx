@@ -3,6 +3,7 @@ import { useParams, Link, Navigate } from "react-router-dom";
 import CylinderIcon from "../components/CylinderIcon";
 import { useInventoryItem, useInventoryList, resolveImageUrl, CYLINDER_TYPE } from "../hooks/useInventory";
 import { useCart } from "../context/CartContext";
+import SEO from "../components/SEO";
 
 function formatPrice(item) {
   const price = Number(item.inventory_price);
@@ -61,6 +62,11 @@ function ProductDetailPage() {
 
   return (
     <>
+      <SEO
+        title={`${label} Gas Cylinder | LPG Refill — Mashesha`}
+        description={`${label} LPG gas cylinder, SANS-certified and refilled for cooking or gas heaters. Order online for same-day delivery in Johannesburg.`}
+        path={`/products/${id}`}
+      />
       {/* Breadcrumb */}
       <div className="bg-cream pt-24 pb-0">
         <div className="mx-auto max-w-7xl px-5 sm:px-8">

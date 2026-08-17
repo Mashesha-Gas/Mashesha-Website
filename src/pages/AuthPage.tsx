@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import SEO from "../components/SEO";
 
 export default function AuthPage() {
   const [tab, setTab] = useState<"login" | "signup" | "forgot">("login");
@@ -80,6 +81,7 @@ export default function AuthPage() {
 
   return (
     <main className="bg-cream min-h-screen flex items-center justify-center pt-20 px-5 pb-12">
+      <SEO title="Log In or Sign Up | Mashesha" description="Log in or create a Mashesha account to order gas delivery." path="/login" noIndex />
       <div className="w-full max-w-md">
 
         <Link to="/" className="inline-block mb-10 text-charcoal/50 text-sm hover:text-charcoal transition-colors duration-200">

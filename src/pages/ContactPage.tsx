@@ -1,4 +1,5 @@
 import { useState } from "react";
+import SEO from "../components/SEO";
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
@@ -15,6 +16,11 @@ export default function ContactPage() {
 
   return (
     <main className="bg-cream min-h-screen pt-24 pb-20">
+      <SEO
+        title="Contact Mashesha — Order Gas Delivery in Johannesburg"
+        description="Get in touch with Mashesha to order LPG gas delivery near you. Call, WhatsApp, or message us for fast gas delivery to your area in Johannesburg."
+        path="/contact"
+      />
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         {/* Page header */}
         <div className="py-12 max-w-2xl">

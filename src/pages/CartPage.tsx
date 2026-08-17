@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import SEO from "../components/SEO";
 
 const DELIVERY_FEE = 50;
 
@@ -11,6 +12,7 @@ export default function CartPage() {
 
   return (
     <main className="bg-rust min-h-screen pt-24 pb-20">
+      <SEO title="Your Cart | Mashesha" description="Review your gas cylinder order before checkout." path="/cart" noIndex />
       <div className="mx-auto max-w-4xl px-5 sm:px-8">
 
         {/* Page header */}

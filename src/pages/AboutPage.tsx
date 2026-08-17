@@ -1,4 +1,6 @@
 import { Link } from "react-router-dom";
+import SEO from "../components/SEO";
+import orangePatternedBackground from "../components/orange-patterned-background.webp";
 
 const VALUES = [
   {
@@ -21,10 +23,18 @@ const VALUES = [
 
 export default function AboutPage() {
   return (
-    <main className="bg-cream min-h-screen pt-24">
+    <main className="bg-cream min-h-screen">
+      <SEO
+        title="About Mashesha — Johannesburg's Gas Delivery Service"
+        description="Mashesha is a Johannesburg-based LPG gas delivery service. Learn how we keep homes and businesses stocked with safe, reliable gas for cooking and heating."
+        path="/about"
+      />
       {/* Hero */}
-      <section className="bg-rust py-20 sm:py-28">
-        <div className="mx-auto max-w-7xl px-5 sm:px-8">
+      <section
+        className="relative bg-rust bg-cover bg-center pt-32 pb-20 sm:pb-28 overflow-hidden"
+        style={{ backgroundImage: `url(${orangePatternedBackground})` }}
+      >
+        <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
           <span className="text-xs font-semibold uppercase tracking-widest text-cream/70">
             About us
           </span>

@@ -13,6 +13,8 @@ import CheckoutPage from "./pages/CheckoutPage";
 import ProfilePage from "./pages/ProfilePage";
 import AuthPage from "./pages/AuthPage";
 import ResetPassword from "./pages/ResetPassword";
+import TermsPage from "./pages/TermsPage";
+import LocalBusinessSchema from "./components/LocalBusinessSchema";
 import { useAuth } from "./context/AuthContext";
 
 // ProtectedRoute wraps pages that require login.
@@ -32,6 +34,7 @@ function ProtectedRoute({ children }) {
 function App() {
   return (
     <>
+      <LocalBusinessSchema />
       <Header />
       <Routes>
         <Route path="/" element={<HomePage />} />
@@ -44,6 +47,7 @@ function App() {
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/login" element={<AuthPage />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/terms" element={<TermsPage />} />
         <Route
           path="/profile"
           element={

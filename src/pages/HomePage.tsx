@@ -1,11 +1,21 @@
 import { Link } from "react-router-dom";
+import SEO from "../components/SEO";
+import orangePatternedBackground from "../components/orange-patterned-background.webp";
 
 export default function HomePage() {
   return (
     <main>
+      <SEO
+        title="Mashesha — Gas Delivery Near You | LPG Gas in Johannesburg"
+        description="Mashesha delivers LPG gas cylinders straight to your door in Johannesburg. Fast, safe gas delivery for cooking, stoves and gas heaters — order gas near you today."
+        path="/"
+      />
       {/* Hero */}
-      <section className="bg-rust min-h-screen flex items-center pt-20">
-        <div className="mx-auto max-w-7xl px-5 sm:px-8 py-20">
+      <section
+        className="relative bg-rust min-h-screen flex items-center pt-20 overflow-hidden bg-cover bg-center"
+        style={{ backgroundImage: `url(${orangePatternedBackground})` }}
+      >
+        <div className="relative mx-auto max-w-7xl px-5 sm:px-8 py-20">
           <span className="text-xs font-semibold uppercase tracking-widest text-cream/80">
             Johannesburg's gas delivery service
           </span>
