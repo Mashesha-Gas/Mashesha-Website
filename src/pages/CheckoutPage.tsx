@@ -55,8 +55,8 @@ function buildInitialForm(user: any): FormState {
 
 // Never shown to the customer — only used when they place an order without
 // opting into a visible account, so the Orders/Customers FK still has a real
-// row to point at. They'd need a password-reset flow (not built yet) to ever
-// log into it.
+// row to point at. They can claim the account later via "Forgot password?"
+// on the login page to set a real one.
 function randomPassword() {
   const bytes = crypto.getRandomValues(new Uint8Array(24));
   return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");

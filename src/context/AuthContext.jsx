@@ -78,10 +78,16 @@ export function AuthProvider({ children }) {
     await establishSession(token);
   }
 
-  async function signup({ name, email, password }) {
+  async function signup({ name, email, password, mobile, company }) {
     const { token } = await request("/api/customers", {
       method: "POST",
-      body: { customer_name: name, customer_email: email, customer_password: password },
+      body: {
+        customer_name: name,
+        customer_email: email,
+        customer_password: password,
+        customer_mobile: mobile,
+        customer_company: company || null,
+      },
     });
     await establishSession(token);
   }

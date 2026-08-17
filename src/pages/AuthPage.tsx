@@ -40,14 +40,17 @@ export default function AuthPage() {
     const form = e.target as HTMLFormElement;
     const name = (form.elements.namedItem("name") as HTMLInputElement).value;
     const email = (form.elements.namedItem("email") as HTMLInputElement).value;
+    const phone = (form.elements.namedItem("phone") as HTMLInputElement).value;
+    const company = (form.elements.namedItem("company") as HTMLInputElement).value;
     const password = (form.elements.namedItem("password") as HTMLInputElement).value;
     const confirm = (form.elements.namedItem("confirm") as HTMLInputElement).value;
     if (!name || !email || !password) { setError("Please fill in all fields."); return; }
+    if (phone.replace(/\D/g, "").length < 10) { setError("Enter a valid phone number."); return; }
     if (password !== confirm) { setError("Passwords don't match."); return; }
 
     setSubmitting(true);
     try {
-      await signup({ name, email, password });
+      await signup({ name, email, password, mobile: phone, company: company || undefined });
       navigate(from, { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Couldn't create your account. Please try again.");
@@ -199,6 +202,14 @@ export default function AuthPage() {
             <div>
               <label className={labelClass}>Email</label>
               <input name="email" type="email" required placeholder="you@example.com" className={inputClass} />
+            </div>
+            <div>
+              <label className={labelClass}>Phone</label>
+              <input name="phone" type="tel" required placeholder="082 123 4567" className={inputClass} />
+            </div>
+            <div>
+              <label className={labelClass}>Company (optional)</label>
+              <input name="company" type="text" placeholder="e.g. Jane's Spaza" className={inputClass} />
             </div>
             <div>
               <label className={labelClass}>Password</label>

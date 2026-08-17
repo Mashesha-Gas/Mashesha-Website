@@ -43,7 +43,13 @@
       "Bash(curl -s -X DELETE http://localhost:3000/api/employees/hoqueabrar@gmail.com -w \"\\\\ndeleted: %{http_code}\\\\n\")",
       "Bash(grep -rln *)",
       "Bash(git add *)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Bash(curl -s -X POST http://localhost:3000/api/customers -H 'Content-Type: application/json' -d '{\"customer_name\":\"Signup Test\",\"customer_email\":\"signup-test@example.com\",\"customer_password\":\"testpass123\",\"customer_mobile\":\"0821234567\",\"customer_company\":\"Test Co\"}' -w '\\\\nstatus: %{http_code}\\\\n')",
+      "Bash(curl -s -X DELETE http://localhost:3000/api/customers/signup-test@example.com -w \"\\\\ndeleted: %{http_code}\\\\n\")",
+      "Bash(curl -s -o /dev/null -w \"status: %{http_code}\\\\n\" http://localhost:3000/api/customers/guest-flow-test@example.com)",
+      "Bash(curl -s -X POST http://localhost:3000/api/customers -H 'Content-Type: application/json' -d '{\"customer_name\":\"Guest Flow Test\",\"customer_email\":\"guest-flow-test@example.com\",\"customer_password\":\"9f3a7c1e8b2d4f6091a5c3e7b8d2f4a6\",\"customer_mobile\":\"0821234567\",\"customer_company\":null}' -w '\\\\nstatus: %{http_code}\\\\n')",
+      "Bash(curl -s -X POST http://localhost:3000/api/customers/forgot-password -H 'Content-Type: application/json' -d '{\"email\":\"guest-flow-test@example.com\"}' -w '\\\\nstatus: %{http_code}\\\\n')",
+      "Bash(curl -s -X DELETE http://localhost:3000/api/customers/guest-flow-test@example.com -w \"\\\\ndeleted: %{http_code}\\\\n\")"
     ]
   }
 }
