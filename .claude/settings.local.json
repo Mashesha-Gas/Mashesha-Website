@@ -52,7 +52,10 @@
       "Bash(curl -s -X DELETE http://localhost:3000/api/customers/guest-flow-test@example.com -w \"\\\\ndeleted: %{http_code}\\\\n\")",
       "Bash(powershell -NoProfile -Command 'Add-Type -AssemblyName System.Drawing; $img = [System.Drawing.Image]::FromFile\\('\\\\''c:\\\\Mashesha\\\\mashesa-website\\\\public\\\\og-image.jpg'\\\\''\\); Write-Output \\($img.Width.ToString\\(\\) + '\\\\''x'\\\\'' + $img.Height.ToString\\(\\)\\); $img.Dispose\\(\\)')",
       "Bash(WEBSITE_URL=https://mashesha.co.za node -e ' *)",
-      "Bash(OUT_PATH=/c/Users/hoque/AppData/Local/Temp/claude/c--Mashesha-mashesa-website/d8c0ecc4-675c-48df-83db-94435cc4feb4/scratchpad/preview-reset-email.html node -e ' *)"
+      "Bash(OUT_PATH=/c/Users/hoque/AppData/Local/Temp/claude/c--Mashesha-mashesa-website/d8c0ecc4-675c-48df-83db-94435cc4feb4/scratchpad/preview-reset-email.html node -e ' *)",
+      "Bash(curl -s -o /dev/null -w \"https://mashesha.co.za/mashesha-email-logo.png -> %{http_code}\\\\n\" https://mashesha.co.za/mashesha-email-logo.png)",
+      "Bash(curl -s -o /dev/null -w \"https://mashesha.co.za/ -> %{http_code}\\\\n\" https://mashesha.co.za/)",
+      "Bash(curl -s -o /dev/null -w \"customer exists check: %{http_code}\\\\n\" http://localhost:3000/api/customers/hoqueabrar@gmail.com)"
     ]
   }
 }
