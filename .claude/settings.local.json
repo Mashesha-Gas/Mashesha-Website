@@ -84,7 +84,23 @@
       "Bash(node --check src/middleware/orderAccess.js)",
       "Bash(grep -n \"fetch\\(\\\\`\\\\${API}\" src/pages/Orders.tsx)",
       "Bash(grep -rln 'fetch\\(`\\\\${API}' src/)",
-      "Bash(curl -s -w \"\\\\n%{http_code}\\\\n\" http://localhost:3000/api/orders/stream --max-time 2)"
+      "Bash(curl -s -w \"\\\\n%{http_code}\\\\n\" http://localhost:3000/api/orders/stream --max-time 2)",
+      "Bash(node --check src/utils/password.js)",
+      "Bash(node --check src/middleware/rateLimit.js)",
+      "Bash(curl -s -w \"\\\\n%{http_code}\\\\n\" -X POST http://localhost:3000/api/customers -H \"Content-Type: application/json\" -d '{\"customer_name\":\"Weak PW Test\",\"customer_email\":\"weak-pw-test@example.com\",\"customer_password\":\"x\"}')",
+      "Bash(curl -s -w \"\\\\n%{http_code}\\\\n\" -X POST http://localhost:3000/api/customers -H \"Content-Type: application/json\" -d '{\"customer_name\":\"Strong PW Test\",\"customer_email\":\"strong-pw-test@example.com\",\"customer_password\":\"reallylongpassword123\"}')",
+      "Bash(curl -s -w \"\\\\n%{http_code}\\\\n\" -X POST http://localhost:3000/api/employees/set-password -H \"Content-Type: application/json\" -d '{\"token\":\"bogus\",\"password\":\"weak\"}')",
+      "Bash(docker --version)",
+      "Bash(docker build *)",
+      "Bash(docker run *)",
+      "Bash(MSYS_NO_PATHCONV=1 docker run --rm -v \"c:/Mashesha/mashesa-website:/app\" -w /app node:24-alpine sh -c \"npm install --package-lock-only\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:18080/)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:18080/products/123)",
+      "Bash(curl -s http://localhost:18080/)",
+      "Bash(docker stop *)",
+      "Bash(docker rmi *)",
+      "Bash(docker compose *)",
+      "Bash(MSYS_NO_PATHCONV=1 docker run --rm -v \"c:/Mashesha/mashesha-api/nginx-staging.conf:/etc/nginx/nginx.conf:ro\" nginx:alpine nginx -t)"
     ]
   }
 }
