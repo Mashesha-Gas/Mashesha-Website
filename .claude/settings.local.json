@@ -100,7 +100,18 @@
       "Bash(docker stop *)",
       "Bash(docker rmi *)",
       "Bash(docker compose *)",
-      "Bash(MSYS_NO_PATHCONV=1 docker run --rm -v \"c:/Mashesha/mashesha-api/nginx-staging.conf:/etc/nginx/nginx.conf:ro\" nginx:alpine nginx -t)"
+      "Bash(MSYS_NO_PATHCONV=1 docker run --rm -v \"c:/Mashesha/mashesha-api/nginx-staging.conf:/etc/nginx/nginx.conf:ro\" nginx:alpine nginx -t)",
+      "Bash(curl -sI https://staging.mashesha.co.za --max-time 8)",
+      "Bash(curl -sI https://staging.mashesha.co.za --resolve staging.mashesha.co.za:443:63.183.223.16 --max-time 8)",
+      "Bash(nslookup staging.mashesha.co.za)",
+      "Bash(getent hosts *)",
+      "Bash(curl -sI -k https://staging.mashesha.co.za --resolve staging.mashesha.co.za:443:63.183.223.16 --max-time 8 -v)",
+      "Bash(curl -sk https://staging.mashesha.co.za --resolve staging.mashesha.co.za:443:63.183.223.16 --max-time 8)",
+      "Bash(JS_PATH=$\\(curl -sk https://staging.mashesha.co.za --resolve staging.mashesha.co.za:443:63.183.223.16 --max-time 8 | grep -o 'src=\"/assets/[^\"]*\\\\.js\"' | head -1 | sed 's/src=\"//;s/\"//'\\) *)",
+      "Bash(curl -sI https://staging-admin.mashesha.co.za --max-time 8)",
+      "Bash(MSYS_NO_PATHCONV=1 docker run --rm -v \"c:/Mashesha/mashesha-terminal/nginx.conf:/etc/nginx/conf.d/default.conf:ro\" nginx:alpine nginx -t)",
+      "Bash(MSYS_NO_PATHCONV=1 docker run --rm -v \"c:/Mashesha/mashesa-website/nginx.conf:/etc/nginx/conf.d/default.conf:ro\" nginx:alpine nginx -t)",
+      "Bash(curl -sI http://localhost:18081/)"
     ]
   }
 }
