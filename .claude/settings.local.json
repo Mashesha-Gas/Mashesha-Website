@@ -111,7 +111,25 @@
       "Bash(curl -sI https://staging-admin.mashesha.co.za --max-time 8)",
       "Bash(MSYS_NO_PATHCONV=1 docker run --rm -v \"c:/Mashesha/mashesha-terminal/nginx.conf:/etc/nginx/conf.d/default.conf:ro\" nginx:alpine nginx -t)",
       "Bash(MSYS_NO_PATHCONV=1 docker run --rm -v \"c:/Mashesha/mashesa-website/nginx.conf:/etc/nginx/conf.d/default.conf:ro\" nginx:alpine nginx -t)",
-      "Bash(curl -sI http://localhost:18081/)"
+      "Bash(curl -sI http://localhost:18081/)",
+      "Bash(node --check src/schema.js)",
+      "Bash(node --check src/migrations/004_seed_delivery_areas.js)",
+      "Bash(node --check src/routes/deliveryAreas.js)",
+      "Bash(node --check src/routes/index.js)",
+      "Bash(rm -f /tmp/mashesha-test.db*)",
+      "Bash(DB_PATH=/tmp/mashesha-test.db node -e ' *)",
+      "Bash(PORT=3099 DB_PATH=/tmp/mashesha-test.db node src/index.js)",
+      "Bash(curl -s http://localhost:3099/api/delivery-areas)",
+      "Bash(jobs -p)",
+      "Bash(netstat -ano)",
+      "Bash(taskkill //PID 36500 //F)",
+      "Bash(rm -f /tmp/mashesha-test.db* /tmp/mashesha-api-test.log /tmp/out1.json /tmp/out2.json /tmp/out3.json /tmp/out4.json *)",
+      "PowerShell(Get-CimInstance Win32_Process -Filter \"ProcessId=30388\")",
+      "PowerShell(Get-CimInstance Win32_Process -Filter \"ProcessId=26684\")",
+      "PowerShell(Get-CimInstance Win32_Process -Filter \"Name='node.exe'\")"
+    ],
+    "additionalDirectories": [
+      "\\tmp"
     ]
   }
 }

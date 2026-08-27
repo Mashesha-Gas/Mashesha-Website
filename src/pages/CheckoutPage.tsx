@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
+import { useDeliveryAreas } from "../hooks/useDeliveryAreas";
 import { PROVINCES } from "../constants";
 import SEO from "../components/SEO";
 
@@ -11,11 +12,14 @@ const DELIVERY_FEE = 50;
 
 type Step = "details" | "processing" | "success";
 
+type Fulfillment = "delivery" | "pickup";
+
 type FormState = {
   fullName: string;
   phone: string;
   email: string;
   company: string;
+  fulfillment: Fulfillment;
   addressLine1: string;
   addressLine2: string;
   city: string;
@@ -28,6 +32,7 @@ const EMPTY_FORM: FormState = {
   phone: "",
   email: "",
   company: "",
+  fulfillment: "delivery",
   addressLine1: "",
   addressLine2: "",
   city: "",
@@ -45,6 +50,7 @@ function buildInitialForm(user: any): FormState {
     phone: user.mobile ?? "",
     email: user.email ?? "",
     company: user.company ?? "",
+    fulfillment: "delivery",
     addressLine1: address?.address_line1 ?? "",
     addressLine2: [address?.address_unit, address?.address_line2].filter(Boolean).join(", "),
     city: address?.address_city ?? "",
@@ -84,6 +90,7 @@ function LockIcon() {
 export default function CheckoutPage() {
   const { user, establishSession } = useAuth();
   const { items: cartItems, clearCart } = useCart();
+  const { activeAreas, loading: areasLoading } = useDeliveryAreas();
   const [step, setStep] = useState<Step>("details");
   const [form, setForm] = useState<FormState>(() => buildInitialForm(user));
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -91,10 +98,11 @@ export default function CheckoutPage() {
   const [createAccount, setCreateAccount] = useState(false);
   const [accountPassword, setAccountPassword] = useState("");
   const [accountConfirm, setAccountConfirm] = useState("");
-  const [placedOrder, setPlacedOrder] = useState<{ items: typeof cartItems; total: number; orderId: number } | null>(null);
+  const [placedOrder, setPlacedOrder] = useState<{ items: typeof cartItems; total: number; orderId: number; fulfillment: Fulfillment } | null>(null);
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.qty, 0);
-  const total = subtotal + DELIVERY_FEE;
+  const deliveryFee = form.fulfillment === "delivery" ? DELIVERY_FEE : 0;
+  const total = subtotal + deliveryFee;
 
   function update<K extends keyof FormState>(field: K, value: FormState[K]) {
     setForm((f) => ({ ...f, [field]: value }));
@@ -106,10 +114,12 @@ export default function CheckoutPage() {
     if (form.phone.replace(/\D/g, "").length < 10) e.phone = "Enter a valid phone number.";
     if (!form.email.trim()) e.email = "Enter your email address.";
     else if (!form.email.includes("@")) e.email = "Enter a valid email address.";
-    if (!form.addressLine1.trim()) e.addressLine1 = "Enter your street address.";
-    if (!form.city.trim()) e.city = "Enter your city or suburb.";
-    if (!form.province) e.province = "Select a province.";
-    if (form.postcode.replace(/\D/g, "").length !== 4) e.postcode = "Enter a valid 4-digit postal code.";
+    if (form.fulfillment === "delivery") {
+      if (!form.addressLine1.trim()) e.addressLine1 = "Enter your street address.";
+      if (!form.city.trim()) e.city = "Select your delivery area.";
+      if (!form.province) e.province = "Select a province.";
+      if (form.postcode.replace(/\D/g, "").length !== 4) e.postcode = "Enter a valid 4-digit postal code.";
+    }
     if (!user && createAccount) {
       if (accountPassword.length < 8) e.accountPassword = "Password must be at least 8 characters.";
       if (accountPassword !== accountConfirm) e.accountConfirm = "Passwords don't match.";
@@ -180,7 +190,7 @@ export default function CheckoutPage() {
       }
 
       const email = await resolveCustomerEmail();
-      const addressId = await createOrderAddress();
+      const addressId = form.fulfillment === "delivery" ? await createOrderAddress() : null;
 
       const vendorIds = Array.from(
         new Set(cartItems.map((item: any) => item.vendorId).filter((v: unknown) => v != null))
@@ -192,7 +202,7 @@ export default function CheckoutPage() {
         order_total: total,
         order_date: now.toISOString().slice(0, 10),
         order_time: now.toTimeString().slice(0, 8),
-        order_type: 202,
+        order_type: form.fulfillment === "delivery" ? 202 : 204,
         order_payment_type: "card",
         order_status: 301,
         order_vendor_id: vendorIds.length === 1 ? vendorIds[0] : null,
@@ -202,7 +212,7 @@ export default function CheckoutPage() {
         paystack_reference: reference,
       });
 
-      setPlacedOrder({ items: cartItems, total, orderId: order.order_id });
+      setPlacedOrder({ items: cartItems, total, orderId: order.order_id, fulfillment: form.fulfillment });
       clearCart();
       setStep("success");
     } catch (err) {
@@ -275,29 +285,51 @@ export default function CheckoutPage() {
             Thanks, {form.fullName.split(" ")[0]}. Order #{placedOrder.orderId} — we'll confirm your delivery by SMS or WhatsApp shortly.
           </p>
 
-          {/* Delivery details */}
-          <div className="rounded-2xl bg-rust p-5 text-left space-y-3">
-            <div className="flex items-start gap-4">
-              <svg viewBox="0 0 24 24" className="h-5 w-5 flex-shrink-0 text-cream mt-0.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <circle cx="12" cy="12" r="10" />
-                <path d="M12 6v6l4 2" />
-              </svg>
-              <div>
-                <p className="text-sm font-semibold text-cream">Estimated delivery</p>
+          {/* Delivery / pickup details */}
+          {placedOrder.fulfillment === "delivery" ? (
+            <div className="rounded-2xl bg-rust p-5 text-left space-y-3">
+              <div className="flex items-start gap-4">
+                <svg viewBox="0 0 24 24" className="h-5 w-5 flex-shrink-0 text-cream mt-0.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 6v6l4 2" />
+                </svg>
+                <div>
+                  <p className="text-sm font-semibold text-cream">Estimated delivery</p>
+                  <p className="mt-0.5 text-sm text-cream/80">
+                    Today between <span className="font-semibold text-cream">2 – 4 hours</span> from now.
+                    Orders placed after 3 pm are delivered the following morning.
+                  </p>
+                </div>
+              </div>
+              <div className="border-t border-cream/20 pt-3">
+                <p className="text-sm font-semibold text-cream">Delivering to</p>
                 <p className="mt-0.5 text-sm text-cream/80">
-                  Today between <span className="font-semibold text-cream">2 – 4 hours</span> from now.
-                  Orders placed after 3 pm are delivered the following morning.
+                  {form.addressLine1}{form.addressLine2 ? `, ${form.addressLine2}` : ""}, {form.city}, {form.province} {form.postcode}
                 </p>
+                <p className="mt-1 text-sm text-cream/80">{form.phone}</p>
               </div>
             </div>
-            <div className="border-t border-cream/20 pt-3">
-              <p className="text-sm font-semibold text-cream">Delivering to</p>
-              <p className="mt-0.5 text-sm text-cream/80">
-                {form.addressLine1}{form.addressLine2 ? `, ${form.addressLine2}` : ""}, {form.city}, {form.province} {form.postcode}
-              </p>
-              <p className="mt-1 text-sm text-cream/80">{form.phone}</p>
+          ) : (
+            <div className="rounded-2xl bg-rust p-5 text-left space-y-3">
+              <div className="flex items-start gap-4">
+                <svg viewBox="0 0 24 24" className="h-5 w-5 flex-shrink-0 text-cream mt-0.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 6v6l4 2" />
+                </svg>
+                <div>
+                  <p className="text-sm font-semibold text-cream">Ready for collection</p>
+                  <p className="mt-0.5 text-sm text-cream/80">
+                    Today within <span className="font-semibold text-cream">2 hours</span>. We'll message you when it's ready.
+                  </p>
+                </div>
+              </div>
+              <div className="border-t border-cream/20 pt-3">
+                <p className="text-sm font-semibold text-cream">Collect from</p>
+                <p className="mt-0.5 text-sm text-cream/80">Mashesha Gas — Jeppestown, Johannesburg</p>
+                <p className="mt-1 text-sm text-cream/80">{form.phone}</p>
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="rounded-2xl border border-charcoal/10 bg-white p-6 text-left space-y-3 text-sm">
             {placedOrder.items.map((item) => (
@@ -308,7 +340,7 @@ export default function CheckoutPage() {
             ))}
             <div className="flex justify-between text-charcoal/65">
               <span>Delivery fee</span>
-              <span>R {DELIVERY_FEE}</span>
+              <span>{placedOrder.fulfillment === "delivery" ? `R ${DELIVERY_FEE}` : "—"}</span>
             </div>
             <div className="border-t border-charcoal/10 pt-3 flex justify-between font-semibold text-charcoal">
               <span>Total paid</span>
@@ -448,72 +480,126 @@ export default function CheckoutPage() {
               )}
             </div>
 
-            {/* Delivery address */}
+            {/* Delivery / pickup */}
             <div className="space-y-5 rounded-2xl border border-charcoal/10 bg-white p-6 sm:p-7">
-              <p className={labelClass}>Delivery address</p>
-              <div>
-                <label className={labelClass}>Street address</label>
-                <input
-                  type="text"
-                  placeholder="e.g. 12 Long Street"
-                  value={form.addressLine1}
-                  onChange={(e) => update("addressLine1", e.target.value)}
-                  className={inputClass("addressLine1")}
-                />
-                {errors.addressLine1 && <p className="mt-1.5 text-xs text-red-500">{errors.addressLine1}</p>}
-              </div>
+              <p className={labelClass}>Delivery or collection</p>
 
-              <div>
-                <label className={labelClass}>Unit / complex (optional)</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Unit 4, Flat 2B"
-                  value={form.addressLine2}
-                  onChange={(e) => update("addressLine2", e.target.value)}
-                  className={inputClass("addressLine2")}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className={labelClass}>City / suburb</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Sandton"
-                    value={form.city}
-                    onChange={(e) => update("city", e.target.value)}
-                    className={inputClass("city")}
-                  />
-                  {errors.city && <p className="mt-1.5 text-xs text-red-500">{errors.city}</p>}
-                </div>
-                <div>
-                  <label className={labelClass}>Postal code</label>
-                  <input
-                    type="text"
-                    placeholder="2065"
-                    inputMode="numeric"
-                    value={form.postcode}
-                    onChange={(e) => update("postcode", e.target.value.replace(/\D/g, "").slice(0, 4))}
-                    className={inputClass("postcode")}
-                  />
-                  {errors.postcode && <p className="mt-1.5 text-xs text-red-500">{errors.postcode}</p>}
-                </div>
-              </div>
-
-              <div>
-                <label className={labelClass}>Province</label>
-                <select
-                  value={form.province}
-                  onChange={(e) => update("province", e.target.value)}
-                  className={inputClass("province")}
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => update("fulfillment", "delivery")}
+                  className={`flex-1 rounded-xl border px-4 py-3 text-sm font-semibold transition-colors duration-200 ${
+                    form.fulfillment === "delivery"
+                      ? "border-rust bg-rust text-cream"
+                      : "border-charcoal/15 text-charcoal/70 hover:border-rust/50"
+                  }`}
                 >
-                  <option value="">Select a province</option>
-                  {PROVINCES.map((p) => (
-                    <option key={p} value={p}>{p}</option>
-                  ))}
-                </select>
-                {errors.province && <p className="mt-1.5 text-xs text-red-500">{errors.province}</p>}
+                  Deliver to me
+                </button>
+                <button
+                  type="button"
+                  onClick={() => update("fulfillment", "pickup")}
+                  className={`flex-1 rounded-xl border px-4 py-3 text-sm font-semibold transition-colors duration-200 ${
+                    form.fulfillment === "pickup"
+                      ? "border-rust bg-rust text-cream"
+                      : "border-charcoal/15 text-charcoal/70 hover:border-rust/50"
+                  }`}
+                >
+                  Collect in store
+                </button>
               </div>
+
+              {form.fulfillment === "delivery" ? (
+                <>
+                  <div>
+                    <label className={labelClass}>Street address</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 12 Long Street"
+                      value={form.addressLine1}
+                      onChange={(e) => update("addressLine1", e.target.value)}
+                      className={inputClass("addressLine1")}
+                    />
+                    {errors.addressLine1 && <p className="mt-1.5 text-xs text-red-500">{errors.addressLine1}</p>}
+                  </div>
+
+                  <div>
+                    <label className={labelClass}>Unit / complex (optional)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Unit 4, Flat 2B"
+                      value={form.addressLine2}
+                      onChange={(e) => update("addressLine2", e.target.value)}
+                      className={inputClass("addressLine2")}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className={labelClass}>City / suburb</label>
+                      <select
+                        value={form.city}
+                        onChange={(e) => update("city", e.target.value)}
+                        className={inputClass("city")}
+                      >
+                        <option value="">
+                          {areasLoading ? "Loading areas…" : "Select your area"}
+                        </option>
+                        {activeAreas.map((a) => (
+                          <option key={a.delivery_area_id} value={a.delivery_area_name}>
+                            {a.delivery_area_name}
+                          </option>
+                        ))}
+                      </select>
+                      {errors.city && <p className="mt-1.5 text-xs text-red-500">{errors.city}</p>}
+                      {!areasLoading && (
+                        <button
+                          type="button"
+                          onClick={() => update("fulfillment", "pickup")}
+                          className="mt-1.5 text-xs text-charcoal/50 hover:text-rust transition-colors duration-200"
+                        >
+                          Don't see your area? Collect in store instead.
+                        </button>
+                      )}
+                    </div>
+                    <div>
+                      <label className={labelClass}>Postal code</label>
+                      <input
+                        type="text"
+                        placeholder="2065"
+                        inputMode="numeric"
+                        value={form.postcode}
+                        onChange={(e) => update("postcode", e.target.value.replace(/\D/g, "").slice(0, 4))}
+                        className={inputClass("postcode")}
+                      />
+                      {errors.postcode && <p className="mt-1.5 text-xs text-red-500">{errors.postcode}</p>}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className={labelClass}>Province</label>
+                    <select
+                      value={form.province}
+                      onChange={(e) => update("province", e.target.value)}
+                      className={inputClass("province")}
+                    >
+                      <option value="">Select a province</option>
+                      {PROVINCES.map((p) => (
+                        <option key={p} value={p}>{p}</option>
+                      ))}
+                    </select>
+                    {errors.province && <p className="mt-1.5 text-xs text-red-500">{errors.province}</p>}
+                  </div>
+                </>
+              ) : (
+                <div className="rounded-xl border border-charcoal/10 bg-cream/60 p-4">
+                  <p className="text-sm font-semibold text-charcoal">Mashesha Gas — Jeppestown, Johannesburg</p>
+                  <p className="mt-1.5 text-sm text-charcoal/65">
+                    Your order will be ready to collect — we'll message you as soon as it's packed.
+                    No delivery fee.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Place order button */}
@@ -544,7 +630,7 @@ export default function CheckoutPage() {
                 ))}
                 <div className="flex justify-between text-charcoal/65">
                   <span>Delivery fee</span>
-                  <span>R {DELIVERY_FEE}</span>
+                  <span>{form.fulfillment === "delivery" ? `R ${DELIVERY_FEE}` : "—"}</span>
                 </div>
                 <div className="border-t border-charcoal/10 pt-3 flex justify-between font-semibold text-charcoal text-base">
                   <span>Total</span>
