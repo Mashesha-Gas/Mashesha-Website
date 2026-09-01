@@ -98,10 +98,13 @@ export default function CheckoutPage() {
   const [createAccount, setCreateAccount] = useState(false);
   const [accountPassword, setAccountPassword] = useState("");
   const [accountConfirm, setAccountConfirm] = useState("");
-  const [placedOrder, setPlacedOrder] = useState<{ items: typeof cartItems; total: number; orderId: number; fulfillment: Fulfillment } | null>(null);
+  const [placedOrder, setPlacedOrder] = useState<{ items: typeof cartItems; total: number; orderId: number; fulfillment: Fulfillment; freeShipping: boolean } | null>(null);
+
+  const selectedArea = activeAreas.find((a) => a.delivery_area_name === form.city);
+  const freeShipping = form.fulfillment === "delivery" && !!selectedArea?.delivery_area_free_shipping;
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.qty, 0);
-  const deliveryFee = form.fulfillment === "delivery" ? DELIVERY_FEE : 0;
+  const deliveryFee = form.fulfillment === "delivery" && !freeShipping ? DELIVERY_FEE : 0;
   const total = subtotal + deliveryFee;
 
   function update<K extends keyof FormState>(field: K, value: FormState[K]) {
@@ -212,7 +215,7 @@ export default function CheckoutPage() {
         paystack_reference: reference,
       });
 
-      setPlacedOrder({ items: cartItems, total, orderId: order.order_id, fulfillment: form.fulfillment });
+      setPlacedOrder({ items: cartItems, total, orderId: order.order_id, fulfillment: form.fulfillment, freeShipping });
       clearCart();
       setStep("success");
     } catch (err) {
@@ -340,7 +343,9 @@ export default function CheckoutPage() {
             ))}
             <div className="flex justify-between text-charcoal/65">
               <span>Delivery fee</span>
-              <span>{placedOrder.fulfillment === "delivery" ? `R ${DELIVERY_FEE}` : "—"}</span>
+              <span>
+                {placedOrder.fulfillment !== "delivery" ? "—" : placedOrder.freeShipping ? "Free" : `R ${DELIVERY_FEE}`}
+              </span>
             </div>
             <div className="border-t border-charcoal/10 pt-3 flex justify-between font-semibold text-charcoal">
               <span>Total paid</span>
@@ -552,6 +557,9 @@ export default function CheckoutPage() {
                         ))}
                       </select>
                       {errors.city && <p className="mt-1.5 text-xs text-red-500">{errors.city}</p>}
+                      {freeShipping && (
+                        <p className="mt-1.5 text-xs font-semibold text-rust">Free shipping to this area.</p>
+                      )}
                       {!areasLoading && (
                         <button
                           type="button"
@@ -630,7 +638,9 @@ export default function CheckoutPage() {
                 ))}
                 <div className="flex justify-between text-charcoal/65">
                   <span>Delivery fee</span>
-                  <span>{form.fulfillment === "delivery" ? `R ${DELIVERY_FEE}` : "—"}</span>
+                  <span>
+                    {form.fulfillment !== "delivery" ? "—" : freeShipping ? "Free" : `R ${DELIVERY_FEE}`}
+                  </span>
                 </div>
                 <div className="border-t border-charcoal/10 pt-3 flex justify-between font-semibold text-charcoal text-base">
                   <span>Total</span>

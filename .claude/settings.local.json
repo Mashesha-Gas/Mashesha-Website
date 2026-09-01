@@ -126,7 +126,27 @@
       "Bash(rm -f /tmp/mashesha-test.db* /tmp/mashesha-api-test.log /tmp/out1.json /tmp/out2.json /tmp/out3.json /tmp/out4.json *)",
       "PowerShell(Get-CimInstance Win32_Process -Filter \"ProcessId=30388\")",
       "PowerShell(Get-CimInstance Win32_Process -Filter \"ProcessId=26684\")",
-      "PowerShell(Get-CimInstance Win32_Process -Filter \"Name='node.exe'\")"
+      "PowerShell(Get-CimInstance Win32_Process -Filter \"Name='node.exe'\")",
+      "Bash(node --check src/migrations/005_add_delivery_area_free_shipping.js)",
+      "Bash(rm -f /tmp/mashesha-test2.db*)",
+      "Bash(DB_PATH=/tmp/mashesha-test2.db node -e \"require\\('./src/db'\\); console.log\\('init ok'\\);\")",
+      "Bash(DB_PATH=/tmp/mashesha-test2.db node -e ' *)",
+      "Bash(rm -f /tmp/mashesha-test3.db*)",
+      "Bash(DB_PATH=/tmp/mashesha-test3.db node -e ' *)",
+      "Bash(rm -f /tmp/mashesha-test2.db* /tmp/mashesha-test3.db*)",
+      "Bash(rm -f /tmp/mashesha-test4.db*)",
+      "Bash(node \"C:\\\\Users\\\\hoque\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Mashesha-mashesa-website\\\\20915087-77df-4be1-970a-8ec16e357151\\\\scratchpad\\\\setup-old-shape.js\" /tmp/mashesha-test4.db)",
+      "Bash(DB_PATH=/tmp/mashesha-test4.db node \"C:\\\\Users\\\\hoque\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Mashesha-mashesa-website\\\\20915087-77df-4be1-970a-8ec16e357151\\\\scratchpad\\\\check-db.js\")",
+      "Bash(rm -f /tmp/mashesha-test5.db*)",
+      "Bash(node \"C:\\\\Users\\\\hoque\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Mashesha-mashesa-website\\\\20915087-77df-4be1-970a-8ec16e357151\\\\scratchpad\\\\setup-old-shape.js\" /tmp/mashesha-test5.db)",
+      "Bash(DB_PATH=/tmp/mashesha-test5.db node \"C:\\\\Users\\\\hoque\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Mashesha-mashesa-website\\\\20915087-77df-4be1-970a-8ec16e357151\\\\scratchpad\\\\check-db.js\")",
+      "Bash(rm -f \"C:\\\\Users\\\\hoque\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Mashesha-mashesa-website\\\\20915087-77df-4be1-970a-8ec16e357151\\\\scratchpad\\\\setup-old-shape.js\" \"C:\\\\Users\\\\hoque\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Mashesha-mashesa-website\\\\20915087-77df-4be1-970a-8ec16e357151\\\\scratchpad\\\\check-db.js\" *)",
+      "Bash(rm -f /tmp/mashesha-test6.db*)",
+      "Bash(DB_PATH=/tmp/mashesha-test6.db node -e ' *)",
+      "Bash(PORT=3098 DB_PATH=/tmp/mashesha-test6.db node src/index.js)",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\);process.stdin.on\\('end',\\(\\)=>{const areas=JSON.parse\\(d\\); console.log\\(areas.filter\\(a=>a.delivery_area_name==='Bryanston'\\)\\)}\\)\")",
+      "Bash(taskkill //PID 7912 //F)",
+      "Bash(rm -f /tmp/mashesha-test6.db* /tmp/mashesha-api-test6.log)"
     ],
     "additionalDirectories": [
       "\\tmp"
