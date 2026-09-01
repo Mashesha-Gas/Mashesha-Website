@@ -1,27 +1,18 @@
 import { Link } from "react-router-dom";
 import JohannesburgMap from "../components/JohannesburgMap";
 import SEO from "../components/SEO";
+import { useDeliveryAreas } from "../hooks/useDeliveryAreas";
 
-const AREAS = [
-  { name: "Soweto", blurb: "Fast LPG gas cylinder delivery across Soweto, every day of the week." },
-  { name: "Sandton", blurb: "Reliable gas delivery in Sandton for homes, offices and restaurants." },
-  { name: "Randburg", blurb: "LPG gas cylinders delivered to your door in Randburg, same day." },
-  { name: "Roodepoort", blurb: "Order gas delivery in Roodepoort — cylinders refilled and delivered fast." },
-  { name: "Midrand", blurb: "Gas delivery in Midrand for cooking, heating, and business use." },
-  { name: "Alexandra", blurb: "Mashesha delivers LPG gas straight to your door in Alexandra." },
-  { name: "Tembisa", blurb: "Same-day gas cylinder delivery across Tembisa, safe and reliable." },
-  { name: "Boksburg", blurb: "Get LPG gas delivered in Boksburg — order online or by phone." },
-  { name: "Germiston", blurb: "Gas delivery in Germiston for households and small businesses." },
-  { name: "Edenvale", blurb: "LPG gas cylinders delivered fast across Edenvale." },
-  { name: "Kempton Park", blurb: "Order gas delivery near Kempton Park, refilled to SANS standards." },
-  { name: "Fourways", blurb: "Gas delivery in Fourways — cylinders for cooking and gas heaters." },
-  { name: "Diepkloof", blurb: "Same-day LPG delivery for homes and businesses in Diepkloof." },
-  { name: "Orange Farm", blurb: "Mashesha delivers gas cylinders to Orange Farm, fast and safe." },
-  { name: "Naturena", blurb: "Reliable gas delivery in Naturena, refilled and delivered same day." },
-  { name: "Lenasia", blurb: "LPG gas delivery in Lenasia for cooking and gas heaters." },
-];
+// Areas are admin-managed (mashesha-terminal Settings → Delivery Areas) —
+// this page just lists whichever are currently active, with one generic
+// blurb rather than per-area copy that'd go stale as the list changes.
+function areaBlurb(name: string) {
+  return `Fast LPG gas cylinder delivery to ${name}, every day of the week.`;
+}
 
 export default function LocationsPage() {
+  const { activeAreas, loading, error } = useDeliveryAreas();
+
   return (
     <main className="bg-cream min-h-screen pt-24 pb-20">
       <SEO
@@ -53,31 +44,47 @@ export default function LocationsPage() {
         </div>
 
         {/* Areas grid */}
-        <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 mb-16">
-          {AREAS.map((area) => (
-            <details
-              key={area.name}
-              className="group rounded-xl border border-charcoal/10 bg-white px-5 py-4"
-            >
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-2 marker:hidden [&::-webkit-details-marker]:hidden">
-                <span className="text-sm font-medium text-charcoal">{area.name}</span>
-                <svg
-                  viewBox="0 0 12 8"
-                  className="h-2.5 w-2.5 flex-shrink-0 text-charcoal/30 transition-transform duration-200 group-open:rotate-180"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M1 1.5L6 6.5L11 1.5" />
-                </svg>
-              </summary>
-              <p className="mt-2 text-xs text-charcoal/60 leading-relaxed">{area.blurb}</p>
-            </details>
-          ))}
-        </div>
+        {loading && (
+          <p className="text-charcoal/60 mb-16">Loading delivery areas…</p>
+        )}
+
+        {!loading && error && (
+          <p className="text-rust mb-16">
+            Couldn't load our delivery areas right now. Please try again shortly.
+          </p>
+        )}
+
+        {!loading && !error && activeAreas.length === 0 && (
+          <p className="text-charcoal/60 mb-16">No delivery areas listed right now — check back soon.</p>
+        )}
+
+        {!loading && !error && activeAreas.length > 0 && (
+          <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 mb-16">
+            {activeAreas.map((area) => (
+              <details
+                key={area.delivery_area_id}
+                className="group rounded-xl border border-charcoal/10 bg-white px-5 py-4"
+              >
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-2 marker:hidden [&::-webkit-details-marker]:hidden">
+                  <span className="text-sm font-medium text-charcoal">{area.delivery_area_name}</span>
+                  <svg
+                    viewBox="0 0 12 8"
+                    className="h-2.5 w-2.5 flex-shrink-0 text-charcoal/30 transition-transform duration-200 group-open:rotate-180"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M1 1.5L6 6.5L11 1.5" />
+                  </svg>
+                </summary>
+                <p className="mt-2 text-xs text-charcoal/60 leading-relaxed">{areaBlurb(area.delivery_area_name)}</p>
+              </details>
+            ))}
+          </div>
+        )}
 
         {/* Delivery info */}
         <div className="grid gap-6 sm:grid-cols-3 mb-16">
