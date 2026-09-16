@@ -79,7 +79,14 @@ export default function JohannesburgMap() {
   return (
     <div
       ref={containerRef}
-      className="w-full rounded-2xl overflow-hidden border border-charcoal/10"
+      // Leaflet's internal panes/controls/popups use z-index values up to
+      // 1000, and the map container itself never gets an explicit z-index
+      // (just position: relative, set by Leaflet's own JS) — so without
+      // `relative z-0` here to give it its own stacking context, those
+      // internal layers compare directly against the page's root stacking
+      // context and render above the fixed mobile header (z-50) when its
+      // menu is open.
+      className="relative z-0 w-full rounded-2xl overflow-hidden border border-charcoal/10"
       style={{ height: "420px" }}
       aria-label="Map showing Mashesha Gas location in Jeppestown, Johannesburg"
     />

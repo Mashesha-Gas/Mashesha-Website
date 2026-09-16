@@ -152,7 +152,12 @@
       "Bash(curl -s http://localhost:3097/api/delivery-areas)",
       "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\);process.stdin.on\\('end',\\(\\)=>{const a=JSON.parse\\(d\\); console.log\\('active areas:', a.filter\\(x=>x.delivery_area_active\\).length, 'of', a.length\\)}\\)\")",
       "Bash(taskkill //PID 29364 //F)",
-      "Bash(rm -f /tmp/mashesha-test7.db* /tmp/mashesha-api-test7.log)"
+      "Bash(rm -f /tmp/mashesha-test7.db* /tmp/mashesha-api-test7.log)",
+      "Bash(npx --yes playwright --version)",
+      "Bash(node -e \"try { require.resolve\\('playwright'\\); console.log\\('playwright resolvable'\\); } catch\\(e\\) { console.log\\('not resolvable:', e.message\\); }\")",
+      "Bash(npm init *)",
+      "Bash(npx playwright *)",
+      "Bash(taskkill //PID 37264 //F)"
     ],
     "additionalDirectories": [
       "\\tmp"
