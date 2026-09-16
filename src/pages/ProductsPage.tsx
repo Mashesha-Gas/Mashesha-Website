@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useInventoryList, resolveImageUrl, CYLINDER_TYPE } from "../hooks/useInventory";
 import { useCart } from "../context/CartContext";
 import SEO from "../components/SEO";
+import logoIcon from "../components/logo-icon.webp";
 
 interface InventoryRow {
   inventory_id: number;
@@ -116,7 +117,7 @@ export default function ProductsPage() {
         description="Browse LPG gas cylinders for cooking, stoves and gas heaters. All sizes in stock, refilled to SANS safety standards, delivered across Johannesburg by Mashesha."
         path="/products"
       />
-      <div className="mx-auto max-w-7xl px-5 sm:px-8">
+      <div className="relative mx-auto max-w-7xl px-5 sm:px-8 overflow-hidden">
         {/* Page header */}
         <div className="max-w-2xl py-12">
           <span className="text-xs font-semibold uppercase tracking-widest text-rust">
@@ -130,6 +131,23 @@ export default function ProductsPage() {
             Click any cylinder to learn more.
           </p>
         </div>
+
+        {/* Decorative logo mark, sits in the gap below the header text */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none mx-auto -mt-4 mb-8 h-40 w-40 opacity-20 sm:h-56 sm:w-56"
+          style={{
+            backgroundColor: "var(--color-rust)",
+            WebkitMaskImage: `url(${logoIcon})`,
+            maskImage: `url(${logoIcon})`,
+            WebkitMaskSize: "contain",
+            maskSize: "contain",
+            WebkitMaskRepeat: "no-repeat",
+            maskRepeat: "no-repeat",
+            WebkitMaskPosition: "center",
+            maskPosition: "center",
+          }}
+        />
 
         {loading && (
           <p className="text-charcoal/60">Loading cylinders…</p>

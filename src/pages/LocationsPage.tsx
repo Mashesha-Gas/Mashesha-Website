@@ -104,10 +104,10 @@ export default function LocationsPage() {
           ].map((item) => (
             <div
               key={item.title}
-              className="rounded-2xl border border-charcoal/10 bg-white p-7"
+              className="rounded-2xl bg-rust p-7"
             >
-              <h3 className="font-display text-xl text-charcoal">{item.title}</h3>
-              <p className="mt-3 text-sm text-charcoal/65 leading-relaxed">{item.desc}</p>
+              <h3 className="font-display text-xl text-cream">{item.title}</h3>
+              <p className="mt-3 text-sm text-cream/75 leading-relaxed">{item.desc}</p>
             </div>
           ))}
         </div>

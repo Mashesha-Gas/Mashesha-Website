@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import logoIcon from "./logo-icon.webp";
-import nameSlogan from "./nameslogan-cropped.png";
+import nameWordmark from "./name-wordmark.png";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 
@@ -87,8 +87,8 @@ function Header() {
           className="flex items-center gap-2"
           aria-label="Mashesha home"
         >
-          <img src={logoIcon} alt="" className="h-9 w-auto" />
-          <img src={nameSlogan} alt="Mashesha — Gas shup shup." className="h-7 w-auto" />
+          <img src={logoIcon} alt="" className="h-14 w-auto" />
+          <img src={nameWordmark} alt="Mashesha" className="h-6 w-auto" />
         </Link>
 
         {/* Desktop nav */}

@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import SEO from "../components/SEO";
 import orangePatternedBackground from "../components/orange-patterned-background.webp";
+import logoIcon from "../components/logo-icon.webp";
 
 export default function HomePage() {
   return (
@@ -77,8 +78,27 @@ export default function HomePage() {
       </section>
 
       {/* Products teaser */}
-      <section className="bg-rust/10 py-20 sm:py-28 text-center">
-        <div className="mx-auto max-w-7xl px-5 sm:px-8">
+      <section className="relative bg-rust/10 py-20 sm:py-28 text-center overflow-hidden">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 flex items-center justify-center"
+        >
+          <div
+            className="h-[20rem] w-[20rem] opacity-30 sm:h-[26rem] sm:w-[26rem]"
+            style={{
+              backgroundColor: "var(--color-rust)",
+              WebkitMaskImage: `url(${logoIcon})`,
+              maskImage: `url(${logoIcon})`,
+              WebkitMaskSize: "contain",
+              maskSize: "contain",
+              WebkitMaskRepeat: "no-repeat",
+              maskRepeat: "no-repeat",
+              WebkitMaskPosition: "center",
+              maskPosition: "center",
+            }}
+          />
+        </div>
+        <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-8">
           <span className="text-xs font-semibold uppercase tracking-widest text-rust">
             Our range
           </span>

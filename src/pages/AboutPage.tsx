@@ -96,10 +96,10 @@ export default function AboutPage() {
             {VALUES.map((v) => (
               <div
                 key={v.title}
-                className="rounded-2xl border border-charcoal/10 bg-cream p-7"
+                className="rounded-2xl bg-rust p-7"
               >
-                <h3 className="font-display text-xl text-charcoal">{v.title}</h3>
-                <p className="mt-3 text-sm text-charcoal/65 leading-relaxed">{v.desc}</p>
+                <h3 className="font-display text-xl text-cream">{v.title}</h3>
+                <p className="mt-3 text-sm text-cream/75 leading-relaxed">{v.desc}</p>
               </div>
             ))}
           </div>

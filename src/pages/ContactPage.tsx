@@ -10,9 +10,9 @@ export default function ContactPage() {
   }
 
   const inputClass =
-    "w-full rounded-xl bg-white border border-charcoal/15 px-4 py-3 text-sm text-charcoal placeholder:text-charcoal/30 focus:border-rust focus:outline-none";
+    "w-full rounded-xl bg-cream border border-cream/40 px-4 py-3 text-sm text-charcoal placeholder:text-charcoal/40 focus:border-charcoal focus:outline-none";
   const labelClass =
-    "block text-xs font-semibold uppercase tracking-widest text-rust mb-2";
+    "block text-xs font-semibold uppercase tracking-widest text-cream/70 mb-2";
 
   return (
     <main className="bg-cream min-h-screen pt-24 pb-20">
@@ -73,24 +73,24 @@ export default function ContactPage() {
           </div>
 
           {/* Contact form */}
-          <div className="rounded-2xl border border-charcoal/10 bg-white p-8">
+          <div className="rounded-2xl bg-rust p-8">
             {submitted ? (
               <div className="flex flex-col items-center justify-center h-full py-12 text-center">
-                <span className="text-4xl text-rust">✓</span>
-                <h2 className="font-display mt-4 text-2xl text-charcoal">Message sent!</h2>
-                <p className="mt-3 text-charcoal/65 text-sm">
+                <span className="text-4xl text-cream">✓</span>
+                <h2 className="font-display mt-4 text-2xl text-cream">Message sent!</h2>
+                <p className="mt-3 text-cream/70 text-sm">
                   We'll get back to you within a few hours during trading hours.
                 </p>
                 <button
                   onClick={() => setSubmitted(false)}
-                  className="mt-6 text-sm text-rust hover:text-rust-dark transition-colors duration-200"
+                  className="mt-6 text-sm text-cream hover:text-cream/70 transition-colors duration-200"
                 >
                   Send another message
                 </button>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-5">
-                <h2 className="font-display text-2xl text-charcoal">Send a message</h2>
+                <h2 className="font-display text-2xl text-cream">Send a message</h2>
 
                 <div>
                   <label className={labelClass}>Name</label>
@@ -113,7 +113,7 @@ export default function ContactPage() {
 
                 <button
                   type="submit"
-                  className="w-full rounded-full bg-rust py-3 text-sm font-semibold text-cream transition-colors duration-200 hover:bg-rust-dark"
+                  className="w-full rounded-full bg-charcoal py-3 text-sm font-semibold text-cream transition-colors duration-200 hover:bg-charcoal/85"
                 >
                   Send message
                 </button>
