@@ -12,6 +12,12 @@ function areaBlurb(name: string) {
 
 export default function LocationsPage() {
   const { activeAreas, loading, error } = useDeliveryAreas();
+  // Only areas an admin has actually given coordinates to get a pin —
+  // JohannesburgMap already skips ones without lat/lng, this just avoids
+  // passing the whole (possibly large) list down for no reason.
+  const pinnedAreas = activeAreas.filter(
+    (area) => area.delivery_area_lat != null && area.delivery_area_lng != null
+  );
 
   return (
     <main className="bg-cream min-h-screen pt-24 pb-20">
@@ -37,7 +43,7 @@ export default function LocationsPage() {
 
         {/* Map */}
         <div className="mb-12">
-          <JohannesburgMap />
+          <JohannesburgMap areas={pinnedAreas} />
           <p className="mt-3 text-xs text-charcoal/40 text-center">
             Mashesha Gas, Jeppestown, Johannesburg
           </p>
