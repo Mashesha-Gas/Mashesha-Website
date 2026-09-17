@@ -5,7 +5,6 @@ import L from "leaflet";
 // Jeppestown, Johannesburg — where Mashesha is based
 const MASHESHA_COORDS = [-26.2041, 28.0617];
 const ZOOM = 13;
-const DELIVERY_RADIUS_METERS = 30000; // 30 km delivery range
 
 // A custom rust-coloured teardrop pin that matches the site theme
 const MASHESHA_PIN = L.divIcon({
@@ -74,15 +73,6 @@ export default function JohannesburgMap({ areas = [] }) {
       }
     ).addTo(mapRef.current);
 
-    // Shade the 30 km delivery range around the Mashesha location
-    const deliveryCircle = L.circle(MASHESHA_COORDS, {
-      radius: DELIVERY_RADIUS_METERS,
-      color: "#b14305",
-      weight: 2,
-      fillColor: "#b14305",
-      fillOpacity: 0.08,
-    }).addTo(mapRef.current);
-
     // Drop the Mashesha pin and open its label immediately
     L.marker(MASHESHA_COORDS, { icon: MASHESHA_PIN })
       .addTo(mapRef.current)
@@ -94,9 +84,6 @@ export default function JohannesburgMap({ areas = [] }) {
         { closeButton: false }
       )
       .openPopup();
-
-    // Fit the view to the full 30 km range so the whole circle is visible
-    mapRef.current.fitBounds(deliveryCircle.getBounds());
 
     areaLayerRef.current = L.layerGroup().addTo(mapRef.current);
 
