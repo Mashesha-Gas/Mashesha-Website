@@ -16,7 +16,7 @@ export default function LocationsPage() {
   return (
     <main className="bg-cream min-h-screen pt-24 pb-20">
       <SEO
-        title="Gas Delivery Near You — Johannesburg Areas We Serve | Mashesha"
+        title="Gas Delivery Near You | Johannesburg Areas We Serve | Mashesha"
         description="Mashesha delivers LPG gas to Soweto, Sandton, Randburg, Midrand and more. Find out if we deliver gas near you, anywhere across Johannesburg."
         path="/locations"
       />
@@ -31,7 +31,7 @@ export default function LocationsPage() {
           </h1>
           <p className="mt-5 text-lg text-charcoal/65">
             Mashesha covers most of Johannesburg and the surrounding areas.
-            If your area isn't listed, contact us — we may still be able to help.
+            If your area isn't listed, contact us. We may still be able to help.
           </p>
         </div>
 
@@ -39,7 +39,7 @@ export default function LocationsPage() {
         <div className="mb-12">
           <JohannesburgMap />
           <p className="mt-3 text-xs text-charcoal/40 text-center">
-            Mashesha Gas — Jeppestown, Johannesburg
+            Mashesha Gas, Jeppestown, Johannesburg
           </p>
         </div>
 
@@ -55,7 +55,7 @@ export default function LocationsPage() {
         )}
 
         {!loading && !error && activeAreas.length === 0 && (
-          <p className="text-charcoal/60 mb-16">No delivery areas listed right now — check back soon.</p>
+          <p className="text-charcoal/60 mb-16">No delivery areas listed right now. Check back soon.</p>
         )}
 
         {!loading && !error && activeAreas.length > 0 && (
@@ -99,7 +99,7 @@ export default function LocationsPage() {
             },
             {
               title: "Not in our area?",
-              desc: "Call us — we're always expanding. We may be able to make a plan.",
+              desc: "Call us. We're always expanding, and we may be able to make a plan.",
             },
           ].map((item) => (
             <div

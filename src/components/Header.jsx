@@ -73,12 +73,12 @@ function Header() {
   const profileLabel = user ? `Profile (${user.name})` : "Log in";
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50">
-      <div
-        className={`relative z-10 mx-auto flex max-w-7xl items-center justify-between px-5 py-3 transition-colors duration-300 sm:px-8 ${
-          scrolled ? "bg-rust/95 backdrop-blur-sm shadow-lg" : "bg-rust"
-        }`}
-      >
+    <header
+      className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
+        scrolled ? "bg-rust/95 backdrop-blur-sm shadow-lg" : "bg-rust"
+      }`}
+    >
+      <div className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-5 py-3 sm:px-8">
 
         {/* Logo */}
         <Link

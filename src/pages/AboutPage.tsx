@@ -15,7 +15,7 @@ const VALUES = [
   },
   {
     title: "Always reliable",
-    desc: "When you order from Mashesha, the gas shows up. No excuses, no delays — just fuel delivered on time.",
+    desc: "When you order from Mashesha, the gas shows up. No excuses, no delays, just fuel delivered on time.",
   },
   {
     title: "Fair pricing",
@@ -27,7 +27,7 @@ export default function AboutPage() {
   return (
     <main className="bg-cream min-h-screen">
       <SEO
-        title="About Mashesha — Johannesburg's Gas Delivery Service"
+        title="About Mashesha | Johannesburg's Gas Delivery Service"
         description="Mashesha is a Johannesburg-based LPG gas delivery service. Learn how we keep homes and businesses stocked with safe, reliable gas for cooking and heating."
         path="/about"
       />
@@ -45,7 +45,7 @@ export default function AboutPage() {
           </h1>
           <p className="mt-6 max-w-xl text-lg text-cream/80">
             Mashesha was built on a simple belief: safe, affordable energy should
-            be easy to access — for every family, every kitchen, every business
+            be easy to access, for every family, every kitchen, every business
             in Johannesburg.
           </p>
         </div>
@@ -63,14 +63,14 @@ export default function AboutPage() {
                 Started in Joburg. Staying in Joburg.
               </h2>
               <p className="mt-6 text-charcoal/70 leading-relaxed">
-                Mashesha started because we saw a gap — too many households were
+                Mashesha started because we saw a gap. Too many households were
                 running out of gas with no easy way to get a refill fast. Lugging
                 heavy cylinders to a garage or waiting days for delivery wasn't
                 good enough.
               </p>
               <p className="mt-4 text-charcoal/70 leading-relaxed">
                 We built a delivery-first gas service that puts the customer at
-                the centre. Order by phone, WhatsApp, or online — and your gas
+                the centre. Order by phone, WhatsApp, or online, and your gas
                 arrives at your door the same day.
               </p>
             </div>
@@ -78,7 +78,7 @@ export default function AboutPage() {
               <div className="rounded-2xl bg-rust p-10">
                 <p className="font-display text-5xl text-cream">Mashesha.</p>
                 <p className="mt-4 text-cream/75 text-sm leading-relaxed">
-                  "Mashesha" means <em>hurry</em> in Zulu — because that's what we
+                  "Mashesha" means <em>hurry</em> in Zulu, because that's what we
                   do. When you're out of gas, we move fast.
                 </p>
               </div>

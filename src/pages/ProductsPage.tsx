@@ -113,7 +113,7 @@ export default function ProductsPage() {
   return (
     <main className="bg-cream min-h-screen pt-24 pb-20">
       <SEO
-        title="Gas Cylinders for Sale | LPG for Cooking & Gas Heaters — Mashesha"
+        title="Gas Cylinders for Sale | LPG for Cooking & Gas Heaters | Mashesha"
         description="Browse LPG gas cylinders for cooking, stoves and gas heaters. All sizes in stock, refilled to SANS safety standards, delivered across Johannesburg by Mashesha."
         path="/products"
       />
@@ -160,7 +160,7 @@ export default function ProductsPage() {
         )}
 
         {!loading && !error && cylinders.length === 0 && (
-          <p className="text-charcoal/60">No cylinders in stock right now — check back soon.</p>
+          <p className="text-charcoal/60">No cylinders in stock right now. Check back soon.</p>
         )}
 
         {!loading && !error && cylinders.length > 0 && (

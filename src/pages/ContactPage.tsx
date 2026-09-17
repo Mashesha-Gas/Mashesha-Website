@@ -17,7 +17,7 @@ export default function ContactPage() {
   return (
     <main className="bg-cream min-h-screen pt-24 pb-20">
       <SEO
-        title="Contact Mashesha — Order Gas Delivery in Johannesburg"
+        title="Contact Mashesha | Order Gas Delivery in Johannesburg"
         description="Get in touch with Mashesha to order LPG gas delivery near you. Call, WhatsApp, or message us for fast gas delivery to your area in Johannesburg."
         path="/contact"
       />
@@ -31,7 +31,7 @@ export default function ContactPage() {
             Contact us.
           </h1>
           <p className="mt-5 text-lg text-charcoal/65">
-            To order gas, ask a question, or arrange a delivery — reach out
+            To order gas, ask a question, or arrange a delivery, reach out
             by phone, WhatsApp, email, or the form below.
           </p>
         </div>

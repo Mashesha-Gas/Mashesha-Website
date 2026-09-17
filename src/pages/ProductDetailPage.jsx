@@ -63,7 +63,7 @@ function ProductDetailPage() {
   return (
     <>
       <SEO
-        title={`${label} Gas Cylinder | LPG Refill — Mashesha`}
+        title={`${label} Gas Cylinder | LPG Refill | Mashesha`}
         description={`${label} LPG gas cylinder, SANS-certified and refilled for cooking or gas heaters. Order online for same-day delivery in Johannesburg.`}
         path={`/products/${id}`}
       />
@@ -174,8 +174,8 @@ function ProductDetailPage() {
               <div className="rounded-2xl bg-rust p-7">
                 <p className="text-sm font-semibold uppercase tracking-widest text-cream/70">Need help choosing?</p>
                 <p className="mt-3 text-base text-cream/85">
-                  Not sure if the {label} is right for you? Call us or send a WhatsApp —
-                  we'll recommend the best size for your situation.
+                  Not sure if the {label} is right for you? Call us or send a WhatsApp.
+                  We'll recommend the best size for your situation.
                 </p>
                 <a href="tel:+27111234567" className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-cream transition-colors duration-200 hover:text-cream/70">
                   Call us now →

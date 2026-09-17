@@ -8,8 +8,8 @@ export default function HomePage() {
   return (
     <main>
       <SEO
-        title="Mashesha — Gas Delivery Near You | LPG Gas in Johannesburg"
-        description="Mashesha delivers LPG gas cylinders straight to your door in Johannesburg. Fast, safe gas delivery for cooking, stoves and gas heaters — order gas near you today."
+        title="Mashesha | Gas Delivery Near You | LPG Gas in Johannesburg"
+        description="Mashesha delivers LPG gas cylinders straight to your door in Johannesburg. Fast, safe gas delivery for cooking, stoves and gas heaters. Order gas near you today."
         path="/"
       />
       {/* Hero */}
@@ -25,7 +25,7 @@ export default function HomePage() {
             Gas when you need it. Where you need it.
           </h1>
           <p className="mt-6 max-w-xl text-lg text-cream/80">
-            Mashesha delivers refilled LPG cylinders straight to your door — fast,
+            Mashesha delivers refilled LPG cylinders straight to your door. Fast,
             safe, and available across Johannesburg.
           </p>
           <div className="mt-10 flex flex-wrap gap-4">
@@ -62,7 +62,7 @@ export default function HomePage() {
               },
               {
                 title: "All cylinder sizes",
-                desc: "From 1 kg camping cylinders to 18 kg family and business cylinders — we stock them all.",
+                desc: "From 1 kg camping cylinders to 18 kg family and business cylinders, we stock them all.",
               },
               {
                 title: "Safe & certified",
@@ -117,7 +117,7 @@ export default function HomePage() {
           </h2>
           <p className="mt-5 max-w-lg mx-auto text-charcoal/65">
             Whether you're camping, cooking for the family, or running a small
-            restaurant — Mashesha has the right size.
+            restaurant, Mashesha has the right size.
           </p>
           <Link
             to="/products"

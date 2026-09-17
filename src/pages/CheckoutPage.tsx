@@ -186,7 +186,7 @@ export default function CheckoutPage() {
       });
       const verifyData = await verifyRes.json().catch(() => ({}));
       if (!verifyRes.ok || !verifyData.verified) {
-        throw new Error("We couldn't confirm your payment with Paystack. You have not been charged — please try again.");
+        throw new Error("We couldn't confirm your payment with Paystack. You have not been charged. Please try again.");
       }
       if (verifyData.currency !== "ZAR" || Math.abs(verifyData.amount - total) > 0.5) {
         throw new Error("The confirmed payment amount didn't match your order. Please contact us before trying again.");
@@ -231,7 +231,7 @@ export default function CheckoutPage() {
 
     const paystack = (window as any).PaystackPop;
     if (!paystack) {
-      setSubmitError("Payments are still loading — please try again in a moment.");
+      setSubmitError("Payments are still loading. Please try again in a moment.");
       return;
     }
 
@@ -245,7 +245,7 @@ export default function CheckoutPage() {
         finalizeOrder(response.reference);
       },
       onClose: () => {
-        setSubmitError("Payment was cancelled — your order was not placed.");
+        setSubmitError("Payment was cancelled. Your order was not placed.");
       },
     });
     handler.openIframe();
@@ -285,7 +285,7 @@ export default function CheckoutPage() {
           </div>
           <h1 className="font-display text-4xl text-charcoal">Order placed!</h1>
           <p className="text-charcoal/65 leading-relaxed">
-            Thanks, {form.fullName.split(" ")[0]}. Order #{placedOrder.orderId} — we'll confirm your delivery by SMS or WhatsApp shortly.
+            Thanks, {form.fullName.split(" ")[0]}. Order #{placedOrder.orderId}. We'll confirm your delivery by SMS or WhatsApp shortly.
           </p>
 
           {/* Delivery / pickup details */}
@@ -328,7 +328,7 @@ export default function CheckoutPage() {
               </div>
               <div className="border-t border-cream/20 pt-3">
                 <p className="text-sm font-semibold text-cream">Collect from</p>
-                <p className="mt-0.5 text-sm text-cream/80">Mashesha Gas — Jeppestown, Johannesburg</p>
+                <p className="mt-0.5 text-sm text-cream/80">Mashesha Gas, Jeppestown, Johannesburg</p>
                 <p className="mt-1 text-sm text-cream/80">{form.phone}</p>
               </div>
             </div>
@@ -344,7 +344,7 @@ export default function CheckoutPage() {
             <div className="flex justify-between text-charcoal/65">
               <span>Delivery fee</span>
               <span>
-                {placedOrder.fulfillment !== "delivery" ? "—" : placedOrder.freeShipping ? "Free" : `R ${DELIVERY_FEE}`}
+                {placedOrder.fulfillment !== "delivery" ? "-" : placedOrder.freeShipping ? "Free" : `R ${DELIVERY_FEE}`}
               </span>
             </div>
             <div className="border-t border-charcoal/10 pt-3 flex justify-between font-semibold text-charcoal">
@@ -601,9 +601,9 @@ export default function CheckoutPage() {
                 </>
               ) : (
                 <div className="rounded-xl border border-charcoal/10 bg-cream/60 p-4">
-                  <p className="text-sm font-semibold text-charcoal">Mashesha Gas — Jeppestown, Johannesburg</p>
+                  <p className="text-sm font-semibold text-charcoal">Mashesha Gas, Jeppestown, Johannesburg</p>
                   <p className="mt-1.5 text-sm text-charcoal/65">
-                    Your order will be ready to collect — we'll message you as soon as it's packed.
+                    Your order will be ready to collect. We'll message you as soon as it's packed.
                     No delivery fee.
                   </p>
                 </div>
@@ -621,7 +621,7 @@ export default function CheckoutPage() {
 
             <p className="text-center text-xs text-charcoal/40 flex items-center justify-center gap-1.5">
               <LockIcon />
-              Secure payment powered by Paystack — your card details never touch our servers.
+              Secure payment powered by Paystack. Your card details never touch our servers.
             </p>
           </form>
 
@@ -639,7 +639,7 @@ export default function CheckoutPage() {
                 <div className="flex justify-between text-charcoal/65">
                   <span>Delivery fee</span>
                   <span>
-                    {form.fulfillment !== "delivery" ? "—" : freeShipping ? "Free" : `R ${DELIVERY_FEE}`}
+                    {form.fulfillment !== "delivery" ? "-" : freeShipping ? "Free" : `R ${DELIVERY_FEE}`}
                   </span>
                 </div>
                 <div className="border-t border-charcoal/10 pt-3 flex justify-between font-semibold text-charcoal text-base">

@@ -25,7 +25,7 @@ function itemsLabel(order: Order, labelById: Record<number, string>) {
     const items: { inventory_id: number; qty: number }[] = JSON.parse(order.order_items_json || "[]");
     return items.map((it) => `${labelById[it.inventory_id] ?? `Item #${it.inventory_id}`} × ${it.qty}`).join(", ");
   } catch {
-    return "—";
+    return "-";
   }
 }
 

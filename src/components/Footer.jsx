@@ -16,7 +16,7 @@ function Footer() {
           <div>
             <div className="flex items-center gap-2">
               <img src={logoIcon} alt="" className="h-16 w-auto" />
-              <img src={nameSlogan} alt="Mashesha — Gas shup shup." className="h-9 w-auto" />
+              <img src={nameSlogan} alt="Mashesha: Gas shup shup." className="h-9 w-auto" />
             </div>
             <Link
               to="/contact"

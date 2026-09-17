@@ -3,11 +3,11 @@ import SEO from "../components/SEO";
 const SECTIONS = [
   {
     title: "1. Acceptance of terms",
-    body: "By ordering from Mashesha — by phone, WhatsApp, or through this website — you agree to these terms and conditions. If you don't agree with any part of them, please don't place an order.",
+    body: "By ordering from Mashesha, whether by phone, WhatsApp, or through this website, you agree to these terms and conditions. If you don't agree with any part of them, please don't place an order.",
   },
   {
     title: "2. Orders & delivery",
-    body: "Orders placed before noon are delivered the same day across most of Johannesburg, subject to stock and location. Delivery windows given at checkout are estimates, not guarantees — traffic, weather, and demand can affect timing.",
+    body: "Orders placed before noon are delivered the same day across most of Johannesburg, subject to stock and location. Delivery windows given at checkout are estimates, not guarantees. Traffic, weather, and demand can affect timing.",
   },
   {
     title: "3. Pricing & payment",
@@ -19,7 +19,7 @@ const SECTIONS = [
   },
   {
     title: "5. Safety compliance",
-    body: "All cylinders we deliver are inspected and refilled to South African LPG safety standards (SANS 10087). It remains your responsibility to store and use LPG cylinders safely — in a ventilated, upright position, away from open flames and out of reach of children.",
+    body: "All cylinders we deliver are inspected and refilled to South African LPG safety standards (SANS 10087). It remains your responsibility to store and use LPG cylinders safely, in a ventilated, upright position, away from open flames and out of reach of children.",
   },
   {
     title: "6. Liability",
@@ -52,7 +52,7 @@ export default function TermsPage() {
         </h1>
         <p className="mt-5 text-charcoal/65 leading-relaxed">
           These terms govern every order placed with Mashesha. Please read them
-          before you order — they cover delivery, pricing, cylinder safety, and
+          before you order. They cover delivery, pricing, cylinder safety, and
           what to expect from us.
         </p>
 
