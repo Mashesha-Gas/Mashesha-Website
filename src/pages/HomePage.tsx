@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import SEO from "../components/SEO";
 import orangePatternedBackground from "../components/orange-patterned-background.webp";
 import logoIcon from "../components/logo-icon.webp";
+import johannesburgAerial from "../components/johannesburg-aerial.jpg";
 
 export default function HomePage() {
   return (
@@ -75,6 +76,15 @@ export default function HomePage() {
             ))}
           </div>
         </div>
+      </section>
+
+      {/* Aerial shot of Johannesburg */}
+      <section className="bg-cream">
+        <img
+          src={johannesburgAerial}
+          alt="Aerial view of Johannesburg, the city Mashesha delivers gas across"
+          className="h-[28rem] w-full object-cover sm:h-[36rem]"
+        />
       </section>
 
       {/* Products teaser */}

@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import SEO from "../components/SEO";
 import orangePatternedBackground from "../components/orange-patterned-background.webp";
+import johannesburgSkyline from "../components/johannesburg-skyline.jpg";
+import logoIcon from "../components/logo-icon.webp";
 
 const VALUES = [
   {
@@ -72,12 +74,30 @@ export default function AboutPage() {
                 arrives at your door the same day.
               </p>
             </div>
-            <div className="rounded-2xl bg-rust p-10">
-              <p className="font-display text-5xl text-cream">Mashesha.</p>
-              <p className="mt-4 text-cream/75 text-sm leading-relaxed">
-                "Mashesha" means <em>hurry</em> in Zulu — because that's what we
-                do. When you're out of gas, we move fast.
-              </p>
+            <div>
+              <div className="rounded-2xl bg-rust p-10">
+                <p className="font-display text-5xl text-cream">Mashesha.</p>
+                <p className="mt-4 text-cream/75 text-sm leading-relaxed">
+                  "Mashesha" means <em>hurry</em> in Zulu — because that's what we
+                  do. When you're out of gas, we move fast.
+                </p>
+              </div>
+              <div
+                role="img"
+                aria-label="Mashesha logo"
+                className="mx-auto mt-16 h-36 w-36 opacity-70"
+                style={{
+                  backgroundColor: "var(--color-rust)",
+                  WebkitMaskImage: `url(${logoIcon})`,
+                  maskImage: `url(${logoIcon})`,
+                  WebkitMaskSize: "contain",
+                  maskSize: "contain",
+                  WebkitMaskRepeat: "no-repeat",
+                  maskRepeat: "no-repeat",
+                  WebkitMaskPosition: "center",
+                  maskPosition: "center",
+                }}
+              />
             </div>
           </div>
         </div>
@@ -104,6 +124,15 @@ export default function AboutPage() {
             ))}
           </div>
         </div>
+      </section>
+
+      {/* Skyline photo */}
+      <section className="bg-cream">
+        <img
+          src={johannesburgSkyline}
+          alt="Johannesburg city skyline at dusk"
+          className="h-[28rem] w-full object-cover sm:h-[36rem]"
+        />
       </section>
 
       {/* CTA */}
