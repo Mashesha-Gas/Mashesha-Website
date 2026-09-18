@@ -74,7 +74,10 @@ function Header() {
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
-        scrolled ? "bg-rust/95 backdrop-blur-sm shadow-lg" : "bg-rust"
+        // backdrop-blur creates a new containing block for fixed descendants,
+        // which would confine the fixed mobile menu below to the header's own
+        // (much shorter) box instead of the viewport — so drop it while open.
+        scrolled && !open ? "bg-rust/95 backdrop-blur-sm shadow-lg" : "bg-rust"
       }`}
     >
       <div className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-5 py-3 sm:px-8">
