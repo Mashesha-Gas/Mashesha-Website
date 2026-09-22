@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Link, NavLink } from "react-router-dom";
 import logoIcon from "./logo-icon.webp";
 import nameWordmark from "./name-wordmark.png";
@@ -74,10 +75,7 @@ function Header() {
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
-        // backdrop-blur creates a new containing block for fixed descendants,
-        // which would confine the fixed mobile menu below to the header's own
-        // (much shorter) box instead of the viewport — so drop it while open.
-        scrolled && !open ? "bg-rust/95 backdrop-blur-sm shadow-lg" : "bg-rust"
+        scrolled ? "bg-rust/95 backdrop-blur-sm shadow-lg" : "bg-rust"
       }`}
     >
       <div className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-5 py-3 sm:px-8">
@@ -159,7 +157,7 @@ function Header() {
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
-            className="flex h-10 w-10 items-center justify-center rounded-full text-cream cursor-pointer"
+            className="flex h-10 w-10 touch-manipulation items-center justify-center rounded-full text-cream cursor-pointer"
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
           >
@@ -174,37 +172,41 @@ function Header() {
         </div>
       </div>
 
-      {/* Mobile menu */}
-      {open && (
-        <div className="fixed inset-x-0 top-[60px] bottom-0 overflow-y-auto border-t border-charcoal/20 bg-rust px-5 pb-6 pt-2 lg:hidden">
-          <nav className="flex flex-col gap-1" aria-label="Mobile">
-            {NAV_LINKS.map((link) => (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                end={link.to === "/"}
+      {/* Mobile menu — portaled to body so it's never subject to the
+          header's own stacking/containing-block context (e.g. backdrop-blur,
+          transforms) trapping or clipping it. */}
+      {open &&
+        createPortal(
+          <div className="fixed inset-x-0 top-20 bottom-0 z-50 overflow-y-auto border-t border-charcoal/20 bg-rust px-5 pb-6 pt-2 lg:hidden">
+            <nav className="flex flex-col gap-1" aria-label="Mobile">
+              {NAV_LINKS.map((link) => (
+                <NavLink
+                  key={link.to}
+                  to={link.to}
+                  end={link.to === "/"}
+                  onClick={() => setOpen(false)}
+                  className={({ isActive }) =>
+                    `rounded-lg px-3 py-3 text-base font-medium transition-colors duration-200 ${
+                      isActive
+                        ? "bg-cream/10 text-cream font-bold"
+                        : "text-cream/80 hover:bg-cream/10 hover:text-cream"
+                    }`
+                  }
+                >
+                  {link.label}
+                </NavLink>
+              ))}
+              <Link
+                to="/contact"
                 onClick={() => setOpen(false)}
-                className={({ isActive }) =>
-                  `rounded-lg px-3 py-3 text-base font-medium transition-colors duration-200 ${
-                    isActive
-                      ? "bg-cream/10 text-cream font-bold"
-                      : "text-cream/80 hover:bg-cream/10 hover:text-cream"
-                  }`
-                }
+                className="mt-3 inline-flex items-center justify-center rounded-full bg-cream px-5 py-3 text-base font-semibold text-rust"
               >
-                {link.label}
-              </NavLink>
-            ))}
-            <Link
-              to="/contact"
-              onClick={() => setOpen(false)}
-              className="mt-3 inline-flex items-center justify-center rounded-full bg-cream px-5 py-3 text-base font-semibold text-rust"
-            >
-              Order Gas
-            </Link>
-          </nav>
-        </div>
-      )}
+                Order Gas
+              </Link>
+            </nav>
+          </div>,
+          document.body
+        )}
     </header>
   );
 }
