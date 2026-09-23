@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, NavLink } from "react-router-dom";
 import logoIcon from "./logo-icon.webp";
-import nameWordmark from "./name-wordmark.png";
+import nameWordmark from "./name-wordmark.webp";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 
@@ -140,7 +140,7 @@ function Header() {
             to={profileLink}
             onClick={() => setOpen(false)}
             aria-label={profileLabel}
-            className="flex h-10 w-10 items-center justify-center rounded-full text-cream/80 hover:text-cream"
+            className="flex h-11 w-11 items-center justify-center rounded-full text-cream/80 hover:text-cream"
           >
             {user ? <UserAvatar name={user.name} /> : <ProfileIcon />}
           </Link>
@@ -148,7 +148,7 @@ function Header() {
             to="/cart"
             onClick={() => setOpen(false)}
             aria-label="My cart"
-            className="relative flex h-10 w-10 items-center justify-center rounded-full text-cream/80 hover:text-cream"
+            className="relative flex h-11 w-11 items-center justify-center rounded-full text-cream/80 hover:text-cream"
           >
             <CartIcon />
             <CartBadge count={cartCount} />
@@ -156,7 +156,7 @@ function Header() {
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
-            className="flex h-10 w-10 touch-manipulation items-center justify-center rounded-full text-cream cursor-pointer"
+            className="flex h-11 w-11 touch-manipulation items-center justify-center rounded-full text-cream cursor-pointer"
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
           >

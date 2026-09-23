@@ -43,6 +43,17 @@
     font-family: var(--font-display);
   }
 
+  /* Smaller pattern image on narrow/mobile-data viewports; the sharper,
+     heavier one only loads once the viewport proves it's worth it. */
+  .hero-pattern-bg {
+    background-image: url("./components/orange-patterned-background-mobile.webp");
+  }
+  @media (min-width: 640px) {
+    .hero-pattern-bg {
+      background-image: url("./components/orange-patterned-background.webp");
+    }
+  }
+
   .pattern-zulu {
     background-image: repeating-linear-gradient(
       45deg,

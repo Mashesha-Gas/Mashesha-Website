@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useCart, lineKey } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
@@ -104,6 +104,17 @@ export default function CheckoutPage() {
   const [accountConfirm, setAccountConfirm] = useState("");
   const [whatsappConsent, setWhatsappConsent] = useState(false);
   const [placedOrder, setPlacedOrder] = useState<{ items: typeof cartItems; total: number; orderId: number; fulfillment: Fulfillment; freeShipping: boolean; pickupLocation: string } | null>(null);
+
+  // Paystack's inline widget is only needed here, so it's loaded on demand
+  // instead of blocking every page's first paint with a third-party script.
+  useEffect(() => {
+    if ((window as any).PaystackPop || document.getElementById("paystack-inline-script")) return;
+    const script = document.createElement("script");
+    script.id = "paystack-inline-script";
+    script.src = "https://js.paystack.co/v1/inline.js";
+    script.async = true;
+    document.body.appendChild(script);
+  }, []);
 
   const selectedArea = activeAreas.find((a) => a.delivery_area_name === form.city);
   const freeShipping = form.fulfillment === "delivery" && !!selectedArea?.delivery_area_free_shipping;

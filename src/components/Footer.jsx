@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import logoIcon from "./logo-icon.webp";
-import nameSlogan from "./nameslogan-cropped.png";
+import nameSlogan from "./nameslogan-cropped.webp";
 import { PaymentBadgeRow } from "./PaymentBadges";
 import { CollectionBadgeLine } from "./CollectionOptions";
 

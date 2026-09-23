@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import SEO from "../components/SEO";
-import orangePatternedBackground from "../components/orange-patterned-background.webp";
 import logoIcon from "../components/logo-icon.webp";
 import johannesburgAerial from "../components/johannesburg-aerial.webp";
+import johannesburgAerialMobile from "../components/johannesburg-aerial-mobile.webp";
 import QuickOrder from "../components/QuickOrder";
 import { PaymentOptionsCard } from "../components/PaymentBadges";
 import { CollectionOptionsCard } from "../components/CollectionOptions";
@@ -29,10 +29,7 @@ export default function HomePage() {
         path="/"
       />
       {/* Hero */}
-      <section
-        className="relative bg-rust min-h-screen flex items-center pt-20 overflow-hidden bg-cover bg-center"
-        style={{ backgroundImage: `url(${orangePatternedBackground})` }}
-      >
+      <section className="hero-pattern-bg relative bg-rust min-h-screen flex items-center pt-20 overflow-hidden bg-cover bg-center">
         <div className="relative mx-auto max-w-7xl px-5 sm:px-8 py-20">
           <span className="text-xs font-semibold uppercase tracking-widest text-cream/80">
             Johannesburg's gas delivery service
@@ -113,7 +110,11 @@ export default function HomePage() {
       <section className="bg-cream">
         <img
           src={johannesburgAerial}
+          srcSet={`${johannesburgAerialMobile} 1000w, ${johannesburgAerial} 3200w`}
+          sizes="100vw"
           alt="Aerial view of Johannesburg, the city Mashesha delivers gas across"
+          loading="lazy"
+          decoding="async"
           className="h-[28rem] w-full object-cover sm:h-[36rem]"
         />
       </section>

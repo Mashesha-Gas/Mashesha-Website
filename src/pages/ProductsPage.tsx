@@ -118,7 +118,7 @@ function ProductCard({ item }: { item: InventoryRow }) {
             <button
               type="button"
               onClick={() => setPurchaseType("refill")}
-              className={`flex-1 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors duration-200 ${
+              className={`flex-1 rounded-full border px-3 py-2.5 text-xs font-semibold transition-colors duration-200 ${
                 purchaseType === "refill" ? "border-rust bg-rust text-cream" : "border-cream/20 text-cream/60"
               }`}
             >
@@ -127,7 +127,7 @@ function ProductCard({ item }: { item: InventoryRow }) {
             <button
               type="button"
               onClick={() => setPurchaseType("new")}
-              className={`flex-1 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors duration-200 ${
+              className={`flex-1 rounded-full border px-3 py-2.5 text-xs font-semibold transition-colors duration-200 ${
                 purchaseType === "new" ? "border-rust bg-rust text-cream" : "border-cream/20 text-cream/60"
               }`}
             >
@@ -141,7 +141,7 @@ function ProductCard({ item }: { item: InventoryRow }) {
             type="button"
             onClick={handleAdd}
             disabled={!inStock}
-            className="flex-1 rounded-full bg-rust px-4 py-2 text-xs font-semibold text-cream transition-colors duration-200 hover:bg-rust-dark disabled:opacity-40 disabled:hover:bg-rust disabled:cursor-not-allowed"
+            className="flex-1 rounded-full bg-rust px-4 py-3 text-xs font-semibold text-cream transition-colors duration-200 hover:bg-rust-dark disabled:opacity-40 disabled:hover:bg-rust disabled:cursor-not-allowed"
           >
             {!inStock ? "Out of stock" : added ? "Added ✓" : "Add to cart"}
           </button>
@@ -149,7 +149,7 @@ function ProductCard({ item }: { item: InventoryRow }) {
             href={whatsAppLink(whatsAppMessage)}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 rounded-full border border-cream/30 px-4 py-2 text-center text-xs font-semibold text-cream transition-colors duration-200 hover:border-cream/60"
+            className="flex-1 rounded-full border border-cream/30 px-4 py-3 text-center text-xs font-semibold text-cream transition-colors duration-200 hover:border-cream/60"
           >
             WhatsApp
           </a>

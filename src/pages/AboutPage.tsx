@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import SEO from "../components/SEO";
-import orangePatternedBackground from "../components/orange-patterned-background.webp";
 import johannesburgSkyline from "../components/johannesburg-skyline.webp";
+import johannesburgSkylineMobile from "../components/johannesburg-skyline-mobile.webp";
 import logoIcon from "../components/logo-icon.webp";
 
 const VALUES = [
@@ -32,10 +32,7 @@ export default function AboutPage() {
         path="/about"
       />
       {/* Hero */}
-      <section
-        className="relative bg-rust bg-cover bg-center pt-32 pb-20 sm:pb-28 overflow-hidden"
-        style={{ backgroundImage: `url(${orangePatternedBackground})` }}
-      >
+      <section className="hero-pattern-bg relative bg-rust bg-cover bg-center pt-32 pb-20 sm:pb-28 overflow-hidden">
         <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
           <span className="text-xs font-semibold uppercase tracking-widest text-cream/70">
             About us
@@ -131,7 +128,11 @@ export default function AboutPage() {
       <section className="bg-cream">
         <img
           src={johannesburgSkyline}
+          srcSet={`${johannesburgSkylineMobile} 1000w, ${johannesburgSkyline} 3200w`}
+          sizes="100vw"
           alt="Johannesburg city skyline at dusk"
+          loading="lazy"
+          decoding="async"
           className="h-[28rem] w-full object-cover sm:h-[36rem]"
         />
       </section>

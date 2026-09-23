@@ -126,7 +126,7 @@ function ProductDetailPage() {
                     <button
                       type="button"
                       onClick={() => setPurchaseType("refill")}
-                      className={`rounded-full border px-4 py-2 text-sm font-semibold transition-colors duration-200 ${
+                      className={`rounded-full border px-4 py-3 text-sm font-semibold transition-colors duration-200 ${
                         purchaseType === "refill" ? "border-rust bg-rust text-cream" : "border-charcoal/20 text-charcoal/60 hover:border-rust/50"
                       }`}
                     >
@@ -135,7 +135,7 @@ function ProductDetailPage() {
                     <button
                       type="button"
                       onClick={() => setPurchaseType("new")}
-                      className={`rounded-full border px-4 py-2 text-sm font-semibold transition-colors duration-200 ${
+                      className={`rounded-full border px-4 py-3 text-sm font-semibold transition-colors duration-200 ${
                         purchaseType === "new" ? "border-rust bg-rust text-cream" : "border-charcoal/20 text-charcoal/60 hover:border-rust/50"
                       }`}
                     >
@@ -156,7 +156,7 @@ function ProductDetailPage() {
                     type="button"
                     onClick={() => setQty((q) => Math.max(1, q - 1))}
                     disabled={qty <= 1}
-                    className="flex h-9 w-9 items-center justify-center rounded-full border border-charcoal/20 text-charcoal/60 hover:border-rust hover:text-rust disabled:opacity-30 disabled:hover:border-charcoal/20 disabled:hover:text-charcoal/60"
+                    className="flex h-11 w-11 items-center justify-center rounded-full border border-charcoal/20 text-charcoal/60 hover:border-rust hover:text-rust disabled:opacity-30 disabled:hover:border-charcoal/20 disabled:hover:text-charcoal/60"
                   >
                     −
                   </button>
@@ -164,7 +164,7 @@ function ProductDetailPage() {
                   <button
                     type="button"
                     onClick={() => setQty((q) => q + 1)}
-                    className="flex h-9 w-9 items-center justify-center rounded-full border border-charcoal/20 text-charcoal/60 hover:border-rust hover:text-rust"
+                    className="flex h-11 w-11 items-center justify-center rounded-full border border-charcoal/20 text-charcoal/60 hover:border-rust hover:text-rust"
                   >
                     +
                   </button>
