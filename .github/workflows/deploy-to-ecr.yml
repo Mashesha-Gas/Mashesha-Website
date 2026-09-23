@@ -30,7 +30,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build, tag, and push image to Amazon ECR
+      - name: Build, tag, and push staging image to Amazon ECR
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
@@ -42,6 +42,30 @@ jobs:
           docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+      # Vite bakes VITE_* vars into the JS bundle at build time, so the
+      # staging image above can never serve prod — it needs its own build
+      # pointed at the prod API and the LIVE Paystack key, pushed under a
+      # separate tag so docker-compose.yml (prod) and
+      # docker-compose.staging.yml can each pull the variant that matches
+      # their domain.
+      #
+      # TODO: VITE_PAYSTACK_PUBLIC_KEY below is still the *test* key as a
+      # placeholder — swap it for the live publishable key (pk_live_...)
+      # from the Paystack dashboard before this is relied on for real
+      # payments.
+      - name: Build, tag, and push prod image to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build \
+            --build-arg VITE_API_URL=https://api.mashesha.co.za \
+            --build-arg VITE_PAYSTACK_PUBLIC_KEY=pk_test_abeefc4d2c839f72599ababcb5dddc58132f35a4 \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:prod-$IMAGE_TAG .
+          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:prod-$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:prod
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:prod-$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:prod
 
       - name: Image digest
         run: echo "Image pushed with tag ${{ github.sha }}"
