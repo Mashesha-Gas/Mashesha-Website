@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import SEO from "../components/SEO";
 import orangePatternedBackground from "../components/orange-patterned-background.webp";
-import johannesburgSkyline from "../components/johannesburg-skyline.jpg";
+import johannesburgSkyline from "../components/johannesburg-skyline.webp";
 import logoIcon from "../components/logo-icon.webp";
 
 const VALUES = [
@@ -54,7 +54,7 @@ export default function AboutPage() {
       {/* Story */}
       <section className="bg-cream py-20 sm:py-28">
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
-          <div className="grid gap-16 sm:grid-cols-2 items-start">
+          <div className="grid gap-16 sm:grid-cols-2 items-center">
             <div>
               <span className="text-xs font-semibold uppercase tracking-widest text-rust">
                 Our story

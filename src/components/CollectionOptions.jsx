@@ -33,26 +33,26 @@ function StoreIcon() {
 // Full explainer card — home page.
 export function CollectionOptionsCard({ className = "" }) {
   return (
-    <div className={`rounded-2xl border border-charcoal/10 bg-white p-6 sm:p-7 ${className}`}>
-      <p className="text-xs font-semibold uppercase tracking-widest text-rust">Collect in store</p>
-      <p className="mt-3 text-sm text-charcoal/60">
+    <div className={`rounded-2xl border border-cream/15 bg-ink-light p-6 sm:p-7 ${className}`}>
+      <p className="text-xs font-semibold uppercase tracking-widest text-cream/50">Collect in store</p>
+      <p className="mt-3 text-sm text-cream/60">
         Skip delivery and pick up your order instead — choose whichever location suits you.
       </p>
       <div className="mt-4 space-y-5">
         {COLLECTION_POINTS.map((point) => (
           <div key={point.id} className="flex items-start gap-3">
-            <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-rust/10 text-rust">
+            <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-rust/15 text-rust">
               <StoreIcon />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold text-charcoal">{point.name}</p>
-              <p className="mt-0.5 text-xs text-charcoal/50">{point.address}</p>
-              <TradingHours point={point} className="mt-2" />
+              <p className="text-sm font-semibold text-cream">{point.name}</p>
+              <p className="mt-0.5 text-xs text-cream/50">{point.address}</p>
+              <TradingHours point={point} variant="dark" className="mt-2" />
               <a
                 href={mapLink(point)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-rust hover:underline"
+                className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-cream hover:underline"
               >
                 Get directions →
               </a>
@@ -60,7 +60,7 @@ export function CollectionOptionsCard({ className = "" }) {
           </div>
         ))}
       </div>
-      <p className="mt-4 text-xs text-charcoal/40">Hours may vary on public holidays.</p>
+      <p className="mt-4 text-xs text-cream/40">Hours may vary on public holidays.</p>
     </div>
   );
 }

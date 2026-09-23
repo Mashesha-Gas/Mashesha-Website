@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import SEO from "../components/SEO";
 import orangePatternedBackground from "../components/orange-patterned-background.webp";
 import logoIcon from "../components/logo-icon.webp";
-import johannesburgAerial from "../components/johannesburg-aerial.jpg";
+import johannesburgAerial from "../components/johannesburg-aerial.webp";
 import QuickOrder from "../components/QuickOrder";
 import { PaymentOptionsCard } from "../components/PaymentBadges";
 import { CollectionOptionsCard } from "../components/CollectionOptions";
@@ -63,19 +63,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Brand story */}
-      <section className="bg-cream pt-20 sm:pt-28">
-        <div className="mx-auto max-w-7xl px-5 sm:px-8">
-          <div className="mx-auto max-w-lg rounded-2xl bg-rust p-10 text-center">
-            <p className="font-display text-5xl text-cream">Mashesha.</p>
-            <p className="mt-4 text-cream/75 text-sm leading-relaxed">
-              "Mashesha" means <em>hurry</em> in Zulu, because that's what we
-              do. When you're out of gas, we move fast.
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* Why Mashesha */}
       <section className="bg-cream py-20 sm:py-28">
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
@@ -105,6 +92,19 @@ export default function HomePage() {
                 <p className="mt-3 text-sm text-charcoal/65 leading-relaxed">{item.desc}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Brand story */}
+      <section className="bg-cream pb-20 sm:pb-28">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8">
+          <div className="mx-auto max-w-lg rounded-2xl bg-ink p-10 text-center">
+            <p className="font-display text-5xl text-cream">Mashesha.</p>
+            <p className="mt-4 text-cream/75 text-sm leading-relaxed">
+              "Mashesha" means <em>hurry</em> in Zulu, because that's what we
+              do. When you're out of gas, we move fast.
+            </p>
           </div>
         </div>
       </section>

@@ -72,33 +72,33 @@ function LinkIcon() {
 // Full explainer card — home page and checkout.
 export function PaymentOptionsCard({ className = "" }) {
   return (
-    <div className={`rounded-2xl border border-charcoal/10 bg-white p-6 sm:p-7 ${className}`}>
-      <p className="text-xs font-semibold uppercase tracking-widest text-rust">How you can pay</p>
+    <div className={`rounded-2xl border border-cream/15 bg-ink-light p-6 sm:p-7 ${className}`}>
+      <p className="text-xs font-semibold uppercase tracking-widest text-cream/50">How you can pay</p>
       <div className="mt-4 space-y-4">
         <div className="flex items-start gap-3">
-          <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-rust/10 text-rust">
+          <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-rust/15 text-rust">
             <CardIcon />
           </div>
           <div>
-            <p className="text-sm font-semibold text-charcoal">Card on delivery</p>
-            <p className="mt-0.5 text-sm text-charcoal/60">
+            <p className="text-sm font-semibold text-cream">Card on delivery</p>
+            <p className="mt-0.5 text-sm text-cream/60">
               Tap or insert your card when your driver arrives — no cash needed.
             </p>
           </div>
         </div>
         <div className="flex items-start gap-3">
-          <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-rust/10 text-rust">
+          <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-rust/15 text-rust">
             <LinkIcon />
           </div>
           <div>
-            <p className="text-sm font-semibold text-charcoal">Payment link</p>
-            <p className="mt-0.5 text-sm text-charcoal/60">
+            <p className="text-sm font-semibold text-cream">Payment link</p>
+            <p className="mt-0.5 text-sm text-cream/60">
               We can send you a secure Yoco payment link to pay online before delivery.
             </p>
           </div>
         </div>
       </div>
-      <div className="mt-5 flex items-center gap-2 border-t border-charcoal/10 pt-4">
+      <div className="mt-5 flex items-center gap-2 border-t border-cream/15 pt-4">
         <YocoMark />
         <CardNetworkIcons />
       </div>

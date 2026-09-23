@@ -81,29 +81,29 @@ function ProductCard({ item }: { item: InventoryRow }) {
     // action buttons below live outside it — an <a> can't contain another
     // <a>/<button> without breaking the DOM (browsers silently un-nest it,
     // which breaks click targeting and layout both).
-    <div className="group flex flex-col rounded-2xl border border-charcoal/10 bg-white overflow-hidden transition-colors duration-200 hover:border-rust/50 hover:bg-rust/5">
+    <div className="group flex flex-col rounded-2xl border border-cream/15 bg-ink-light overflow-hidden transition-colors duration-200 hover:border-rust/50">
       <Link to={`/products/${item.inventory_id}`} className="flex flex-col flex-1">
         {/* Product image */}
         <ProductImage src={resolveImageUrl(item.inventory_thumbnail_path)} label={label} />
 
         {/* Card text */}
         <div className="flex flex-col flex-1 p-6 pb-0">
-          <span className="font-display text-4xl text-charcoal">{label}</span>
-          <span className="mt-2 text-sm font-semibold text-rust">
+          <span className="font-display text-4xl text-cream">{label}</span>
+          <span className="mt-2 text-sm font-semibold text-cream">
             {purchaseType === "new" && hasDeposit
               ? `R ${(Number(item.inventory_sale ?? item.inventory_price) + deposit).toLocaleString()}`
               : formatPrice(item)}
           </span>
           {hasDeposit && (
-            <span className="mt-1 text-xs text-charcoal/45">
+            <span className="mt-1 text-xs text-cream/45">
               {purchaseType === "new" ? `Includes R ${deposit.toLocaleString()} refundable deposit` : "Refill/exchange price — new cylinders include a refundable deposit"}
             </span>
           )}
-          <p className="mt-3 text-sm text-charcoal/65 leading-relaxed flex-1">
+          <p className="mt-3 text-sm text-cream/65 leading-relaxed flex-1">
             {item.inventory_description}
           </p>
 
-          <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-charcoal transition-colors duration-200 group-hover:text-rust">
+          <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-cream/80 transition-colors duration-200 group-hover:text-cream">
             View details
             <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" aria-hidden="true">
               <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -119,7 +119,7 @@ function ProductCard({ item }: { item: InventoryRow }) {
               type="button"
               onClick={() => setPurchaseType("refill")}
               className={`flex-1 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors duration-200 ${
-                purchaseType === "refill" ? "border-rust bg-rust text-cream" : "border-charcoal/20 text-charcoal/60"
+                purchaseType === "refill" ? "border-rust bg-rust text-cream" : "border-cream/20 text-cream/60"
               }`}
             >
               Refill / exchange
@@ -128,7 +128,7 @@ function ProductCard({ item }: { item: InventoryRow }) {
               type="button"
               onClick={() => setPurchaseType("new")}
               className={`flex-1 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors duration-200 ${
-                purchaseType === "new" ? "border-rust bg-rust text-cream" : "border-charcoal/20 text-charcoal/60"
+                purchaseType === "new" ? "border-rust bg-rust text-cream" : "border-cream/20 text-cream/60"
               }`}
             >
               New cylinder
@@ -149,7 +149,7 @@ function ProductCard({ item }: { item: InventoryRow }) {
             href={whatsAppLink(whatsAppMessage)}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 rounded-full border border-rust/30 px-4 py-2 text-center text-xs font-semibold text-rust transition-colors duration-200 hover:border-rust/60"
+            className="flex-1 rounded-full border border-cream/30 px-4 py-2 text-center text-xs font-semibold text-cream transition-colors duration-200 hover:border-cream/60"
           >
             WhatsApp
           </a>

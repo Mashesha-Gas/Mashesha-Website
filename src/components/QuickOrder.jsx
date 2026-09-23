@@ -46,12 +46,12 @@ function StepDots({ step }) {
           <div key={label} className="flex items-center gap-2">
             <span
               className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
-                active ? "bg-rust text-cream" : done ? "bg-rust/20 text-rust" : "bg-charcoal/10 text-charcoal/40"
+                active ? "bg-rust text-cream" : done ? "bg-rust/25 text-rust" : "bg-cream/10 text-cream/40"
               }`}
             >
               {done ? "✓" : n}
             </span>
-            {n < STEP_LABELS.length && <span className="h-0.5 w-6 bg-charcoal/10" aria-hidden="true" />}
+            {n < STEP_LABELS.length && <span className="h-0.5 w-6 bg-cream/15" aria-hidden="true" />}
           </div>
         );
       })}
@@ -67,11 +67,11 @@ function QtyStepper({ qty, onIncrease, onDecrease }) {
         onClick={onDecrease}
         disabled={qty === 0}
         aria-label="Decrease quantity"
-        className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-rust text-xl font-bold text-rust transition-colors duration-200 disabled:opacity-30"
+        className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-cream/30 text-xl font-bold text-cream transition-colors duration-200 disabled:opacity-30"
       >
         −
       </button>
-      <span className="w-6 text-center text-lg font-bold text-charcoal">{qty}</span>
+      <span className="w-6 text-center text-lg font-bold text-cream">{qty}</span>
       <button
         type="button"
         onClick={onIncrease}
@@ -251,7 +251,7 @@ export default function QuickOrder() {
     setErrors({});
   }
 
-  const bigLabel = "block text-lg font-bold text-charcoal mb-3";
+  const bigLabel = "block text-lg font-bold text-cream mb-3";
   const bigInput =
     "w-full rounded-2xl border-2 border-charcoal/15 px-5 py-4 text-lg text-charcoal placeholder:text-charcoal/30 focus:outline-none focus:border-rust bg-white";
 
@@ -259,17 +259,17 @@ export default function QuickOrder() {
   if (placedOrder) {
     const point = COLLECTION_POINTS.find((p) => p.id === placedOrder.pickupLocation);
     return (
-      <div className="rounded-3xl border border-charcoal/10 bg-white p-6 text-center sm:p-10">
+      <div className="rounded-3xl border border-cream/15 bg-ink p-6 text-center sm:p-10">
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-rust">
           <svg viewBox="0 0 24 24" className="h-8 w-8 text-cream" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h3 className="font-display mt-5 text-3xl text-charcoal">Order placed!</h3>
-        <p className="mt-3 text-charcoal/65">
-          Order #{placedOrder.orderId}. We'll contact you on <span className="font-semibold text-charcoal">{placedOrder.phone}</span> to confirm.
+        <h3 className="font-display mt-5 text-3xl text-cream">Order placed!</h3>
+        <p className="mt-3 text-cream/70">
+          Order #{placedOrder.orderId}. We'll contact you on <span className="font-semibold text-cream">{placedOrder.phone}</span> to confirm.
         </p>
-        <p className="mt-1 text-sm text-charcoal/50">Your order confirmation will be sent by WhatsApp or SMS.</p>
+        <p className="mt-1 text-sm text-cream/50">Your order confirmation will be sent by WhatsApp or SMS.</p>
 
         <div className="mt-6 rounded-2xl bg-cream p-5 text-left text-sm">
           {placedOrder.fulfillment === "delivery" ? (
@@ -310,9 +310,9 @@ export default function QuickOrder() {
   }
 
   return (
-    <div className="rounded-3xl border border-charcoal/10 bg-white p-5 sm:p-8">
+    <div className="rounded-3xl border border-cream/15 bg-ink p-5 sm:p-8">
       <StepDots step={step} />
-      <p className="mt-4 text-center text-xs font-semibold uppercase tracking-widest text-rust">
+      <p className="mt-4 text-center text-xs font-semibold uppercase tracking-widest text-cream/60">
         Step {step} of 3 — {STEP_LABELS[step - 1]}
       </p>
 
@@ -321,9 +321,9 @@ export default function QuickOrder() {
         <div className="mt-6">
           <p className={bigLabel}>Choose your cylinder</p>
 
-          {productsLoading && <p className="text-charcoal/60">Loading cylinders…</p>}
+          {productsLoading && <p className="text-cream/60">Loading cylinders…</p>}
           {!productsLoading && productsError && (
-            <p className="text-rust">Couldn't load cylinders right now. Please try again shortly.</p>
+            <p className="text-cream">Couldn't load cylinders right now. Please try again shortly.</p>
           )}
 
           {!productsLoading && !productsError && (
@@ -335,7 +335,7 @@ export default function QuickOrder() {
                 return (
                   <div
                     key={item.inventory_id}
-                    className={`flex items-center gap-4 rounded-2xl border-2 p-4 ${qty > 0 ? "border-rust bg-rust/5" : "border-charcoal/10"}`}
+                    className={`flex items-center gap-4 rounded-2xl border-2 p-4 ${qty > 0 ? "border-rust bg-rust/10" : "border-cream/15"}`}
                   >
                     <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl bg-cream/60">
                       {src ? (
@@ -348,9 +348,9 @@ export default function QuickOrder() {
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="font-display text-lg text-charcoal">{item.inventory_size || item.inventory_name}</p>
-                      <p className="text-sm font-semibold text-rust">{formatPrice(item)}</p>
-                      {!inStock && <p className="text-xs text-charcoal/40">Out of stock</p>}
+                      <p className="font-display text-lg text-cream">{item.inventory_size || item.inventory_name}</p>
+                      <p className="text-sm font-semibold text-cream">{formatPrice(item)}</p>
+                      {!inStock && <p className="text-xs text-cream/40">Out of stock</p>}
                     </div>
                     {inStock && (
                       <QtyStepper qty={qty} onIncrease={() => increaseQty(item)} onDecrease={() => decreaseQty(item.inventory_id)} />
@@ -382,9 +382,9 @@ export default function QuickOrder() {
               ))}
             </select>
             {errors.suburb && <p className="mt-1.5 text-sm text-red-600">{errors.suburb}</p>}
-            <p className="mt-2 text-sm text-charcoal/50">
+            <p className="mt-2 text-sm text-cream/50">
               Your suburb not listed here?{" "}
-              <Link to="/contact" className="font-semibold text-rust hover:underline">Contact us</Link> to see if we can make a plan.
+              <Link to="/contact" className="font-semibold text-cream hover:underline">Contact us</Link> to see if we can make a plan.
             </p>
           </div>
 
@@ -395,7 +395,7 @@ export default function QuickOrder() {
                 type="button"
                 onClick={() => setFulfillment("delivery")}
                 className={`flex-1 rounded-2xl border-2 px-4 py-4 text-lg font-semibold transition-colors duration-200 ${
-                  fulfillment === "delivery" ? "border-rust bg-rust text-cream" : "border-charcoal/15 text-charcoal/70"
+                  fulfillment === "delivery" ? "border-rust bg-rust text-cream" : "border-cream/20 text-cream/70"
                 }`}
               >
                 Deliver to me
@@ -404,7 +404,7 @@ export default function QuickOrder() {
                 type="button"
                 onClick={() => setFulfillment("collection")}
                 className={`flex-1 rounded-2xl border-2 px-4 py-4 text-lg font-semibold transition-colors duration-200 ${
-                  fulfillment === "collection" ? "border-rust bg-rust text-cream" : "border-charcoal/15 text-charcoal/70"
+                  fulfillment === "collection" ? "border-rust bg-rust text-cream" : "border-cream/20 text-cream/70"
                 }`}
               >
                 Collect in store
@@ -422,12 +422,12 @@ export default function QuickOrder() {
                     type="button"
                     onClick={() => setPickupLocation(point.id)}
                     className={`w-full rounded-2xl border-2 px-4 py-3 text-left transition-colors duration-200 ${
-                      selected ? "border-rust bg-rust text-cream" : "border-charcoal/15 text-charcoal/70"
+                      selected ? "border-rust bg-rust text-cream" : "border-cream/20 text-cream/70"
                     }`}
                   >
                     <span className="text-base font-semibold">{point.name}</span>
-                    <span className={`mt-0.5 block text-xs ${selected ? "text-cream/70" : "text-charcoal/45"}`}>{point.address}</span>
-                    <TradingHours point={point} variant={selected ? "dark" : "light"} className="mt-1.5" />
+                    <span className={`mt-0.5 block text-xs ${selected ? "text-cream/70" : "text-cream/45"}`}>{point.address}</span>
+                    <TradingHours point={point} variant="dark" className="mt-1.5" />
                   </button>
                 );
               })}
@@ -477,7 +477,7 @@ export default function QuickOrder() {
                 onChange={(e) => setAddress(e.target.value)}
                 className={bigInput}
               />
-              <p className="mt-1.5 text-sm text-charcoal/50">Delivering to {suburb}.</p>
+              <p className="mt-1.5 text-sm text-cream/50">Delivering to {suburb}.</p>
               {errors.address && <p className="mt-1.5 text-sm text-red-600">{errors.address}</p>}
             </div>
           ) : (
@@ -501,14 +501,14 @@ export default function QuickOrder() {
                 type="button"
                 onClick={() => setPaymentMethod("card_on_delivery")}
                 className={`flex w-full items-center justify-between rounded-2xl border-2 px-5 py-4 text-left transition-colors duration-200 ${
-                  paymentMethod === "card_on_delivery" ? "border-rust bg-rust text-cream" : "border-charcoal/15"
+                  paymentMethod === "card_on_delivery" ? "border-rust bg-rust text-cream" : "border-cream/20"
                 }`}
               >
                 <span>
-                  <span className={`block text-lg font-semibold ${paymentMethod === "card_on_delivery" ? "text-cream" : "text-charcoal"}`}>
+                  <span className="block text-lg font-semibold text-cream">
                     Card on delivery
                   </span>
-                  <span className={`block text-sm ${paymentMethod === "card_on_delivery" ? "text-cream/80" : "text-charcoal/55"}`}>
+                  <span className={`block text-sm ${paymentMethod === "card_on_delivery" ? "text-cream/80" : "text-cream/55"}`}>
                     Tap or insert your card when it arrives
                   </span>
                 </span>
@@ -521,14 +521,14 @@ export default function QuickOrder() {
                 type="button"
                 onClick={() => setPaymentMethod("payment_link")}
                 className={`flex w-full items-center justify-between rounded-2xl border-2 px-5 py-4 text-left transition-colors duration-200 ${
-                  paymentMethod === "payment_link" ? "border-rust bg-rust text-cream" : "border-charcoal/15"
+                  paymentMethod === "payment_link" ? "border-rust bg-rust text-cream" : "border-cream/20"
                 }`}
               >
                 <span>
-                  <span className={`block text-lg font-semibold ${paymentMethod === "payment_link" ? "text-cream" : "text-charcoal"}`}>
+                  <span className="block text-lg font-semibold text-cream">
                     Payment link
                   </span>
-                  <span className={`block text-sm ${paymentMethod === "payment_link" ? "text-cream/80" : "text-charcoal/55"}`}>
+                  <span className={`block text-sm ${paymentMethod === "payment_link" ? "text-cream/80" : "text-cream/55"}`}>
                     We'll send a secure link to pay online
                   </span>
                 </span>
@@ -538,14 +538,14 @@ export default function QuickOrder() {
             {errors.paymentMethod && <p className="mt-1.5 text-sm text-red-600">{errors.paymentMethod}</p>}
           </div>
 
-          <label className="flex items-start gap-3 rounded-2xl border-2 border-charcoal/15 p-4">
+          <label className="flex items-start gap-3 rounded-2xl border-2 border-cream/20 p-4">
             <input
               type="checkbox"
               checked={whatsappConsent}
               onChange={(e) => setWhatsappConsent(e.target.checked)}
-              className="mt-0.5 h-5 w-5 rounded border-charcoal/30 text-rust focus:ring-rust"
+              className="mt-0.5 h-5 w-5 rounded border-cream/40 text-rust focus:ring-rust"
             />
-            <span className="text-sm text-charcoal/70 leading-relaxed">
+            <span className="text-sm text-cream/70 leading-relaxed">
               Send me WhatsApp updates and offers from Mashesha. You can opt out any time.
             </span>
           </label>
@@ -566,7 +566,7 @@ export default function QuickOrder() {
           </div>
 
           {submitError && (
-            <p className="rounded-xl border border-rust/30 bg-rust/10 px-4 py-3 text-sm text-rust">{submitError}</p>
+            <p className="rounded-xl border border-rust/40 bg-rust/15 px-4 py-3 text-sm text-cream">{submitError}</p>
           )}
         </div>
       )}
@@ -577,7 +577,7 @@ export default function QuickOrder() {
           <button
             type="button"
             onClick={goBack}
-            className="rounded-full border-2 border-charcoal/15 px-6 py-4 text-lg font-semibold text-charcoal/70"
+            className="rounded-full border-2 border-cream/20 px-6 py-4 text-lg font-semibold text-cream/70"
           >
             Back
           </button>
@@ -602,7 +602,7 @@ export default function QuickOrder() {
         )}
       </div>
 
-      <p className="mt-4 text-center text-xs text-charcoal/40">No account or email needed to order.</p>
+      <p className="mt-4 text-center text-xs text-cream/40">No account or email needed to order.</p>
     </div>
   );
 }

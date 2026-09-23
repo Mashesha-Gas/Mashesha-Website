@@ -8,7 +8,7 @@ function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-rust pt-10 pb-6">
+    <footer className="bg-ink pt-10 pb-6">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
 
         {/* Main content */}
