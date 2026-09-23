@@ -6,9 +6,7 @@ import johannesburgAerial from "../components/johannesburg-aerial.jpg";
 import QuickOrder from "../components/QuickOrder";
 import { PaymentOptionsCard } from "../components/PaymentBadges";
 import { CollectionOptionsCard } from "../components/CollectionOptions";
-
-const WHATSAPP_NUMBER = "27111234567";
-const WHATSAPP_MESSAGE = "Hi Mashesha, I'd like to order gas.";
+import { whatsAppLink } from "../utils/whatsapp";
 
 export default function HomePage() {
   return (
@@ -42,7 +40,7 @@ export default function HomePage() {
               Order gas now
             </a>
             <a
-              href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`}
+              href={whatsAppLink("Hi Mashesha, I'd like to order gas.")}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center rounded-full border border-cream/30 px-6 py-3 text-sm font-semibold text-cream transition-colors duration-200 hover:border-cream/70"
@@ -173,6 +171,14 @@ export default function HomePage() {
                 className="inline-flex items-center justify-center rounded-full border border-cream/30 px-6 py-3 text-sm font-semibold text-cream transition-colors duration-200 hover:border-cream/70"
               >
                 Call us
+              </a>
+              <a
+                href={whatsAppLink("Hi Mashesha, I'm not sure which cylinder size I need. Can you help?")}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center rounded-full border border-cream/30 px-6 py-3 text-sm font-semibold text-cream transition-colors duration-200 hover:border-cream/70"
+              >
+                WhatsApp us
               </a>
             </div>
           </div>

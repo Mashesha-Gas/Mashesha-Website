@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useCart } from "../context/CartContext";
+import { useCart, lineKey } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { useDeliveryAreas } from "../hooks/useDeliveryAreas";
 import { useInventoryList, resolveImageUrl, formatPrice, CYLINDER_TYPE } from "../hooks/useInventory";
@@ -104,28 +104,33 @@ export default function QuickOrder() {
   const [submitError, setSubmitError] = useState("");
   const [placedOrder, setPlacedOrder] = useState(null);
 
+  // The quick-order flow only ever adds refills/exchanges — no deposit, no
+  // "new cylinder" choice, to keep it to the promised three short steps.
+  // That choice still lives on the product pages for anyone who wants it.
+  const PURCHASE_TYPE = "refill";
+
   const cartQty = cartItems.reduce((sum, item) => sum + item.qty, 0);
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.qty, 0);
+  const subtotal = cartItems.reduce((sum, item) => sum + (item.price + (item.deposit || 0)) * item.qty, 0);
   const selectedArea = activeAreas.find((a) => a.delivery_area_name === suburb);
   const freeShipping = fulfillment === "delivery" && !!selectedArea?.delivery_area_free_shipping;
   const deliveryFee = fulfillment === "delivery" && !freeShipping ? DELIVERY_FEE : 0;
   const total = subtotal + deliveryFee;
 
   function qtyFor(id) {
-    return cartItems.find((item) => item.id === id)?.qty ?? 0;
+    return cartItems.find((item) => item.id === id && item.purchaseType === PURCHASE_TYPE)?.qty ?? 0;
   }
 
   function increaseQty(product) {
-    const existing = cartItems.find((item) => item.id === product.inventory_id);
-    if (existing) increment(product.inventory_id);
-    else addItem(product, 1, { silent: true });
+    const existing = cartItems.find((item) => item.id === product.inventory_id && item.purchaseType === PURCHASE_TYPE);
+    if (existing) increment(product.inventory_id, PURCHASE_TYPE);
+    else addItem(product, 1, { purchaseType: PURCHASE_TYPE, silent: true });
   }
 
   function decreaseQty(id) {
-    const existing = cartItems.find((item) => item.id === id);
+    const existing = cartItems.find((item) => item.id === id && item.purchaseType === PURCHASE_TYPE);
     if (!existing) return;
-    if (existing.qty <= 1) removeItem(id);
-    else decrement(id);
+    if (existing.qty <= 1) removeItem(id, PURCHASE_TYPE);
+    else decrement(id, PURCHASE_TYPE);
   }
 
   function goNext() {
@@ -193,7 +198,7 @@ export default function QuickOrder() {
       const now = new Date();
 
       const order = await postJson("/api/orders", {
-        order_items_json: JSON.stringify(cartItems.map((item) => ({ inventory_id: item.id, qty: item.qty }))),
+        order_items_json: JSON.stringify(cartItems.map((item) => ({ inventory_id: item.id, qty: item.qty, purchaseType: item.purchaseType }))),
         order_total: total,
         order_date: now.toISOString().slice(0, 10),
         order_time: now.toTimeString().slice(0, 8),
@@ -268,9 +273,9 @@ export default function QuickOrder() {
           )}
           <div className="mt-4 space-y-1 border-t border-charcoal/10 pt-4">
             {placedOrder.items.map((item) => (
-              <div key={item.id} className="flex justify-between text-charcoal/65">
+              <div key={lineKey(item.id, item.purchaseType)} className="flex justify-between text-charcoal/65">
                 <span>{item.size} × {item.qty}</span>
-                <span>R {(item.price * item.qty).toLocaleString()}</span>
+                <span>R {((item.price + (item.deposit || 0)) * item.qty).toLocaleString()}</span>
               </div>
             ))}
             <div className="flex justify-between pt-2 font-bold text-charcoal">

@@ -4,6 +4,7 @@ import { useInventoryList, resolveImageUrl, CYLINDER_TYPE } from "../hooks/useIn
 import { useCart } from "../context/CartContext";
 import SEO from "../components/SEO";
 import logoIcon from "../components/logo-icon.webp";
+import { whatsAppLink } from "../utils/whatsapp";
 
 interface InventoryRow {
   inventory_id: number;
@@ -12,6 +13,7 @@ interface InventoryRow {
   inventory_size: string | null;
   inventory_price: number | string | null;
   inventory_sale: number | string | null;
+  inventory_deposit: number | string | null;
   inventory_quantity: number | string | null;
   inventory_type: string | null;
   inventory_brand: string | null;
@@ -61,11 +63,12 @@ function ProductCard({ item }: { item: InventoryRow }) {
   const [added, setAdded] = useState(false);
   const label = item.inventory_size || item.inventory_name;
   const inStock = Number(item.inventory_quantity) > 0;
+  const hasDeposit = Number(item.inventory_deposit) > 0;
 
   function handleAdd(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
-    addItem(item);
+    addItem(item, 1, { purchaseType: "refill" });
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);
   }
@@ -82,6 +85,9 @@ function ProductCard({ item }: { item: InventoryRow }) {
       <div className="flex flex-col flex-1 p-6">
         <span className="font-display text-4xl text-charcoal">{label}</span>
         <span className="mt-2 text-sm font-semibold text-rust">{formatPrice(item)}</span>
+        {hasDeposit && (
+          <span className="mt-1 text-xs text-charcoal/45">Refill/exchange price — new cylinders include a refundable deposit</span>
+        )}
         <p className="mt-3 text-sm text-charcoal/65 leading-relaxed flex-1">
           {item.inventory_description}
         </p>
@@ -192,6 +198,14 @@ export default function ProductsPage() {
               className="inline-flex items-center justify-center rounded-full border border-cream/30 px-6 py-3 text-sm font-semibold text-cream transition-colors duration-200 hover:border-cream/70"
             >
               Call us
+            </a>
+            <a
+              href={whatsAppLink("Hi Mashesha, I'm not sure which cylinder size I need. Can you help?")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center rounded-full border border-cream/30 px-6 py-3 text-sm font-semibold text-cream transition-colors duration-200 hover:border-cream/70"
+            >
+              WhatsApp us
             </a>
           </div>
         </div>

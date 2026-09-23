@@ -1,13 +1,13 @@
 import { Link } from "react-router-dom";
-import { useCart } from "../context/CartContext";
+import { useCart, lineKey } from "../context/CartContext";
 import SEO from "../components/SEO";
-
-const DELIVERY_FEE = 50;
+import { DELIVERY_FEE } from "../constants";
 
 export default function CartPage() {
   const { items: cartItems, increment, decrement, removeItem } = useCart();
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.qty, 0);
-  const total = subtotal + DELIVERY_FEE;
+  const deposits = cartItems.reduce((sum, item) => sum + (item.deposit || 0) * item.qty, 0);
+  const total = subtotal + deposits + DELIVERY_FEE;
   const isEmpty = cartItems.length === 0;
 
   return (
@@ -40,47 +40,56 @@ export default function CartPage() {
 
             {/* Cart items */}
             <div className="lg:col-span-2 space-y-4">
-              {cartItems.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center justify-between rounded-2xl bg-cream p-6"
-                >
-                  <div>
-                    <p className="font-display text-2xl text-charcoal">{item.size}</p>
-                    <p className="mt-1 text-sm text-rust">{item.tagline}</p>
-                  </div>
-                  <div className="flex items-center gap-6">
-                    <div className="flex items-center gap-3">
+              {cartItems.map((item) => {
+                const lineTotal = (item.price + (item.deposit || 0)) * item.qty;
+                return (
+                  <div
+                    key={lineKey(item.id, item.purchaseType)}
+                    className="flex items-center justify-between rounded-2xl bg-cream p-6"
+                  >
+                    <div>
+                      <p className="font-display text-2xl text-charcoal">{item.size}</p>
+                      {item.purchaseType === "new" ? (
+                        <p className="mt-1 text-sm text-rust">
+                          New cylinder{item.deposit > 0 ? ` · R ${item.deposit.toLocaleString()} deposit (refundable)` : ""}
+                        </p>
+                      ) : (
+                        <p className="mt-1 text-sm text-rust">{item.tagline || "Refill / exchange"}</p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-6">
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => decrement(item.id, item.purchaseType)}
+                          disabled={item.qty <= 1}
+                          className="flex h-7 w-7 items-center justify-center rounded-full border border-charcoal/20 text-charcoal/60 hover:border-rust hover:text-rust text-sm disabled:opacity-30 disabled:hover:border-charcoal/20 disabled:hover:text-charcoal/60"
+                        >
+                          −
+                        </button>
+                        <span className="text-charcoal text-sm w-4 text-center">{item.qty}</span>
+                        <button
+                          type="button"
+                          onClick={() => increment(item.id, item.purchaseType)}
+                          className="flex h-7 w-7 items-center justify-center rounded-full border border-charcoal/20 text-charcoal/60 hover:border-rust hover:text-rust text-sm"
+                        >
+                          +
+                        </button>
+                      </div>
+                      <span className="text-charcoal font-semibold w-20 text-right">
+                        R {lineTotal.toLocaleString()}
+                      </span>
                       <button
                         type="button"
-                        onClick={() => decrement(item.id)}
-                        disabled={item.qty <= 1}
-                        className="flex h-7 w-7 items-center justify-center rounded-full border border-charcoal/20 text-charcoal/60 hover:border-rust hover:text-rust text-sm disabled:opacity-30 disabled:hover:border-charcoal/20 disabled:hover:text-charcoal/60"
+                        onClick={() => removeItem(item.id, item.purchaseType)}
+                        className="text-charcoal/25 hover:text-rust transition-colors duration-200 text-sm"
                       >
-                        −
-                      </button>
-                      <span className="text-charcoal text-sm w-4 text-center">{item.qty}</span>
-                      <button
-                        type="button"
-                        onClick={() => increment(item.id)}
-                        className="flex h-7 w-7 items-center justify-center rounded-full border border-charcoal/20 text-charcoal/60 hover:border-rust hover:text-rust text-sm"
-                      >
-                        +
+                        ✕
                       </button>
                     </div>
-                    <span className="text-charcoal font-semibold w-20 text-right">
-                      R {(item.price * item.qty).toLocaleString()}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => removeItem(item.id)}
-                      className="text-charcoal/25 hover:text-rust transition-colors duration-200 text-sm"
-                    >
-                      ✕
-                    </button>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Order summary */}
@@ -89,11 +98,17 @@ export default function CartPage() {
 
               <div className="mt-6 space-y-3 text-sm">
                 {cartItems.map((item) => (
-                  <div key={item.id} className="flex justify-between text-charcoal/60">
-                    <span>{item.size} × {item.qty}</span>
-                    <span>R {(item.price * item.qty).toLocaleString()}</span>
+                  <div key={lineKey(item.id, item.purchaseType)} className="flex justify-between text-charcoal/60">
+                    <span>{item.size} × {item.qty}{item.purchaseType === "new" ? " (new)" : ""}</span>
+                    <span>R {((item.price + (item.deposit || 0)) * item.qty).toLocaleString()}</span>
                   </div>
                 ))}
+                {deposits > 0 && (
+                  <div className="flex justify-between text-charcoal/60">
+                    <span>Includes cylinder deposit</span>
+                    <span>R {deposits.toLocaleString()}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-charcoal/60">
                   <span>Delivery fee</span>
                   <span>R {DELIVERY_FEE}</span>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useCart } from "../context/CartContext";
+import { useCart, lineKey } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { useDeliveryAreas } from "../hooks/useDeliveryAreas";
 import { PROVINCES, COLLECTION_POINTS, DELIVERY_FEE } from "../constants";
@@ -108,8 +108,9 @@ export default function CheckoutPage() {
   const freeShipping = form.fulfillment === "delivery" && !!selectedArea?.delivery_area_free_shipping;
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.qty, 0);
+  const deposits = cartItems.reduce((sum, item) => sum + (item.deposit || 0) * item.qty, 0);
   const deliveryFee = form.fulfillment === "delivery" && !freeShipping ? DELIVERY_FEE : 0;
-  const total = subtotal + deliveryFee;
+  const total = subtotal + deposits + deliveryFee;
 
   function update<K extends keyof FormState>(field: K, value: FormState[K]) {
     setForm((f) => ({ ...f, [field]: value }));
@@ -207,7 +208,7 @@ export default function CheckoutPage() {
       const now = new Date();
 
       const order = await postJson("/api/orders", {
-        order_items_json: JSON.stringify(cartItems.map((item) => ({ inventory_id: item.id, qty: item.qty }))),
+        order_items_json: JSON.stringify(cartItems.map((item) => ({ inventory_id: item.id, qty: item.qty, purchaseType: item.purchaseType }))),
         order_total: total,
         order_date: now.toISOString().slice(0, 10),
         order_time: now.toTimeString().slice(0, 8),
@@ -353,9 +354,9 @@ export default function CheckoutPage() {
 
           <div className="rounded-2xl border border-charcoal/10 bg-white p-6 text-left space-y-3 text-sm">
             {placedOrder.items.map((item) => (
-              <div key={item.id} className="flex justify-between text-charcoal/65">
-                <span>{item.size} × {item.qty}</span>
-                <span>R {(item.price * item.qty).toLocaleString()}</span>
+              <div key={lineKey(item.id, item.purchaseType)} className="flex justify-between text-charcoal/65">
+                <span>{item.size} × {item.qty}{item.purchaseType === "new" ? " (new)" : ""}</span>
+                <span>R {((item.price + (item.deposit || 0)) * item.qty).toLocaleString()}</span>
               </div>
             ))}
             <div className="flex justify-between text-charcoal/65">
@@ -673,11 +674,17 @@ export default function CheckoutPage() {
               <h2 className="font-display text-xl text-charcoal">Order summary</h2>
               <div className="mt-6 space-y-3 text-sm">
                 {cartItems.map((item) => (
-                  <div key={item.id} className="flex justify-between text-charcoal/65">
-                    <span>{item.size} × {item.qty}</span>
-                    <span>R {(item.price * item.qty).toLocaleString()}</span>
+                  <div key={lineKey(item.id, item.purchaseType)} className="flex justify-between text-charcoal/65">
+                    <span>{item.size} × {item.qty}{item.purchaseType === "new" ? " (new)" : ""}</span>
+                    <span>R {((item.price + (item.deposit || 0)) * item.qty).toLocaleString()}</span>
                   </div>
                 ))}
+                {deposits > 0 && (
+                  <div className="flex justify-between text-charcoal/65">
+                    <span>Includes cylinder deposit</span>
+                    <span>R {deposits.toLocaleString()}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-charcoal/65">
                   <span>Delivery fee</span>
                   <span>

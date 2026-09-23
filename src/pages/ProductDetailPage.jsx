@@ -4,6 +4,9 @@ import CylinderIcon from "../components/CylinderIcon";
 import { useInventoryItem, useInventoryList, resolveImageUrl, CYLINDER_TYPE } from "../hooks/useInventory";
 import { useCart } from "../context/CartContext";
 import SEO from "../components/SEO";
+import { PaymentOptionsCard } from "../components/PaymentBadges";
+import { CollectionOptionsCard } from "../components/CollectionOptions";
+import { whatsAppLink } from "../utils/whatsapp";
 
 function formatPrice(item) {
   const price = Number(item.inventory_price);
@@ -31,6 +34,7 @@ function ProductDetailPage() {
   const [imageFailed, setImageFailed] = useState(false);
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
+  const [purchaseType, setPurchaseType] = useState("refill");
 
   if (loading) {
     return (
@@ -54,8 +58,11 @@ function ProductDetailPage() {
     (i) => i.inventory_type === CYLINDER_TYPE && i.inventory_id !== product.inventory_id
   );
 
+  const deposit = Number(product.inventory_deposit) || 0;
+  const hasDeposit = deposit > 0;
+
   function handleAddToCart() {
-    addItem(product, qty);
+    addItem(product, qty, { purchaseType: hasDeposit ? purchaseType : "refill" });
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   }
@@ -104,10 +111,44 @@ function ProductDetailPage() {
               </span>
               <h1 className="font-display mt-3 text-6xl text-charcoal sm:text-7xl">{label}</h1>
               <p className="mt-2 text-xl font-semibold text-charcoal/60">
-                {price.current}
-                {price.was && <span className="ml-2 text-base font-medium text-charcoal/40 line-through">{price.was}</span>}
+                {purchaseType === "new" && hasDeposit ? `R ${(Number(product.inventory_sale ?? product.inventory_price) + deposit).toLocaleString()}` : price.current}
+                {price.was && purchaseType !== "new" && <span className="ml-2 text-base font-medium text-charcoal/40 line-through">{price.was}</span>}
               </p>
+              {purchaseType === "new" && hasDeposit && (
+                <p className="mt-1 text-sm text-charcoal/50">Includes R {deposit.toLocaleString()} refundable cylinder deposit</p>
+              )}
               <p className="mt-5 max-w-lg text-base leading-relaxed text-charcoal/65">{product.inventory_description}</p>
+
+              {hasDeposit && (
+                <div className="mt-6">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-rust mb-2">How would you like this?</p>
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setPurchaseType("refill")}
+                      className={`rounded-full border px-4 py-2 text-sm font-semibold transition-colors duration-200 ${
+                        purchaseType === "refill" ? "border-rust bg-rust text-cream" : "border-charcoal/20 text-charcoal/60 hover:border-rust/50"
+                      }`}
+                    >
+                      Refill / exchange
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPurchaseType("new")}
+                      className={`rounded-full border px-4 py-2 text-sm font-semibold transition-colors duration-200 ${
+                        purchaseType === "new" ? "border-rust bg-rust text-cream" : "border-charcoal/20 text-charcoal/60 hover:border-rust/50"
+                      }`}
+                    >
+                      New cylinder
+                    </button>
+                  </div>
+                  <p className="mt-2 text-xs text-charcoal/50">
+                    {purchaseType === "refill"
+                      ? "You'll hand over an empty cylinder of the same size — no deposit."
+                      : "You don't have a cylinder to exchange yet — a refundable deposit applies."}
+                  </p>
+                </div>
+              )}
 
               {inStock && (
                 <div className="mt-6 flex items-center gap-3">
@@ -139,6 +180,18 @@ function ProductDetailPage() {
                 >
                   {!inStock ? "Out of stock" : added ? "Added ✓" : "Add to cart"}
                 </button>
+                <a
+                  href={whatsAppLink(
+                    `Hi Mashesha, I'd like to order: ${qty} x ${label} gas cylinder${qty > 1 ? "s" : ""}${
+                      hasDeposit ? ` (${purchaseType === "new" ? "new cylinder" : "refill/exchange"})` : ""
+                    }.`
+                  )}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center rounded-full border border-rust/30 px-6 py-3 text-sm font-semibold text-rust transition-colors duration-200 hover:border-rust/60"
+                >
+                  Order on WhatsApp
+                </a>
                 {added ? (
                   <Link to="/cart" className="text-sm font-semibold text-rust transition-colors duration-200 hover:text-rust-dark">
                     View cart →
@@ -165,6 +218,7 @@ function ProductDetailPage() {
                 <InfoRow label="Size" value={label} />
                 {product.inventory_brand && <InfoRow label="Brand" value={product.inventory_brand} />}
                 <InfoRow label="Price" value={price.current} />
+                {hasDeposit && <InfoRow label="New cylinder deposit" value={`R ${deposit.toLocaleString()} (refundable)`} />}
                 <InfoRow label="Availability" value={inStock ? "In stock" : "Out of stock"} />
               </ul>
             </div>
@@ -182,6 +236,12 @@ function ProductDetailPage() {
                 </a>
               </div>
             </div>
+          </div>
+
+          {/* Payment & collection options */}
+          <div className="mt-12 grid gap-6 sm:grid-cols-2">
+            <PaymentOptionsCard />
+            <CollectionOptionsCard />
           </div>
         </div>
       </section>
