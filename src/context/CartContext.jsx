@@ -21,7 +21,10 @@ export function CartProvider({ children }) {
 
   // Accepts a raw Inventory row from the API and adds it to the cart,
   // merging into an existing line if that product is already in there.
-  function addItem(product, qty = 1) {
+  // { silent: true } skips the toast — for flows like the home page's
+  // quick-order wizard, where "Added to cart" plus a "View cart" link would
+  // just invite someone away from the step they're on.
+  function addItem(product, qty = 1, { silent = false } = {}) {
     const price =
       product.inventory_sale != null && Number(product.inventory_sale) < Number(product.inventory_price)
         ? Number(product.inventory_sale)
@@ -35,6 +38,8 @@ export function CartProvider({ children }) {
     } else {
       persist([...items, { id, size, tagline: product.inventory_brand || "", price, qty, vendorId: product.inventory_vendor_id }]);
     }
+
+    if (silent) return;
 
     setToast({
       id,

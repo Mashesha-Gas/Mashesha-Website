@@ -3,12 +3,13 @@ import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { useDeliveryAreas } from "../hooks/useDeliveryAreas";
-import { PROVINCES } from "../constants";
+import { PROVINCES, COLLECTION_POINTS, DELIVERY_FEE } from "../constants";
 import SEO from "../components/SEO";
+import { PaymentOptionsCard } from "../components/PaymentBadges";
+import { TradingHours } from "../components/CollectionOptions";
 
 const API = import.meta.env.VITE_API_URL;
 const PAYSTACK_PUBLIC_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
-const DELIVERY_FEE = 50;
 
 type Step = "details" | "processing" | "success";
 
@@ -25,6 +26,7 @@ type FormState = {
   city: string;
   province: string;
   postcode: string;
+  pickupLocation: string;
 };
 
 const EMPTY_FORM: FormState = {
@@ -38,6 +40,7 @@ const EMPTY_FORM: FormState = {
   city: "",
   province: "",
   postcode: "",
+  pickupLocation: "",
 };
 
 // Prefills the form from the logged-in customer's saved details (if any) —
@@ -56,6 +59,7 @@ function buildInitialForm(user: any): FormState {
     city: address?.address_city ?? "",
     province: address?.address_province ?? "",
     postcode: address?.address_postcode != null ? String(address.address_postcode) : "",
+    pickupLocation: "",
   };
 }
 
@@ -98,7 +102,7 @@ export default function CheckoutPage() {
   const [createAccount, setCreateAccount] = useState(false);
   const [accountPassword, setAccountPassword] = useState("");
   const [accountConfirm, setAccountConfirm] = useState("");
-  const [placedOrder, setPlacedOrder] = useState<{ items: typeof cartItems; total: number; orderId: number; fulfillment: Fulfillment; freeShipping: boolean } | null>(null);
+  const [placedOrder, setPlacedOrder] = useState<{ items: typeof cartItems; total: number; orderId: number; fulfillment: Fulfillment; freeShipping: boolean; pickupLocation: string } | null>(null);
 
   const selectedArea = activeAreas.find((a) => a.delivery_area_name === form.city);
   const freeShipping = form.fulfillment === "delivery" && !!selectedArea?.delivery_area_free_shipping;
@@ -122,6 +126,8 @@ export default function CheckoutPage() {
       if (!form.city.trim()) e.city = "Select your delivery area.";
       if (!form.province) e.province = "Select a province.";
       if (form.postcode.replace(/\D/g, "").length !== 4) e.postcode = "Enter a valid 4-digit postal code.";
+    } else if (form.fulfillment === "pickup") {
+      if (!form.pickupLocation) e.pickupLocation = "Select where you'd like to collect.";
     }
     if (!user && createAccount) {
       if (accountPassword.length < 8) e.accountPassword = "Password must be at least 8 characters.";
@@ -215,7 +221,7 @@ export default function CheckoutPage() {
         paystack_reference: reference,
       });
 
-      setPlacedOrder({ items: cartItems, total, orderId: order.order_id, fulfillment: form.fulfillment, freeShipping });
+      setPlacedOrder({ items: cartItems, total, orderId: order.order_id, fulfillment: form.fulfillment, freeShipping, pickupLocation: form.pickupLocation });
       clearCart();
       setStep("success");
     } catch (err) {
@@ -300,7 +306,7 @@ export default function CheckoutPage() {
                   <p className="text-sm font-semibold text-cream">Estimated delivery</p>
                   <p className="mt-0.5 text-sm text-cream/80">
                     Today between <span className="font-semibold text-cream">2 – 4 hours</span> from now.
-                    Orders placed after 3 pm are delivered the following morning.
+                    Orders placed after noon are delivered the following morning.
                   </p>
                 </div>
               </div>
@@ -328,7 +334,18 @@ export default function CheckoutPage() {
               </div>
               <div className="border-t border-cream/20 pt-3">
                 <p className="text-sm font-semibold text-cream">Collect from</p>
-                <p className="mt-0.5 text-sm text-cream/80">Mashesha Gas, Jeppestown, Johannesburg</p>
+                {(() => {
+                  const point = COLLECTION_POINTS.find((p) => p.id === placedOrder.pickupLocation);
+                  return point ? (
+                    <>
+                      <p className="mt-0.5 text-sm text-cream/80">{point.name}</p>
+                      <TradingHours point={point} variant="dark" className="mt-1.5" />
+                    </>
+                  ) : (
+                    <p className="mt-0.5 text-sm text-cream/80">Store to be confirmed</p>
+                  );
+                })()}
+                <p className="mt-2 text-xs text-cream/60">We'll send the exact address by SMS or WhatsApp.</p>
                 <p className="mt-1 text-sm text-cream/80">{form.phone}</p>
               </div>
             </div>
@@ -600,15 +617,37 @@ export default function CheckoutPage() {
                   </div>
                 </>
               ) : (
-                <div className="rounded-xl border border-charcoal/10 bg-cream/60 p-4">
-                  <p className="text-sm font-semibold text-charcoal">Mashesha Gas, Jeppestown, Johannesburg</p>
-                  <p className="mt-1.5 text-sm text-charcoal/65">
-                    Your order will be ready to collect. We'll message you as soon as it's packed.
-                    No delivery fee.
+                <div>
+                  <label className={labelClass}>Collect from</label>
+                  <div className="space-y-2.5">
+                    {COLLECTION_POINTS.map((point) => {
+                      const selected = form.pickupLocation === point.id;
+                      return (
+                        <button
+                          key={point.id}
+                          type="button"
+                          onClick={() => update("pickupLocation", point.id)}
+                          className={`w-full rounded-xl border px-4 py-3 text-left transition-colors duration-200 ${
+                            selected
+                              ? "border-rust bg-rust text-cream"
+                              : "border-charcoal/15 text-charcoal/70 hover:border-rust/50"
+                          }`}
+                        >
+                          <span className="text-sm font-semibold">{point.name}</span>
+                          <TradingHours point={point} variant={selected ? "dark" : "light"} className="mt-1.5" />
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {errors.pickupLocation && <p className="mt-1.5 text-xs text-red-500">{errors.pickupLocation}</p>}
+                  <p className="mt-3 text-sm text-charcoal/65">
+                    We'll message you the exact address and collection time once your order is ready. No delivery fee.
                   </p>
                 </div>
               )}
             </div>
+
+            <PaymentOptionsCard />
 
             {/* Place order button */}
             <button
@@ -622,6 +661,9 @@ export default function CheckoutPage() {
             <p className="text-center text-xs text-charcoal/40 flex items-center justify-center gap-1.5">
               <LockIcon />
               Secure payment powered by Paystack. Your card details never touch our servers.
+            </p>
+            <p className="text-center text-xs text-charcoal/40">
+              Prefer card on delivery or a payment link instead? Let us know via WhatsApp or phone after checking out.
             </p>
           </form>
 

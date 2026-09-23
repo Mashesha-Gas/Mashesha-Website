@@ -7,7 +7,7 @@ const SECTIONS = [
   },
   {
     title: "2. Orders & delivery",
-    body: "Orders placed before noon are delivered the same day across most of Johannesburg, subject to stock and location. Delivery windows given at checkout are estimates, not guarantees. Traffic, weather, and demand can affect timing.",
+    body: "Orders placed before noon are delivered the same day in our areas of operation, subject to stock and location. Delivery windows given at checkout are estimates, not guarantees. Traffic, weather, and demand can affect timing.",
   },
   {
     title: "3. Pricing & payment",

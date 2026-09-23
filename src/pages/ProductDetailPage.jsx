@@ -64,7 +64,7 @@ function ProductDetailPage() {
     <>
       <SEO
         title={`${label} Gas Cylinder | LPG Refill | Mashesha`}
-        description={`${label} LPG gas cylinder, SANS-certified and refilled for cooking or gas heaters. Order online for same-day delivery in Johannesburg.`}
+        description={`${label} LPG gas cylinder, SANS-certified and refilled for cooking or gas heaters. Order before noon for same-day delivery in our areas of operation.`}
         path={`/products/${id}`}
       />
       {/* Breadcrumb */}

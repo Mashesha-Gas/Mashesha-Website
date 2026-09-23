@@ -70,22 +70,16 @@ export default function AboutPage() {
               </p>
               <p className="mt-4 text-charcoal/70 leading-relaxed">
                 We built a delivery-first gas service that puts the customer at
-                the centre. Order by phone, WhatsApp, or online, and your gas
-                arrives at your door the same day.
+                the centre. Order by phone, WhatsApp, or online before noon, and
+                your gas arrives at your door the same day — anywhere in our
+                areas of operation.
               </p>
             </div>
             <div>
-              <div className="rounded-2xl bg-rust p-10">
-                <p className="font-display text-5xl text-cream">Mashesha.</p>
-                <p className="mt-4 text-cream/75 text-sm leading-relaxed">
-                  "Mashesha" means <em>hurry</em> in Zulu, because that's what we
-                  do. When you're out of gas, we move fast.
-                </p>
-              </div>
               <div
                 role="img"
                 aria-label="Mashesha logo"
-                className="mx-auto mt-16 h-36 w-36 opacity-70"
+                className="mx-auto h-36 w-36 opacity-70"
                 style={{
                   backgroundColor: "var(--color-rust)",
                   WebkitMaskImage: `url(${logoIcon})`,

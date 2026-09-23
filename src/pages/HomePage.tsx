@@ -1,95 +1,16 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import SEO from "../components/SEO";
 import orangePatternedBackground from "../components/orange-patterned-background.webp";
 import logoIcon from "../components/logo-icon.webp";
 import johannesburgAerial from "../components/johannesburg-aerial.jpg";
-import { useInventoryList, resolveImageUrl, CYLINDER_TYPE } from "../hooks/useInventory";
-import { useCart } from "../context/CartContext";
+import QuickOrder from "../components/QuickOrder";
+import { PaymentOptionsCard } from "../components/PaymentBadges";
+import { CollectionOptionsCard } from "../components/CollectionOptions";
 
-interface InventoryRow {
-  inventory_id: number;
-  inventory_name: string;
-  inventory_description: string | null;
-  inventory_size: string | null;
-  inventory_price: number | string | null;
-  inventory_sale: number | string | null;
-  inventory_quantity: number | string | null;
-  inventory_type: string | null;
-  inventory_brand: string | null;
-  inventory_thumbnail_path: string | null;
-}
-
-function formatPrice(item: InventoryRow) {
-  const price = Number(item.inventory_price);
-  const sale = item.inventory_sale != null ? Number(item.inventory_sale) : null;
-  if (sale != null && sale < price) {
-    return `R ${sale.toLocaleString()} (was R ${price.toLocaleString()})`;
-  }
-  return `R ${price.toLocaleString()}`;
-}
-
-function ProductPreviewCard({ item }: { item: InventoryRow }) {
-  const { addItem } = useCart();
-  const [failed, setFailed] = useState(false);
-  const [added, setAdded] = useState(false);
-  const label = item.inventory_size || item.inventory_name;
-  const src = resolveImageUrl(item.inventory_thumbnail_path);
-  const showImage = src && !failed;
-  const inStock = Number(item.inventory_quantity) > 0;
-
-  function handleAdd(e: React.MouseEvent) {
-    e.preventDefault();
-    e.stopPropagation();
-    addItem(item);
-    setAdded(true);
-    setTimeout(() => setAdded(false), 1500);
-  }
-
-  return (
-    <Link
-      to={`/products/${item.inventory_id}`}
-      className="group flex flex-col rounded-2xl border border-cream/10 bg-ink overflow-hidden text-left transition-colors duration-200 hover:border-rust/50 hover:bg-ink-light"
-    >
-      <div className="relative w-full h-40 bg-cream/60">
-        {showImage && (
-          <img
-            src={src}
-            alt={`Mashesha ${label} gas cylinder`}
-            className="w-full h-full object-contain p-4"
-            onError={() => setFailed(true)}
-          />
-        )}
-        {!showImage && (
-          <div className="absolute inset-0 flex items-center justify-center text-rust/30">
-            <svg viewBox="0 0 24 24" className="h-8 w-8" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <rect x="3" y="7" width="18" height="13" rx="2" />
-              <circle cx="12" cy="13" r="3" />
-              <path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" />
-            </svg>
-          </div>
-        )}
-      </div>
-      <div className="flex flex-1 flex-col p-4">
-        <span className="font-display text-2xl text-cream">{label}</span>
-        <span className="mt-1 text-sm font-semibold text-rust">{formatPrice(item)}</span>
-        <button
-          type="button"
-          onClick={handleAdd}
-          disabled={!inStock}
-          className="mt-4 rounded-full bg-rust px-4 py-2 text-xs font-semibold text-cream transition-colors duration-200 hover:bg-rust-dark disabled:opacity-40 disabled:hover:bg-rust disabled:cursor-not-allowed"
-        >
-          {!inStock ? "Out of stock" : added ? "Added ✓" : "Add to cart"}
-        </button>
-      </div>
-    </Link>
-  );
-}
+const WHATSAPP_NUMBER = "27111234567";
+const WHATSAPP_MESSAGE = "Hi Mashesha, I'd like to order gas.";
 
 export default function HomePage() {
-  const { items, loading, error } = useInventoryList();
-  const cylinders = items.filter((item: InventoryRow) => item.inventory_type === CYLINDER_TYPE).slice(0, 4);
-
   return (
     <main>
       <SEO
@@ -107,25 +28,40 @@ export default function HomePage() {
             Johannesburg's gas delivery service
           </span>
           <h1 className="font-display mt-4 text-5xl text-cream sm:text-7xl max-w-3xl leading-tight">
-            Gas when you need it. Where you need it.
+            Started in Joburg, Staying in Joburg – Since 1963
           </h1>
+          <p className="mt-3 font-display text-2xl text-cream/90">Gas shup shup.</p>
           <p className="mt-6 max-w-xl text-lg text-cream/80">
-            Mashesha delivers refilled LPG cylinders straight to your door. Fast,
-            safe, and available across Johannesburg.
+            Serving the community from the inner city, bringing life back to the City.
           </p>
           <div className="mt-10 flex flex-wrap gap-4">
-            <Link
-              to="/products"
+            <a
+              href="#order"
               className="inline-flex items-center justify-center rounded-full bg-cream px-6 py-3 text-sm font-semibold text-rust transition-colors duration-200 hover:bg-cream-dim"
             >
-              See our cylinders
-            </Link>
-            <Link
-              to="/contact"
+              Order gas now
+            </a>
+            <a
+              href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`}
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center justify-center rounded-full border border-cream/30 px-6 py-3 text-sm font-semibold text-cream transition-colors duration-200 hover:border-cream/70"
             >
-              Contact us
-            </Link>
+              Order on WhatsApp
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Brand story */}
+      <section className="bg-cream pt-20 sm:pt-28">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8">
+          <div className="mx-auto max-w-lg rounded-2xl bg-rust p-10 text-center">
+            <p className="font-display text-5xl text-cream">Mashesha.</p>
+            <p className="mt-4 text-cream/75 text-sm leading-relaxed">
+              "Mashesha" means <em>hurry</em> in Zulu, because that's what we
+              do. When you're out of gas, we move fast.
+            </p>
           </div>
         </div>
       </section>
@@ -143,11 +79,11 @@ export default function HomePage() {
             {[
               {
                 title: "Same-day delivery",
-                desc: "Order before noon and get your cylinder delivered the same day across most of Johannesburg.",
+                desc: "Order before noon and get your cylinder delivered the same day in our areas of operation.",
               },
               {
                 title: "All cylinder sizes",
-                desc: "From 1 kg camping cylinders to 18 kg family and business cylinders, we stock them all.",
+                desc: "From 1 kg camping cylinders to 18 kg family and 48kg business cylinders, we stock them all.",
               },
               {
                 title: "Safe & certified",
@@ -172,8 +108,8 @@ export default function HomePage() {
         />
       </section>
 
-      {/* Products teaser */}
-      <section className="relative bg-rust/10 py-20 sm:py-28 text-center overflow-hidden">
+      {/* Quick order */}
+      <section id="order" className="relative bg-rust/10 py-20 sm:py-28 overflow-hidden">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 flex items-center justify-center"
@@ -194,44 +130,30 @@ export default function HomePage() {
           />
         </div>
         <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-8">
-          <span className="text-xs font-semibold uppercase tracking-widest text-rust">
-            Our range
-          </span>
-          <h2 className="font-display mt-4 text-4xl text-charcoal sm:text-5xl">
-            A cylinder for every need.
-          </h2>
-          <p className="mt-5 max-w-lg mx-auto text-charcoal/65">
-            Whether you're camping, cooking for the family, or running a small
-            restaurant, Mashesha has the right size.
+          <div className="text-center">
+            <span className="text-xs font-semibold uppercase tracking-widest text-rust">
+              Order in 3 steps
+            </span>
+            <h2 className="font-display mt-4 text-4xl text-charcoal sm:text-5xl">
+              Get your gas delivered.
+            </h2>
+            <p className="mt-5 max-w-lg mx-auto text-charcoal/65">
+              No account, no email — just your cylinder, your suburb, and your details.
+            </p>
+          </div>
+
+          <div className="mt-12 max-w-xl mx-auto text-left">
+            <QuickOrder />
+          </div>
+
+          <p className="mt-8 text-center">
+            <Link to="/products" className="text-sm font-semibold text-rust hover:underline">
+              Browse our full range →
+            </Link>
           </p>
 
-          {loading && (
-            <p className="mt-14 text-charcoal/60">Loading cylinders…</p>
-          )}
-
-          {!loading && error && (
-            <p className="mt-14 text-rust">
-              Couldn't load products right now. Please try again shortly.
-            </p>
-          )}
-
-          {!loading && !error && cylinders.length > 0 && (
-            <div className="mt-14 grid gap-6 text-left sm:grid-cols-2 lg:grid-cols-4">
-              {cylinders.map((item: InventoryRow) => (
-                <ProductPreviewCard key={item.inventory_id} item={item} />
-              ))}
-            </div>
-          )}
-
-          <Link
-            to="/products"
-            className="mt-10 inline-flex items-center gap-2 rounded-full bg-rust px-6 py-3 text-sm font-semibold text-cream transition-colors duration-200 hover:bg-rust-dark"
-          >
-            View all products →
-          </Link>
-
           {/* Size guidance */}
-          <div className="mt-16 rounded-2xl bg-rust p-10">
+          <div className="mt-16 rounded-2xl bg-rust p-10 text-center">
             <h3 className="font-display text-3xl text-cream">
               Not sure which size you need?
             </h3>
@@ -253,6 +175,33 @@ export default function HomePage() {
                 Call us
               </a>
             </div>
+          </div>
+
+          <div className="mt-16 grid gap-6 max-w-4xl mx-auto sm:grid-cols-3">
+            {[
+              {
+                title: "Same-day delivery",
+                desc: "Order before noon and get your cylinder delivered the same day in our areas of operation.",
+              },
+              {
+                title: "Scheduled delivery",
+                desc: "Prefer a specific time slot? We can arrange a morning or afternoon delivery.",
+              },
+              {
+                title: "Not in our area?",
+                desc: "Call us. We're always expanding, and we may be able to make a plan.",
+              },
+            ].map((item) => (
+              <div key={item.title} className="rounded-2xl bg-rust p-7">
+                <h3 className="font-display text-xl text-cream">{item.title}</h3>
+                <p className="mt-3 text-sm text-cream/75 leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-8 grid gap-6 text-left max-w-4xl mx-auto sm:grid-cols-2">
+            <CollectionOptionsCard />
+            <PaymentOptionsCard />
           </div>
         </div>
       </section>

@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import logoIcon from "./logo-icon.webp";
 import nameSlogan from "./nameslogan-cropped.png";
+import { PaymentBadgeRow } from "./PaymentBadges";
+import { CollectionBadgeLine } from "./CollectionOptions";
 
 function Footer() {
   const year = new Date().getFullYear();
@@ -24,6 +26,9 @@ function Footer() {
             >
               Get in touch with us →
             </Link>
+            <div className="mt-4">
+              <PaymentBadgeRow />
+            </div>
           </div>
 
           {/* Contact info */}
@@ -34,6 +39,7 @@ function Footer() {
               <li><a href="mailto:info@mashesha.co.za" className="hover:text-cream transition-colors duration-200">info@mashesha.co.za</a></li>
               <li>Jeppestown, Johannesburg</li>
             </ul>
+            <CollectionBadgeLine className="mt-3" />
           </div>
 
           {/* Disclaimer */}

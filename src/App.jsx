@@ -7,7 +7,6 @@ import ProductsPage from "./pages/ProductsPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
-import LocationsPage from "./pages/LocationsPage";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import ProfilePage from "./pages/ProfilePage";
@@ -42,7 +41,9 @@ function App() {
         <Route path="/products/:id" element={<ProductDetailPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/contact" element={<ContactPage />} />
-        <Route path="/locations" element={<LocationsPage />} />
+        {/* Delivery Areas page is gone — its content moved into the home
+            page's "Where are you?" quick-order picker. Redirect old links. */}
+        <Route path="/locations" element={<Navigate to="/" replace />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/login" element={<AuthPage />} />

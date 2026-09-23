@@ -63,3 +63,14 @@ export function useInventoryItem(id) {
 export function resolveImageUrl(path) {
   return path ? `${API}/uploads/${path}` : null;
 }
+
+// Shows the sale price with the original struck through in text (via the
+// "(was R ...)" suffix) whenever a sale price is actually set and lower.
+export function formatPrice(item) {
+  const price = Number(item.inventory_price);
+  const sale = item.inventory_sale != null ? Number(item.inventory_sale) : null;
+  if (sale != null && sale < price) {
+    return `R ${sale.toLocaleString()} (was R ${price.toLocaleString()})`;
+  }
+  return `R ${price.toLocaleString()}`;
+}
