@@ -63,7 +63,9 @@ export default function CartToast() {
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-xs font-semibold uppercase tracking-widest text-rust">Added to cart</p>
-          <p className="mt-1 truncate font-display text-xl text-charcoal">{current.size}</p>
+          <p className="mt-1 truncate font-display text-xl text-charcoal">
+            {current.size}{current.purchaseType === "new" && <span className="text-charcoal/50"> (new)</span>}
+          </p>
           <p className="mt-0.5 text-sm text-charcoal/60">
             Qty {current.qty} · R {(current.price * current.qty).toLocaleString()}
           </p>
