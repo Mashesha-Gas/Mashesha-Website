@@ -47,9 +47,9 @@ const ROUTES = [
   },
   {
     path: "/contact",
-    title: "Contact Mashesha | Order Gas Delivery in Johannesburg",
+    title: "Contact Mashesha | Join Our WhatsApp List",
     description:
-      "Get in touch with Mashesha to order LPG gas delivery near you. Call, WhatsApp, or message us for fast gas delivery to your area in Johannesburg.",
+      "Join Mashesha's WhatsApp list for specials and updates, or send us a general enquiry. Order gas from the home page or on WhatsApp.",
   },
   {
     path: "/terms",

@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { useInventoryList, resolveImageUrl, CYLINDER_TYPE } from "../hooks/useInventory";
 import { useCart } from "../context/CartContext";
 import SEO from "../components/SEO";
-import logoIcon from "../components/logo-icon.webp";
 import { whatsAppLink } from "../utils/whatsapp";
 
 interface InventoryRow {
@@ -61,54 +60,102 @@ function ProductImage({ src, label }: { src: string | null; label: string }) {
 function ProductCard({ item }: { item: InventoryRow }) {
   const { addItem } = useCart();
   const [added, setAdded] = useState(false);
+  const [purchaseType, setPurchaseType] = useState<"refill" | "new">("refill");
   const label = item.inventory_size || item.inventory_name;
   const inStock = Number(item.inventory_quantity) > 0;
-  const hasDeposit = Number(item.inventory_deposit) > 0;
+  const deposit = Number(item.inventory_deposit) || 0;
+  const hasDeposit = deposit > 0;
 
-  function handleAdd(e: React.MouseEvent) {
-    e.preventDefault();
-    e.stopPropagation();
-    addItem(item, 1, { purchaseType: "refill" });
+  function handleAdd() {
+    addItem(item, 1, { purchaseType: hasDeposit ? purchaseType : "refill" });
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);
   }
 
-  return (
-    <Link
-      to={`/products/${item.inventory_id}`}
-      className="group flex flex-col rounded-2xl border border-charcoal/10 bg-white overflow-hidden transition-colors duration-200 hover:border-rust/50 hover:bg-rust/5"
-    >
-      {/* Product image */}
-      <ProductImage src={resolveImageUrl(item.inventory_thumbnail_path)} label={label} />
+  const whatsAppMessage = `Hi Mashesha, I'd like to order: 1 x ${label} gas cylinder${
+    hasDeposit ? ` (${purchaseType === "new" ? "new cylinder" : "refill/exchange"})` : ""
+  }.`;
 
-      {/* Card text */}
-      <div className="flex flex-col flex-1 p-6">
-        <span className="font-display text-4xl text-charcoal">{label}</span>
-        <span className="mt-2 text-sm font-semibold text-rust">{formatPrice(item)}</span>
-        {hasDeposit && (
-          <span className="mt-1 text-xs text-charcoal/45">Refill/exchange price — new cylinders include a refundable deposit</span>
-        )}
-        <p className="mt-3 text-sm text-charcoal/65 leading-relaxed flex-1">
-          {item.inventory_description}
-        </p>
-        <div className="mt-5 flex items-center justify-between gap-3">
-          <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-charcoal transition-colors duration-200 group-hover:text-rust">
+  return (
+    // The clickable "view details" area is a <Link> (an <a>), so the actual
+    // action buttons below live outside it — an <a> can't contain another
+    // <a>/<button> without breaking the DOM (browsers silently un-nest it,
+    // which breaks click targeting and layout both).
+    <div className="group flex flex-col rounded-2xl border border-charcoal/10 bg-white overflow-hidden transition-colors duration-200 hover:border-rust/50 hover:bg-rust/5">
+      <Link to={`/products/${item.inventory_id}`} className="flex flex-col flex-1">
+        {/* Product image */}
+        <ProductImage src={resolveImageUrl(item.inventory_thumbnail_path)} label={label} />
+
+        {/* Card text */}
+        <div className="flex flex-col flex-1 p-6 pb-0">
+          <span className="font-display text-4xl text-charcoal">{label}</span>
+          <span className="mt-2 text-sm font-semibold text-rust">
+            {purchaseType === "new" && hasDeposit
+              ? `R ${(Number(item.inventory_sale ?? item.inventory_price) + deposit).toLocaleString()}`
+              : formatPrice(item)}
+          </span>
+          {hasDeposit && (
+            <span className="mt-1 text-xs text-charcoal/45">
+              {purchaseType === "new" ? `Includes R ${deposit.toLocaleString()} refundable deposit` : "Refill/exchange price — new cylinders include a refundable deposit"}
+            </span>
+          )}
+          <p className="mt-3 text-sm text-charcoal/65 leading-relaxed flex-1">
+            {item.inventory_description}
+          </p>
+
+          <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-charcoal transition-colors duration-200 group-hover:text-rust">
             View details
             <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" aria-hidden="true">
               <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </span>
+        </div>
+      </Link>
+
+      <div className="p-6 pt-4">
+        {hasDeposit && (
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setPurchaseType("refill")}
+              className={`flex-1 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors duration-200 ${
+                purchaseType === "refill" ? "border-rust bg-rust text-cream" : "border-charcoal/20 text-charcoal/60"
+              }`}
+            >
+              Refill / exchange
+            </button>
+            <button
+              type="button"
+              onClick={() => setPurchaseType("new")}
+              className={`flex-1 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors duration-200 ${
+                purchaseType === "new" ? "border-rust bg-rust text-cream" : "border-charcoal/20 text-charcoal/60"
+              }`}
+            >
+              New cylinder
+            </button>
+          </div>
+        )}
+
+        <div className={`flex items-center gap-2 ${hasDeposit ? "mt-3" : ""}`}>
           <button
             type="button"
             onClick={handleAdd}
             disabled={!inStock}
-            className="rounded-full bg-rust px-4 py-2 text-xs font-semibold text-cream transition-colors duration-200 hover:bg-rust-dark disabled:opacity-40 disabled:hover:bg-rust disabled:cursor-not-allowed"
+            className="flex-1 rounded-full bg-rust px-4 py-2 text-xs font-semibold text-cream transition-colors duration-200 hover:bg-rust-dark disabled:opacity-40 disabled:hover:bg-rust disabled:cursor-not-allowed"
           >
             {!inStock ? "Out of stock" : added ? "Added ✓" : "Add to cart"}
           </button>
+          <a
+            href={whatsAppLink(whatsAppMessage)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 rounded-full border border-rust/30 px-4 py-2 text-center text-xs font-semibold text-rust transition-colors duration-200 hover:border-rust/60"
+          >
+            WhatsApp
+          </a>
         </div>
       </div>
-    </Link>
+    </div>
   );
 }
 
@@ -137,23 +184,6 @@ export default function ProductsPage() {
             Click any cylinder to learn more.
           </p>
         </div>
-
-        {/* Decorative logo mark, sits in the gap below the header text */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none mx-auto -mt-4 mb-8 h-40 w-40 opacity-20 sm:h-56 sm:w-56"
-          style={{
-            backgroundColor: "var(--color-rust)",
-            WebkitMaskImage: `url(${logoIcon})`,
-            maskImage: `url(${logoIcon})`,
-            WebkitMaskSize: "contain",
-            maskSize: "contain",
-            WebkitMaskRepeat: "no-repeat",
-            maskRepeat: "no-repeat",
-            WebkitMaskPosition: "center",
-            maskPosition: "center",
-          }}
-        />
 
         {loading && (
           <p className="text-charcoal/60">Loading cylinders…</p>

@@ -99,6 +99,7 @@ export default function QuickOrder() {
   const [phone, setPhone] = useState(user?.mobile ?? "");
   const [address, setAddress] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
+  const [whatsappConsent, setWhatsappConsent] = useState(false);
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
@@ -211,6 +212,16 @@ export default function QuickOrder() {
         order_guid: crypto.randomUUID(),
       });
 
+      if (whatsappConsent) {
+        postJson("/api/subscribers", {
+          subscriber_name: fullName,
+          subscriber_whatsapp: phone,
+          subscriber_suburb: fulfillment === "delivery" ? suburb : null,
+          subscriber_consent: true,
+          subscriber_consent_source: fulfillment === "delivery" ? "checkout_delivery" : "checkout_pickup",
+        }).catch((err) => console.error("Failed to record WhatsApp opt-in", err));
+      }
+
       setPlacedOrder({
         orderId: order.order_id,
         items: cartItems,
@@ -236,6 +247,7 @@ export default function QuickOrder() {
     setPickupLocation("");
     setAddress("");
     setPaymentMethod("");
+    setWhatsappConsent(false);
     setErrors({});
   }
 
@@ -269,6 +281,7 @@ export default function QuickOrder() {
             <>
               <p className="font-semibold text-charcoal">Collecting from</p>
               <p className="mt-1 text-charcoal/70">{point?.name}</p>
+              {point?.address && <p className="mt-0.5 text-xs text-charcoal/50">{point.address}</p>}
             </>
           )}
           <div className="mt-4 space-y-1 border-t border-charcoal/10 pt-4">
@@ -413,6 +426,7 @@ export default function QuickOrder() {
                     }`}
                   >
                     <span className="text-base font-semibold">{point.name}</span>
+                    <span className={`mt-0.5 block text-xs ${selected ? "text-cream/70" : "text-charcoal/45"}`}>{point.address}</span>
                     <TradingHours point={point} variant={selected ? "dark" : "light"} className="mt-1.5" />
                   </button>
                 );
@@ -468,7 +482,15 @@ export default function QuickOrder() {
             </div>
           ) : (
             <div className="rounded-2xl bg-cream p-4 text-sm text-charcoal/70">
-              Collecting from <span className="font-semibold text-charcoal">{COLLECTION_POINTS.find((p) => p.id === pickupLocation)?.name}</span>.
+              {(() => {
+                const point = COLLECTION_POINTS.find((p) => p.id === pickupLocation);
+                return (
+                  <>
+                    Collecting from <span className="font-semibold text-charcoal">{point?.name}</span>.
+                    {point?.address && <span className="block mt-1 text-xs text-charcoal/50">{point.address}</span>}
+                  </>
+                );
+              })()}
             </div>
           )}
 
@@ -515,6 +537,18 @@ export default function QuickOrder() {
             </div>
             {errors.paymentMethod && <p className="mt-1.5 text-sm text-red-600">{errors.paymentMethod}</p>}
           </div>
+
+          <label className="flex items-start gap-3 rounded-2xl border-2 border-charcoal/15 p-4">
+            <input
+              type="checkbox"
+              checked={whatsappConsent}
+              onChange={(e) => setWhatsappConsent(e.target.checked)}
+              className="mt-0.5 h-5 w-5 rounded border-charcoal/30 text-rust focus:ring-rust"
+            />
+            <span className="text-sm text-charcoal/70 leading-relaxed">
+              Send me WhatsApp updates and offers from Mashesha. You can opt out any time.
+            </span>
+          </label>
 
           <div className="rounded-2xl bg-cream p-4 text-sm">
             <div className="flex justify-between text-charcoal/65">

@@ -102,6 +102,7 @@ export default function CheckoutPage() {
   const [createAccount, setCreateAccount] = useState(false);
   const [accountPassword, setAccountPassword] = useState("");
   const [accountConfirm, setAccountConfirm] = useState("");
+  const [whatsappConsent, setWhatsappConsent] = useState(false);
   const [placedOrder, setPlacedOrder] = useState<{ items: typeof cartItems; total: number; orderId: number; fulfillment: Fulfillment; freeShipping: boolean; pickupLocation: string } | null>(null);
 
   const selectedArea = activeAreas.find((a) => a.delivery_area_name === form.city);
@@ -222,6 +223,16 @@ export default function CheckoutPage() {
         paystack_reference: reference,
       });
 
+      if (whatsappConsent) {
+        postJson("/api/subscribers", {
+          subscriber_name: form.fullName,
+          subscriber_whatsapp: form.phone,
+          subscriber_suburb: form.fulfillment === "delivery" ? form.city : null,
+          subscriber_consent: true,
+          subscriber_consent_source: form.fulfillment === "delivery" ? "checkout_delivery" : "checkout_pickup",
+        }).catch((err) => console.error("Failed to record WhatsApp opt-in", err));
+      }
+
       setPlacedOrder({ items: cartItems, total, orderId: order.order_id, fulfillment: form.fulfillment, freeShipping, pickupLocation: form.pickupLocation });
       clearCart();
       setStep("success");
@@ -340,14 +351,14 @@ export default function CheckoutPage() {
                   return point ? (
                     <>
                       <p className="mt-0.5 text-sm text-cream/80">{point.name}</p>
+                      <p className="mt-0.5 text-xs text-cream/60">{point.address}</p>
                       <TradingHours point={point} variant="dark" className="mt-1.5" />
                     </>
                   ) : (
                     <p className="mt-0.5 text-sm text-cream/80">Store to be confirmed</p>
                   );
                 })()}
-                <p className="mt-2 text-xs text-cream/60">We'll send the exact address by SMS or WhatsApp.</p>
-                <p className="mt-1 text-sm text-cream/80">{form.phone}</p>
+                <p className="mt-2 text-xs text-cream/60">We'll message you on {form.phone} when it's ready to collect.</p>
               </div>
             </div>
           )}
@@ -635,6 +646,7 @@ export default function CheckoutPage() {
                           }`}
                         >
                           <span className="text-sm font-semibold">{point.name}</span>
+                          <span className={`mt-0.5 block text-xs ${selected ? "text-cream/70" : "text-charcoal/45"}`}>{point.address}</span>
                           <TradingHours point={point} variant={selected ? "dark" : "light"} className="mt-1.5" />
                         </button>
                       );
@@ -642,13 +654,26 @@ export default function CheckoutPage() {
                   </div>
                   {errors.pickupLocation && <p className="mt-1.5 text-xs text-red-500">{errors.pickupLocation}</p>}
                   <p className="mt-3 text-sm text-charcoal/65">
-                    We'll message you the exact address and collection time once your order is ready. No delivery fee.
+                    We'll message you once your order is ready to collect. No delivery fee.
                   </p>
                 </div>
               )}
             </div>
 
             <PaymentOptionsCard />
+
+            <label className="flex items-start gap-3 rounded-xl border border-charcoal/10 bg-white p-4">
+              <input
+                type="checkbox"
+                checked={whatsappConsent}
+                onChange={(e) => setWhatsappConsent(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded border-charcoal/30 text-rust focus:ring-rust"
+              />
+              <span className="text-xs text-charcoal/65 leading-relaxed">
+                Yes, send me WhatsApp updates and offers from Mashesha. You can opt out at
+                any time by replying "STOP" to any message, or by contacting us.
+              </span>
+            </label>
 
             {/* Place order button */}
             <button

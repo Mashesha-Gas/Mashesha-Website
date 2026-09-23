@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import SEO from "../components/SEO";
 import orangePatternedBackground from "../components/orange-patterned-background.webp";
 import logoIcon from "../components/logo-icon.webp";
@@ -9,6 +10,17 @@ import { CollectionOptionsCard } from "../components/CollectionOptions";
 import { whatsAppLink } from "../utils/whatsapp";
 
 export default function HomePage() {
+  // Same-page anchor clicks (the hero button) already scroll natively.
+  // This covers arriving from another page via a link like "/#order" —
+  // React Router's client-side navigation doesn't trigger the browser's
+  // usual scroll-to-hash behaviour, since no real page load happens.
+  const location = useLocation();
+  useEffect(() => {
+    if (!location.hash) return;
+    const el = document.querySelector(location.hash);
+    if (el) el.scrollIntoView({ behavior: "smooth" });
+  }, [location.hash]);
+
   return (
     <main>
       <SEO

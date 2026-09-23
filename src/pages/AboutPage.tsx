@@ -63,16 +63,23 @@ export default function AboutPage() {
                 Started in Joburg. Staying in Joburg.
               </h2>
               <p className="mt-6 text-charcoal/70 leading-relaxed">
-                Mashesha started because we saw a gap. Too many households were
-                running out of gas with no easy way to get a refill fast. Lugging
-                heavy cylinders to a garage or waiting days for delivery wasn't
-                good enough.
+                Mashesha has called Jeppestown home since 1963. For decades, this
+                inner-city base has kept nearby households and businesses stocked
+                with gas — long before "delivery" was a buzzword, it was just how
+                we did business.
               </p>
               <p className="mt-4 text-charcoal/70 leading-relaxed">
-                We built a delivery-first gas service that puts the customer at
-                the centre. Order by phone, WhatsApp, or online before noon, and
-                your gas arrives at your door the same day — anywhere in our
-                areas of operation.
+                After some years away, we relaunched with the same name, the same
+                Jeppestown roots, and a team that still believes gas shouldn't be
+                hard to get. We're back doing what we've always done — serving the
+                inner city first, with real people answering the phone and driving
+                the deliveries.
+              </p>
+              <p className="mt-4 text-charcoal/70 leading-relaxed">
+                Order by phone, WhatsApp, or online before noon, and your gas
+                arrives at your door the same day, in our areas of operation. Pay
+                by card on delivery (powered by Yoco), or collect it yourself from
+                our Jules Street or Warrior Paint, Norwood stores instead.
               </p>
             </div>
             <div>

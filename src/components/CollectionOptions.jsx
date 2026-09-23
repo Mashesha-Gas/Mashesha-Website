@@ -1,8 +1,8 @@
 import { COLLECTION_POINTS } from "../constants";
 
-// Street addresses aren't published on the site yet — those get confirmed
-// after checkout. Trading hours are shown since customers need them to plan
-// a collection.
+export function mapLink(point) {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(point.address)}`;
+}
 
 export function TradingHours({ point, variant = "light", className = "" }) {
   const dtClass = variant === "dark" ? "text-cream/70" : "text-charcoal/55";
@@ -37,7 +37,6 @@ export function CollectionOptionsCard({ className = "" }) {
       <p className="text-xs font-semibold uppercase tracking-widest text-rust">Collect in store</p>
       <p className="mt-3 text-sm text-charcoal/60">
         Skip delivery and pick up your order instead — choose whichever location suits you.
-        We'll confirm the address and collection time when we get in touch about your order.
       </p>
       <div className="mt-4 space-y-5">
         {COLLECTION_POINTS.map((point) => (
@@ -47,7 +46,16 @@ export function CollectionOptionsCard({ className = "" }) {
             </div>
             <div className="flex-1">
               <p className="text-sm font-semibold text-charcoal">{point.name}</p>
-              <TradingHours point={point} className="mt-1.5" />
+              <p className="mt-0.5 text-xs text-charcoal/50">{point.address}</p>
+              <TradingHours point={point} className="mt-2" />
+              <a
+                href={mapLink(point)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-rust hover:underline"
+              >
+                Get directions →
+              </a>
             </div>
           </div>
         ))}
