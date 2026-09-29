@@ -13,7 +13,7 @@ const SCHEMA = {
   description:
     "Mashesha delivers refilled LPG gas cylinders for cooking and gas heaters straight to your door across Johannesburg.",
   image: "https://mashesha.co.za/og-image.jpg",
-  telephone: "+27111234567",
+  telephone: "+27637973195",
   email: "info@mashesha.co.za",
   url: "https://mashesha.co.za/",
   priceRange: "R",

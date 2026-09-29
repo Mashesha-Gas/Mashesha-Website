@@ -35,7 +35,7 @@ function Footer() {
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest text-cream/50">Contact</p>
             <ul className="mt-3 space-y-1.5 text-sm text-cream/80">
-              <li><a href="tel:+27111234567" className="hover:text-cream transition-colors duration-200">+27 11 123 4567</a></li>
+              <li><a href="tel:+27637973195" className="hover:text-cream transition-colors duration-200">+27 63 797 3195</a></li>
               <li><a href="mailto:info@mashesha.co.za" className="hover:text-cream transition-colors duration-200">info@mashesha.co.za</a></li>
               <li>Jeppestown, Johannesburg</li>
             </ul>

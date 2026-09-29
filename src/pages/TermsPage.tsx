@@ -74,7 +74,7 @@ export default function TermsPage() {
             <a href="mailto:info@mashesha.co.za" className="text-rust hover:text-rust-dark">
               info@mashesha.co.za
             </a>{" "}
-            or +27 11 123 4567.
+            or +27 63 797 3195.
           </p>
         </div>
       </div>

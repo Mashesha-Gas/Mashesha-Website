@@ -231,7 +231,7 @@ function ProductDetailPage() {
                   Not sure if the {label} is right for you? Call us or send a WhatsApp.
                   We'll recommend the best size for your situation.
                 </p>
-                <a href="tel:+27111234567" className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-cream transition-colors duration-200 hover:text-cream/70">
+                <a href="tel:+27637973195" className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-cream transition-colors duration-200 hover:text-cream/70">
                   Call us now →
                 </a>
               </div>

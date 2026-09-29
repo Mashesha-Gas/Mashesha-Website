@@ -139,8 +139,8 @@ export default function ContactPage() {
           {/* Contact details */}
           <div className="space-y-8">
             {[
-              { label: "Phone", value: "+27 11 123 4567", href: "tel:+27111234567" },
-              { label: "WhatsApp", value: "Chat with us on WhatsApp", href: "https://wa.me/27111234567" },
+              { label: "Phone", value: "+27 63 797 3195", href: "tel:+27637973195" },
+              { label: "WhatsApp", value: "Chat with us on WhatsApp", href: "https://wa.me/27637973195" },
               { label: "Email", value: "info@mashesha.co.za", href: "mailto:info@mashesha.co.za" },
             ].map((item) => (
               <div key={item.label} className="border-t border-charcoal/10 pt-6">
@@ -319,7 +319,7 @@ export default function ContactPage() {
                     type="checkbox"
                     checked={consent}
                     onChange={(e) => setConsent(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 rounded border-cream/50 text-rust focus:ring-rust"
+                    className="mt-0.5 h-4 w-4 rounded border-cream/50 accent-ink focus:ring-rust"
                   />
                   <span className="text-xs text-cream/80 leading-relaxed">
                     Yes, send me WhatsApp updates and offers from Mashesha. You can opt out

@@ -224,7 +224,7 @@ export default function ProductsPage() {
               Contact us
             </Link>
             <a
-              href="tel:+27111234567"
+              href="tel:+27637973195"
               className="inline-flex items-center justify-center rounded-full border border-cream/30 px-6 py-3 text-sm font-semibold text-cream transition-colors duration-200 hover:border-cream/70"
             >
               Call us
