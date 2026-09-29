@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
 import CylinderIcon from "../components/CylinderIcon";
-import { useInventoryItem, useInventoryList, resolveImageUrl, CYLINDER_TYPE } from "../hooks/useInventory";
+import { useInventoryItem, useInventoryList, resolveImageUrl, activeSalePrice, effectivePrice, effectiveDeposit, CYLINDER_TYPE } from "../hooks/useInventory";
 import { useCart } from "../context/CartContext";
 import SEO from "../components/SEO";
 import { PaymentOptionsCard } from "../components/PaymentBadges";
@@ -10,8 +10,8 @@ import { whatsAppLink } from "../utils/whatsapp";
 
 function formatPrice(item) {
   const price = Number(item.inventory_price);
-  const sale = item.inventory_sale != null ? Number(item.inventory_sale) : null;
-  if (sale != null && sale < price) {
+  const sale = activeSalePrice(item);
+  if (sale != null) {
     return { current: `R ${sale.toLocaleString()}`, was: `R ${price.toLocaleString()}` };
   }
   return { current: `R ${price.toLocaleString()}`, was: null };
@@ -58,7 +58,7 @@ function ProductDetailPage() {
     (i) => i.inventory_type === CYLINDER_TYPE && i.inventory_id !== product.inventory_id
   );
 
-  const deposit = Number(product.inventory_deposit) || 0;
+  const deposit = effectiveDeposit(product);
   const hasDeposit = deposit > 0;
 
   function handleAddToCart() {
@@ -111,7 +111,7 @@ function ProductDetailPage() {
               </span>
               <h1 className="font-display mt-3 text-6xl text-charcoal sm:text-7xl">{label}</h1>
               <p className="mt-2 text-xl font-semibold text-charcoal/60">
-                {purchaseType === "new" && hasDeposit ? `R ${(Number(product.inventory_sale ?? product.inventory_price) + deposit).toLocaleString()}` : price.current}
+                {purchaseType === "new" && hasDeposit ? `R ${(effectivePrice(product) + deposit).toLocaleString()}` : price.current}
                 {price.was && purchaseType !== "new" && <span className="ml-2 text-base font-medium text-charcoal/40 line-through">{price.was}</span>}
               </p>
               {purchaseType === "new" && hasDeposit && (

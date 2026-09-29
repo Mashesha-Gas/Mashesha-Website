@@ -64,12 +64,37 @@ export function resolveImageUrl(path) {
   return path ? `${API}/uploads/${path}` : null;
 }
 
+// The one rule for whether a (refill) discount is on: sale prices come only
+// from a live promotion on the terminal's Promotions page, which the API
+// adds as inventory_promo_price. It only counts when it's above zero and
+// below the normal price. Every price shown or charged on the site goes
+// through this, so display and cart can't disagree.
+export function activeSalePrice(item) {
+  const price = Number(item.inventory_price);
+  const promo = item.inventory_promo_price != null && item.inventory_promo_price !== "" ? Number(item.inventory_promo_price) : NaN;
+  return promo > 0 && promo < price ? promo : null;
+}
+
+export function effectivePrice(item) {
+  return activeSalePrice(item) ?? Number(item.inventory_price);
+}
+
+// The cylinder price (inventory_deposit) charged on top of the refill price
+// for a new cylinder — lowered while a cylinder promotion from the
+// terminal's Promotions page is live (the API adds that as
+// inventory_cylinder_promo_price).
+export function effectiveDeposit(item) {
+  const deposit = Number(item.inventory_deposit) || 0;
+  const promo = item.inventory_cylinder_promo_price != null ? Number(item.inventory_cylinder_promo_price) : NaN;
+  return promo >= 0 && promo < deposit ? promo : deposit;
+}
+
 // Shows the sale price with the original struck through in text (via the
-// "(was R ...)" suffix) whenever a sale price is actually set and lower.
+// "(was R ...)" suffix) whenever a sale is actually on.
 export function formatPrice(item) {
   const price = Number(item.inventory_price);
-  const sale = item.inventory_sale != null ? Number(item.inventory_sale) : null;
-  if (sale != null && sale < price) {
+  const sale = activeSalePrice(item);
+  if (sale != null) {
     return `R ${sale.toLocaleString()} (was R ${price.toLocaleString()})`;
   }
   return `R ${price.toLocaleString()}`;

@@ -1,4 +1,5 @@
 import { createContext, useContext, useState } from "react";
+import { effectivePrice, effectiveDeposit } from "../hooks/useInventory";
 
 // CartContext holds the items in the user's cart and the functions to change them.
 // Any component in the app can call useCart() to read or change cart state.
@@ -38,11 +39,8 @@ export function CartProvider({ children }) {
   // quick-order wizard, where "Added to cart" plus a "View cart" link would
   // just invite someone away from the step they're on.
   function addItem(product, qty = 1, { purchaseType = "refill", silent = false } = {}) {
-    const price =
-      product.inventory_sale != null && Number(product.inventory_sale) < Number(product.inventory_price)
-        ? Number(product.inventory_sale)
-        : Number(product.inventory_price);
-    const deposit = purchaseType === "new" ? Number(product.inventory_deposit) || 0 : 0;
+    const price = effectivePrice(product);
+    const deposit = purchaseType === "new" ? effectiveDeposit(product) : 0;
     const size = product.inventory_size || product.inventory_name;
     const id = product.inventory_id;
     const key = lineKey(id, purchaseType);

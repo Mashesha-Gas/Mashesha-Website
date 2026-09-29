@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useInventoryList, resolveImageUrl, CYLINDER_TYPE } from "../hooks/useInventory";
+import { useInventoryList, resolveImageUrl, formatPrice, effectivePrice, effectiveDeposit, CYLINDER_TYPE } from "../hooks/useInventory";
 import { useCart } from "../context/CartContext";
 import SEO from "../components/SEO";
 import { whatsAppLink } from "../utils/whatsapp";
@@ -11,21 +11,11 @@ interface InventoryRow {
   inventory_description: string | null;
   inventory_size: string | null;
   inventory_price: number | string | null;
-  inventory_sale: number | string | null;
   inventory_deposit: number | string | null;
   inventory_quantity: number | string | null;
   inventory_type: string | null;
   inventory_brand: string | null;
   inventory_thumbnail_path: string | null;
-}
-
-function formatPrice(item: InventoryRow) {
-  const price = Number(item.inventory_price);
-  const sale = item.inventory_sale != null ? Number(item.inventory_sale) : null;
-  if (sale != null && sale < price) {
-    return `R ${sale.toLocaleString()} (was R ${price.toLocaleString()})`;
-  }
-  return `R ${price.toLocaleString()}`;
 }
 
 function ProductImage({ src, label }: { src: string | null; label: string }) {
@@ -63,7 +53,7 @@ function ProductCard({ item }: { item: InventoryRow }) {
   const [purchaseType, setPurchaseType] = useState<"refill" | "new">("refill");
   const label = item.inventory_size || item.inventory_name;
   const inStock = Number(item.inventory_quantity) > 0;
-  const deposit = Number(item.inventory_deposit) || 0;
+  const deposit = effectiveDeposit(item);
   const hasDeposit = deposit > 0;
 
   function handleAdd() {
@@ -91,7 +81,7 @@ function ProductCard({ item }: { item: InventoryRow }) {
           <span className="font-display text-4xl text-cream">{label}</span>
           <span className="mt-2 text-sm font-semibold text-cream">
             {purchaseType === "new" && hasDeposit
-              ? `R ${(Number(item.inventory_sale ?? item.inventory_price) + deposit).toLocaleString()}`
+              ? `R ${(effectivePrice(item) + deposit).toLocaleString()}`
               : formatPrice(item)}
           </span>
           {hasDeposit && (
