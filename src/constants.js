@@ -39,3 +39,8 @@ export const COLLECTION_POINTS = [
     ],
   },
 ];
+
+// Paying means leaving the site for Yoco's hosted checkout, so the data the
+// return page needs to show a receipt can't stay in memory — CheckoutPage
+// stashes it under this key and CheckoutCompletePage reads it back.
+export const CHECKOUT_STASH_KEY = "mashesha.checkout.pending";

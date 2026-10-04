@@ -3,15 +3,14 @@ import { Link } from "react-router-dom";
 import { useCart, lineKey } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { useDeliveryAreas } from "../hooks/useDeliveryAreas";
-import { PROVINCES, COLLECTION_POINTS, DELIVERY_FEE } from "../constants";
+import { PROVINCES, COLLECTION_POINTS, DELIVERY_FEE, CHECKOUT_STASH_KEY } from "../constants";
 import SEO from "../components/SEO";
 import { PaymentOptionsCard } from "../components/PaymentBadges";
 import { TradingHours } from "../components/CollectionOptions";
 
 const API = import.meta.env.VITE_API_URL;
-const PAYSTACK_PUBLIC_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
 
-type Step = "details" | "processing" | "success";
+type Step = "details" | "processing";
 
 type Fulfillment = "delivery" | "pickup";
 
@@ -93,7 +92,7 @@ function LockIcon() {
 
 export default function CheckoutPage() {
   const { user, establishSession } = useAuth();
-  const { items: cartItems, clearCart } = useCart();
+  const { items: cartItems } = useCart();
   const { activeAreas, loading: areasLoading } = useDeliveryAreas();
   const [step, setStep] = useState<Step>("details");
   const [form, setForm] = useState<FormState>(() => buildInitialForm(user));
@@ -103,17 +102,14 @@ export default function CheckoutPage() {
   const [accountPassword, setAccountPassword] = useState("");
   const [accountConfirm, setAccountConfirm] = useState("");
   const [whatsappConsent, setWhatsappConsent] = useState(false);
-  const [placedOrder, setPlacedOrder] = useState<{ items: typeof cartItems; total: number; orderId: number; fulfillment: Fulfillment; freeShipping: boolean; pickupLocation: string } | null>(null);
 
-  // Paystack's inline widget is only needed here, so it's loaded on demand
-  // instead of blocking every page's first paint with a third-party script.
+  // Coming back from a cancelled Yoco checkout — nothing was charged and
+  // the cart is untouched, so the form just explains itself and waits.
   useEffect(() => {
-    if ((window as any).PaystackPop || document.getElementById("paystack-inline-script")) return;
-    const script = document.createElement("script");
-    script.id = "paystack-inline-script";
-    script.src = "https://js.paystack.co/v1/inline.js";
-    script.async = true;
-    document.body.appendChild(script);
+    if (new URLSearchParams(window.location.search).get("cancelled")) {
+      setSubmitError("Payment was cancelled. Your order was not placed and your cart is still here.");
+      window.history.replaceState({}, "", "/checkout");
+    }
   }, []);
 
   const selectedArea = activeAreas.find((a) => a.delivery_area_name === form.city);
@@ -189,95 +185,70 @@ export default function CheckoutPage() {
     return data.address_id;
   }
 
-  // Runs after Paystack's popup calls back with a reference. This does its
-  // own early verify+amount check purely for fast user feedback — the real
-  // enforcement happens server-side in POST /api/orders, which independently
-  // re-verifies paystack_reference with Paystack before it'll write anything
-  // to order_payment_reference, so a request that skips this flow entirely
-  // (e.g. hitting the API directly) still can't forge a paid order.
-  async function finalizeOrder(reference: string) {
+  // Unlike the Paystack popup this replaces, paying means leaving the site
+  // entirely for Yoco's own page — so everything that has to exist before
+  // the order can be written happens here, up front, and the order itself
+  // is written server-side by Yoco's webhook once the payment is confirmed.
+  // Nothing here decides what gets charged either: the API re-prices the
+  // cart and tells Yoco the amount, so the total shown below is only ever
+  // a display of what the server independently works out.
+  async function handlePlaceOrder(e: React.SyntheticEvent) {
+    e.preventDefault();
+    if (!validate()) return;
+    setSubmitError("");
     setStep("processing");
-    try {
-      const verifyRes = await fetch(`${API}/api/payments/verify`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ reference, email: form.email }),
-      });
-      const verifyData = await verifyRes.json().catch(() => ({}));
-      if (!verifyRes.ok || !verifyData.verified) {
-        throw new Error("We couldn't confirm your payment with Paystack. You have not been charged. Please try again.");
-      }
-      if (verifyData.currency !== "ZAR" || Math.abs(verifyData.amount - total) > 0.5) {
-        throw new Error("The confirmed payment amount didn't match your order. Please contact us before trying again.");
-      }
 
+    try {
       const email = await resolveCustomerEmail();
       const addressId = form.fulfillment === "delivery" ? await createOrderAddress() : null;
 
       const vendorIds = Array.from(
         new Set(cartItems.map((item: any) => item.vendorId).filter((v: unknown) => v != null))
       );
-      const now = new Date();
 
-      const order = await postJson("/api/orders", {
-        order_items_json: JSON.stringify(cartItems.map((item) => ({ inventory_id: item.id, qty: item.qty, purchaseType: item.purchaseType }))),
-        order_total: total,
-        order_date: now.toISOString().slice(0, 10),
-        order_time: now.toTimeString().slice(0, 8),
-        order_type: form.fulfillment === "delivery" ? 202 : 204,
-        order_payment_type: "card",
-        order_status: 301,
-        order_vendor_id: vendorIds.length === 1 ? vendorIds[0] : null,
+      const checkout = await postJson("/api/payments/checkout", {
+        items: cartItems.map((item) => ({ inventory_id: item.id, qty: item.qty, purchaseType: item.purchaseType })),
+        fulfillment: form.fulfillment,
         order_customer_email: email,
         order_address_id: addressId,
-        order_guid: crypto.randomUUID(),
-        paystack_reference: reference,
+        order_vendor_id: vendorIds.length === 1 ? vendorIds[0] : null,
+        // Recorded only if the payment goes through, same as before.
+        subscriber: whatsappConsent
+          ? {
+              subscriber_name: form.fullName,
+              subscriber_whatsapp: form.phone,
+              subscriber_suburb: form.fulfillment === "delivery" ? form.city : null,
+              subscriber_consent: true,
+              subscriber_consent_source: form.fulfillment === "delivery" ? "checkout_delivery" : "checkout_pickup",
+            }
+          : null,
       });
 
-      if (whatsappConsent) {
-        postJson("/api/subscribers", {
-          subscriber_name: form.fullName,
-          subscriber_whatsapp: form.phone,
-          subscriber_suburb: form.fulfillment === "delivery" ? form.city : null,
-          subscriber_consent: true,
-          subscriber_consent_source: form.fulfillment === "delivery" ? "checkout_delivery" : "checkout_pickup",
-        }).catch((err) => console.error("Failed to record WhatsApp opt-in", err));
-      }
+      // The receipt the customer comes back to is built from this — the
+      // page is about to be torn down, and a guest has no way to read their
+      // own order back out of the API afterwards.
+      try {
+        sessionStorage.setItem(CHECKOUT_STASH_KEY, JSON.stringify({
+          reference: checkout.reference,
+          items: cartItems,
+          total: checkout.amount,
+          fulfillment: form.fulfillment,
+          freeShipping,
+          pickupLocation: form.pickupLocation,
+          fullName: form.fullName,
+          phone: form.phone,
+          address: {
+            line1: form.addressLine1, line2: form.addressLine2,
+            city: form.city, province: form.province, postcode: form.postcode,
+          },
+        }));
+      } catch { /* a receipt is nice to have; never block payment over it */ }
 
-      setPlacedOrder({ items: cartItems, total, orderId: order.order_id, fulfillment: form.fulfillment, freeShipping, pickupLocation: form.pickupLocation });
-      clearCart();
-      setStep("success");
+      window.location.href = checkout.redirectUrl;
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : "Couldn't place your order. Please try again.");
+      setSubmitError(err instanceof Error ? err.message : "Couldn't start your payment. Please try again.");
       setStep("details");
     }
-  }
-
-  function handlePlaceOrder(e: React.SyntheticEvent) {
-    e.preventDefault();
-    if (!validate()) return;
-    setSubmitError("");
-
-    const paystack = (window as any).PaystackPop;
-    if (!paystack) {
-      setSubmitError("Payments are still loading. Please try again in a moment.");
-      return;
-    }
-
-    const handler = paystack.setup({
-      key: PAYSTACK_PUBLIC_KEY,
-      email: form.email,
-      amount: Math.round(total * 100),
-      currency: "ZAR",
-      ref: crypto.randomUUID(),
-      callback: (response: { reference: string }) => {
-        finalizeOrder(response.reference);
-      },
-      onClose: () => {
-        setSubmitError("Payment was cancelled. Your order was not placed.");
-      },
-    });
-    handler.openIframe();
   }
 
   const inputClass = (field: string) =>
@@ -291,118 +262,11 @@ export default function CheckoutPage() {
   if (step === "processing") {
     return (
       <main className="bg-cream min-h-screen flex items-center justify-center pt-20">
-        <SEO title="Placing Your Order… | Mashesha" description="Placing your gas cylinder order." path="/checkout" noIndex />
+        <SEO title="Taking You to Payment… | Mashesha" description="Redirecting to secure payment." path="/checkout" noIndex />
         <div className="text-center space-y-5">
           <div className="mx-auto h-14 w-14 rounded-full border-4 border-rust border-t-transparent animate-spin" />
-          <p className="font-display text-2xl text-charcoal">Placing your order…</p>
-          <p className="text-sm text-charcoal/50">Please don't close this page.</p>
-        </div>
-      </main>
-    );
-  }
-
-  // ── Success screen ──────────────────────────────────────────────────────────
-  if (step === "success" && placedOrder) {
-    return (
-      <main className="bg-cream min-h-screen flex items-center justify-center pt-20 px-5 pb-12">
-        <SEO title="Order Placed | Mashesha" description="Your gas cylinder order has been placed." path="/checkout" noIndex />
-        <div className="w-full max-w-md text-center space-y-5">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-rust">
-            <svg viewBox="0 0 24 24" className="h-8 w-8 text-cream" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <h1 className="font-display text-4xl text-charcoal">Order placed!</h1>
-          <p className="text-charcoal/65 leading-relaxed">
-            Thanks, {form.fullName.split(" ")[0]}. Order #{placedOrder.orderId}. We'll confirm your delivery by SMS or WhatsApp shortly.
-          </p>
-
-          {/* Delivery / pickup details */}
-          {placedOrder.fulfillment === "delivery" ? (
-            <div className="rounded-2xl bg-rust p-5 text-left space-y-3">
-              <div className="flex items-start gap-4">
-                <svg viewBox="0 0 24 24" className="h-5 w-5 flex-shrink-0 text-cream mt-0.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M12 6v6l4 2" />
-                </svg>
-                <div>
-                  <p className="text-sm font-semibold text-cream">Estimated delivery</p>
-                  <p className="mt-0.5 text-sm text-cream/80">
-                    Today between <span className="font-semibold text-cream">2 – 4 hours</span> from now.
-                    Orders placed after noon are delivered the following morning.
-                  </p>
-                </div>
-              </div>
-              <div className="border-t border-cream/20 pt-3">
-                <p className="text-sm font-semibold text-cream">Delivering to</p>
-                <p className="mt-0.5 text-sm text-cream/80">
-                  {form.addressLine1}{form.addressLine2 ? `, ${form.addressLine2}` : ""}, {form.city}, {form.province} {form.postcode}
-                </p>
-                <p className="mt-1 text-sm text-cream/80">{form.phone}</p>
-              </div>
-            </div>
-          ) : (
-            <div className="rounded-2xl bg-rust p-5 text-left space-y-3">
-              <div className="flex items-start gap-4">
-                <svg viewBox="0 0 24 24" className="h-5 w-5 flex-shrink-0 text-cream mt-0.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M12 6v6l4 2" />
-                </svg>
-                <div>
-                  <p className="text-sm font-semibold text-cream">Ready for collection</p>
-                  <p className="mt-0.5 text-sm text-cream/80">
-                    Today within <span className="font-semibold text-cream">2 hours</span>. We'll message you when it's ready.
-                  </p>
-                </div>
-              </div>
-              <div className="border-t border-cream/20 pt-3">
-                <p className="text-sm font-semibold text-cream">Collect from</p>
-                {(() => {
-                  const point = COLLECTION_POINTS.find((p) => p.id === placedOrder.pickupLocation);
-                  return point ? (
-                    <>
-                      <p className="mt-0.5 text-sm text-cream/80">{point.name}</p>
-                      <p className="mt-0.5 text-xs text-cream/60">{point.address}</p>
-                      <TradingHours point={point} variant="dark" className="mt-1.5" />
-                    </>
-                  ) : (
-                    <p className="mt-0.5 text-sm text-cream/80">Store to be confirmed</p>
-                  );
-                })()}
-                <p className="mt-2 text-xs text-cream/60">We'll message you on {form.phone} when it's ready to collect.</p>
-              </div>
-            </div>
-          )}
-
-          <div className="rounded-2xl border border-charcoal/10 bg-white p-6 text-left space-y-3 text-sm">
-            {placedOrder.items.map((item) => (
-              <div key={lineKey(item.id, item.purchaseType)} className="flex justify-between text-charcoal/65">
-                <span>{item.size} × {item.qty}{item.purchaseType === "new" ? " (new)" : ""}</span>
-                <span>R {((item.price + (item.deposit || 0)) * item.qty).toLocaleString()}</span>
-              </div>
-            ))}
-            <div className="flex justify-between text-charcoal/65">
-              <span>Delivery fee</span>
-              <span>
-                {placedOrder.fulfillment !== "delivery" ? "-" : placedOrder.freeShipping ? "Free" : `R ${DELIVERY_FEE}`}
-              </span>
-            </div>
-            <div className="border-t border-charcoal/10 pt-3 flex justify-between font-semibold text-charcoal">
-              <span>Total paid</span>
-              <span>R {placedOrder.total.toLocaleString()}</span>
-            </div>
-          </div>
-          <div className="flex flex-col gap-3 pt-2">
-            <Link
-              to="/"
-              className="inline-flex items-center justify-center rounded-full bg-rust px-6 py-3 text-sm font-semibold text-cream transition-colors duration-200 hover:bg-rust-dark"
-            >
-              Back to home
-            </Link>
-            <Link to="/profile" className="text-sm text-charcoal/50 hover:text-rust transition-colors duration-200">
-              View order history
-            </Link>
-          </div>
+          <p className="font-display text-2xl text-charcoal">Taking you to payment…</p>
+          <p className="text-sm text-charcoal/50">You'll finish paying on Yoco's secure page, then come straight back.</p>
         </div>
       </main>
     );
@@ -689,15 +553,16 @@ export default function CheckoutPage() {
             {/* Place order button */}
             <button
               type="submit"
-              className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-rust py-4 text-sm font-semibold text-cream transition-colors duration-200 hover:bg-rust-dark"
+              disabled={step === "processing"}
+              className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-rust py-4 text-sm font-semibold text-cream transition-colors duration-200 hover:bg-rust-dark disabled:opacity-60"
             >
               <LockIcon />
-              Pay R {total.toLocaleString()} with Paystack
+              Pay R {total.toLocaleString()} with Yoco
             </button>
 
             <p className="text-center text-xs text-charcoal/40 flex items-center justify-center gap-1.5">
               <LockIcon />
-              Secure payment powered by Paystack. Your card details never touch our servers.
+              Secure payment powered by Yoco. You'll pay on Yoco's own page — your card details never touch our servers.
             </p>
             <p className="text-center text-xs text-charcoal/40">
               Prefer card on delivery or a payment link instead? Let us know via WhatsApp or phone after checking out.

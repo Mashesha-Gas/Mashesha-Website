@@ -1,7 +1,7 @@
-// Yoco doesn't have a checkout integration wired up yet — this is purely
-// informational branding so customers know card-on-delivery and payment
-// links are on the way / available on request. See CheckoutPage for the
-// live payment flow, which still runs on Paystack.
+// Card payments now genuinely run on Yoco — CheckoutPage sends the customer
+// to a Yoco-hosted checkout. The card-on-delivery and payment-link options
+// described below are the offline alternatives staff arrange by hand; they
+// aren't wired to anything here.
 
 function VisaMark({ className = "" }) {
   return (

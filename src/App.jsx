@@ -17,6 +17,7 @@ const AboutPage = lazy(() => import("./pages/AboutPage"));
 const ContactPage = lazy(() => import("./pages/ContactPage"));
 const CartPage = lazy(() => import("./pages/CartPage"));
 const CheckoutPage = lazy(() => import("./pages/CheckoutPage"));
+const CheckoutCompletePage = lazy(() => import("./pages/CheckoutCompletePage"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const AuthPage = lazy(() => import("./pages/AuthPage"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
@@ -53,6 +54,10 @@ function App() {
           <Route path="/locations" element={<Navigate to="/" replace />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
+          {/* Where Yoco returns the customer after payment. Deliberately
+              public and unguarded — the page confirms nothing itself, it
+              polls the API until the webhook has settled the payment. */}
+          <Route path="/checkout/complete" element={<CheckoutCompletePage />} />
           <Route path="/login" element={<AuthPage />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/terms" element={<TermsPage />} />
