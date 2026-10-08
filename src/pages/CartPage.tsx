@@ -54,7 +54,7 @@ export default function CartPage() {
                           New cylinder{item.deposit > 0 ? ` · R ${item.deposit.toLocaleString()} deposit (refundable)` : ""}
                         </p>
                       ) : (
-                        <p className="mt-1 text-sm text-rust">{item.tagline || "Refill / exchange"}</p>
+                        <p className="mt-1 text-sm text-rust">{item.tagline || "Exchange"}</p>
                       )}
                     </div>
                     <div className="flex items-center gap-6">

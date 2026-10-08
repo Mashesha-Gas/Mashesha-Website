@@ -4,7 +4,8 @@ import { useCart, lineKey } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { useDeliveryAreas } from "../hooks/useDeliveryAreas";
 import { useInventoryList, resolveImageUrl, formatPrice, CYLINDER_TYPE } from "../hooks/useInventory";
-import { COLLECTION_POINTS, DELIVERY_FEE } from "../constants";
+import { DELIVERY_FEE } from "../constants";
+import { useCollectionPoints } from "../hooks/useCollectionPoints";
 import { YocoMark, CardNetworkIcons } from "./PaymentBadges";
 import { TradingHours } from "./CollectionOptions";
 
@@ -85,6 +86,7 @@ function QtyStepper({ qty, onIncrease, onDecrease }) {
 }
 
 export default function QuickOrder() {
+  const COLLECTION_POINTS = useCollectionPoints();
   const { user } = useAuth();
   const { items: cartItems, addItem, increment, decrement, removeItem, clearCart } = useCart();
   const { activeAreas, loading: areasLoading } = useDeliveryAreas();

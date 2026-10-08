@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import SEO from "../components/SEO";
 import { useDeliveryAreas } from "../hooks/useDeliveryAreas";
 import { useInventoryList, CYLINDER_TYPE } from "../hooks/useInventory";
-import { COLLECTION_POINTS } from "../constants";
+import { useCollectionPoints } from "../hooks/useCollectionPoints";
 import { TradingHours, mapLink } from "../components/CollectionOptions";
 import { whatsAppLink } from "../utils/whatsapp";
 import { MASHESHA_VCARD_URL } from "../utils/saveContact";
@@ -40,6 +40,7 @@ const EMPTY_FORM: FormState = {
 };
 
 export default function ContactPage() {
+  const COLLECTION_POINTS = useCollectionPoints();
   const { activeAreas } = useDeliveryAreas();
   const { items } = useInventoryList();
   const cylinderSizes = Array.from(

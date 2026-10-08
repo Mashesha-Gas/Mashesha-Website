@@ -63,7 +63,7 @@ function ProductCard({ item }: { item: InventoryRow }) {
   }
 
   const whatsAppMessage = `Hi Mashesha, I'd like to order: 1 x ${label} gas cylinder${
-    hasDeposit ? ` (${purchaseType === "new" ? "new cylinder" : "refill/exchange"})` : ""
+    hasDeposit ? ` (${purchaseType === "new" ? "new cylinder" : "exchange"})` : ""
   }.`;
 
   return (
@@ -86,7 +86,7 @@ function ProductCard({ item }: { item: InventoryRow }) {
           </span>
           {hasDeposit && (
             <span className="mt-1 text-xs text-cream/45">
-              {purchaseType === "new" ? `Includes R ${deposit.toLocaleString()} refundable deposit` : "Refill/exchange price — new cylinders include a refundable deposit"}
+              {purchaseType === "new" ? `Includes R ${deposit.toLocaleString()} refundable deposit` : "Exchange price — new cylinders include a refundable deposit"}
             </span>
           )}
           <p className="mt-3 text-sm text-cream/65 leading-relaxed flex-1">
@@ -112,7 +112,7 @@ function ProductCard({ item }: { item: InventoryRow }) {
                 purchaseType === "refill" ? "border-rust bg-rust text-cream" : "border-cream/20 text-cream/60"
               }`}
             >
-              Refill / exchange
+              Exchange
             </button>
             <button
               type="button"

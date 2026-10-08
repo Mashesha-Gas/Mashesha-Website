@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useCart, lineKey } from "../context/CartContext";
-import { COLLECTION_POINTS, DELIVERY_FEE, CHECKOUT_STASH_KEY } from "../constants";
+import { DELIVERY_FEE, CHECKOUT_STASH_KEY } from "../constants";
+import { useCollectionPoints } from "../hooks/useCollectionPoints";
 import SEO from "../components/SEO";
 import { TradingHours } from "../components/CollectionOptions";
 
@@ -43,6 +44,7 @@ function readStash(reference: string | null): Stash | null {
 }
 
 export default function CheckoutCompletePage() {
+  const COLLECTION_POINTS = useCollectionPoints();
   const [params] = useSearchParams();
   const reference = params.get("ref");
   const declaredFailed = params.get("failed") === "1";

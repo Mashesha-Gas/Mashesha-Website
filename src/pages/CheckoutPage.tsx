@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import { useCart, lineKey } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { useDeliveryAreas } from "../hooks/useDeliveryAreas";
-import { PROVINCES, COLLECTION_POINTS, DELIVERY_FEE, CHECKOUT_STASH_KEY } from "../constants";
+import { PROVINCES, DELIVERY_FEE, CHECKOUT_STASH_KEY } from "../constants";
+import { useCollectionPoints } from "../hooks/useCollectionPoints";
 import SEO from "../components/SEO";
 import { PaymentOptionsCard } from "../components/PaymentBadges";
 import { TradingHours } from "../components/CollectionOptions";
@@ -91,6 +92,7 @@ function LockIcon() {
 }
 
 export default function CheckoutPage() {
+  const COLLECTION_POINTS = useCollectionPoints();
   const { user, establishSession } = useAuth();
   const { items: cartItems } = useCart();
   const { activeAreas, loading: areasLoading } = useDeliveryAreas();

@@ -1,4 +1,4 @@
-import { COLLECTION_POINTS } from "../constants";
+import { useCollectionPoints } from "../hooks/useCollectionPoints";
 
 export function mapLink(point) {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(point.address)}`;
@@ -15,6 +15,7 @@ export function TradingHours({ point, variant = "light", className = "" }) {
           <dd className={ddClass}>{row.time}</dd>
         </div>
       ))}
+      {point.note && <p className={`pt-1 text-xs ${dtClass}`}>{point.note}</p>}
     </dl>
   );
 }
@@ -32,6 +33,7 @@ function StoreIcon() {
 
 // Full explainer card — home page.
 export function CollectionOptionsCard({ className = "" }) {
+  const COLLECTION_POINTS = useCollectionPoints();
   return (
     <div className={`rounded-2xl border border-cream/15 bg-ink-light p-6 sm:p-7 ${className}`}>
       <p className="text-xs font-semibold uppercase tracking-widest text-cream/50">Collect in store</p>
@@ -67,6 +69,7 @@ export function CollectionOptionsCard({ className = "" }) {
 
 // Compact "we've also got collection" line — footer.
 export function CollectionBadgeLine({ className = "" }) {
+  const COLLECTION_POINTS = useCollectionPoints();
   return (
     <p className={`text-sm text-cream/80 ${className}`}>
       Or collect in store: {COLLECTION_POINTS.map((p) => p.name).join(" · ")}

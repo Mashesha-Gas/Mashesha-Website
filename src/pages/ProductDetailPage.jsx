@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
 import CylinderIcon from "../components/CylinderIcon";
-import { useInventoryItem, useInventoryList, resolveImageUrl, activeSalePrice, effectivePrice, effectiveDeposit, CYLINDER_TYPE } from "../hooks/useInventory";
+import { useInventoryItem, useInventoryList, isSoldOnline, resolveImageUrl, activeSalePrice, effectivePrice, effectiveDeposit, CYLINDER_TYPE } from "../hooks/useInventory";
 import { useCart } from "../context/CartContext";
 import SEO from "../components/SEO";
 import { PaymentOptionsCard } from "../components/PaymentBadges";
@@ -44,7 +44,7 @@ function ProductDetailPage() {
     );
   }
 
-  if (error || !product) {
+  if (error || !product || !isSoldOnline(product)) {
     return <Navigate to="/products" replace />;
   }
 
@@ -130,7 +130,7 @@ function ProductDetailPage() {
                         purchaseType === "refill" ? "border-rust bg-rust text-cream" : "border-charcoal/20 text-charcoal/60 hover:border-rust/50"
                       }`}
                     >
-                      Refill / exchange
+                      Exchange
                     </button>
                     <button
                       type="button"
@@ -183,7 +183,7 @@ function ProductDetailPage() {
                 <a
                   href={whatsAppLink(
                     `Hi Mashesha, I'd like to order: ${qty} x ${label} gas cylinder${qty > 1 ? "s" : ""}${
-                      hasDeposit ? ` (${purchaseType === "new" ? "new cylinder" : "refill/exchange"})` : ""
+                      hasDeposit ? ` (${purchaseType === "new" ? "new cylinder" : "exchange"})` : ""
                     }.`
                   )}
                   target="_blank"

@@ -22,8 +22,12 @@ function formatOrderDate(dateStr: string) {
 
 function itemsLabel(order: Order, labelById: Record<number, string>) {
   try {
-    const items: { inventory_id: number; qty: number }[] = JSON.parse(order.order_items_json || "[]");
-    return items.map((it) => `${labelById[it.inventory_id] ?? `Item #${it.inventory_id}`} × ${it.qty}`).join(", ");
+    const items: { inventory_id: number; qty: number; purchaseType?: string; gasKg?: number }[] = JSON.parse(order.order_items_json || "[]");
+    return items
+      .map((it) => it.purchaseType === "gas"
+        ? `Gas refill — ${it.gasKg} kg`
+        : `${labelById[it.inventory_id] ?? `Item #${it.inventory_id}`} × ${it.qty}`)
+      .join(", ");
   } catch {
     return "-";
   }
@@ -204,7 +208,7 @@ export default function ProfilePage() {
   const { user, logout, updateProfile } = useAuth();
   const navigate = useNavigate();
   const { orders, loading: ordersLoading } = useMyOrders(user?.token);
-  const { items: inventory } = useInventoryList();
+  const { items: inventory } = useInventoryList({ includeStoreOnly: true });
 
   const labelById = inventory.reduce<Record<number, string>>((map, item) => {
     map[item.inventory_id] = item.inventory_size || item.inventory_name;

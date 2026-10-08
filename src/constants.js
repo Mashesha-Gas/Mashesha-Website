@@ -15,8 +15,9 @@ export const PROVINCES = [
   "Western Cape",
 ];
 
-// Trading hours are the same every weekday at each location, so they're
-// pre-grouped here rather than listed day by day.
+// Fallback only: the stores and their trading hours now come from the API
+// (hooks/useCollectionPoints.js), kept current by each vendor in the
+// terminal. This list is what shows if the API can't be reached.
 export const COLLECTION_POINTS = [
   {
     id: "jules-street",
